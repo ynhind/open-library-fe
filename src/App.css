@@ -17,18 +17,9 @@
   --color-dark-Ex: #e5e3da;
   --color-light: #efeee8;
 
-  --color-primary: #7a6930;
+  --color-primary: rgb(189, 61, 38);
   --color-bg-1: #f5f5f5;
   --color-bg-2: #eaeaea;
-
-  --color-text-dark: #333333;
-  --color-text-light: #ffffff;
-
-  --color-border: #dcdcdc;
-  --color-shadow: rgba(0, 0, 0, 0.1);
-
-  --color-highlight: #007bff; /* Muted Blue for Links or Buttons */
-  --color-highlight-alt: #ff6f61; /* Soft Coral for Alerts or Warnings */
 
   --font-family-prata: "Prata", serif;
   --font-family-Jakarta: "Plus Jakarta Sans", sans-serif;
@@ -58,8 +49,7 @@ h6 {
   text-transform: capitalize;
 }
 h1 {
-  font-size: 73px;
-  line-height: 145px;
+  font-size: 56px;
   color: var(--color-black-Ex);
 }
 h2 {
@@ -105,7 +95,7 @@ small {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 20x 35px;
+  padding: 20px 35px;
   text-transform: uppercase;
   transition: var(--transition);
   position: relative;

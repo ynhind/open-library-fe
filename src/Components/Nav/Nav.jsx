@@ -9,6 +9,18 @@ import "./Nav.css";
 
 export default function Footer() {
   const [isNavLinksShowing, setIsNavLinksShowing] = useState(false);
+
+  if (innerWidth < 1024) {
+    window.addEventListener("scroll", () => {
+      document.querySelector(".nav-links").classList.add("navLinksHide");
+      setIsNavLinksShowing(false);
+    });
+    window.addEventListener("scroll", () => {
+      document
+        .querySelector("nav")
+        .classList.toggle("navShadow", window.scrollY > 0);
+    });
+  }
   return (
     <nav>
       <div className="container nav-container">
