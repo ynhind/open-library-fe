@@ -4,7 +4,11 @@ import Logo from "../../assets/logo.png";
 import { navLinks, navRight } from "../../Data/Data";
 import { VscMenu } from "react-icons/vsc";
 import { GrClose } from "react-icons/gr";
+import { useState } from "react";
+import "./Nav.css";
+
 export default function Footer() {
+  const [isNavLinksShowing, setIsNavLinksShowing] = useState(false);
   return (
     <nav>
       <div className="container nav-container">
@@ -13,11 +17,20 @@ export default function Footer() {
             <img src={Logo} alt="Logo" />
           </Link>
         }
-        <ul className="nav-links">
+        <ul
+          className={`nav-links ${
+            isNavLinksShowing ? "navLinksShow" : "navLinksHide"
+          }`}
+        >
           {navLinks.map(({ name, path }, index) => {
             return (
               <li key={index}>
-                <NavLink to={path}>{name}</NavLink>
+                <NavLink
+                  to={path}
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  {name}
+                </NavLink>
               </li>
             );
           })}
@@ -28,9 +41,11 @@ export default function Footer() {
               <item.icon />
             </Link>
           ))}
-          <button className="menu-button btn btn-border">
-            <VscMenu className="menu-icon" />
-            <GrClose className="close-icon" />
+          <button
+            className="menu-button "
+            onClick={() => setIsNavLinksShowing(!isNavLinksShowing)}
+          >
+            {!isNavLinksShowing ? <VscMenu /> : <GrClose />}
           </button>
         </div>
       </div>
