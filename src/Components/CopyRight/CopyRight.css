@@ -1,0 +1,31 @@
+.footer-copyright {
+  padding: 40px 0;
+  margin-top: 56px;
+  border-top: 1px solid var(--color-dark);
+}
+.copyright-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.footer-socials {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+.footer-socials a {
+  color: var(--color-dark);
+  font-size: 16px;
+  transition: var(--transition);
+}
+.footer-socials a:hover {
+  color: var(--color-primary);
+}
+@media (max-width: 600px) {
+  .copyright-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
