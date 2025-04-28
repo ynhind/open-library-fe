@@ -3,7 +3,10 @@ import Header from "../Components/Header/Header";
 import Brands from "../Components/Brands/Brands";
 import FeaturesBook from "../Components/FeaturesBook/FeaturesBook";
 import BestSellingBook from "../Components/BestSellingBook/BestSellingBook";
-import PopularBook from "../Components/PopularBook/PopularBook";
+import PopularBooks from "../Components/PopularBooks/PopularBooks";
+import Quote from "../Components/Quote/Quote";
+import LatestArticle from "../Components/LatestArticle/LatestArticle";
+// import Footer from "../Components/Footer/Footer";
 
 export default function Home() {
   return (
@@ -12,7 +15,10 @@ export default function Home() {
       <Brands />
       <FeaturesBook />
       <BestSellingBook />
-      <PopularBook />
+      <PopularBooks />
+      <Quote />
+      <LatestArticle />
+      {/* <Footer /> */}
     </>
   );
 }

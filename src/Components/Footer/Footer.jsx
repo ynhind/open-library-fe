@@ -1,6 +1,7 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import Logo from "../../assets/logo.png";
+import "./Footer.css";
+// import { FootersLinkData } from "../../Data/Data";
+import { Link } from "react-router-dom";
+
 export default function Footer() {
-  return <div>Footer</div>;
+  return <div></div>;
 }
