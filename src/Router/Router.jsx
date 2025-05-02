@@ -1,9 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "../Pages/Home";
+import Login from "../Pages/Login/Login";
+import Verification from "../Pages/Verification/Verification";
+import Register from "../Pages/Register/Register";
 import NotFound from "../Pages/NotFound/NotFound";
 import Nav from "../Components/Nav/Nav";
 import Footer from "../Components/Footer/Footer";
+
+import AdminDashboard from "../Pages/Admin/AdminDashboard";
+import BookManagement from "../Pages/Admin/BookManagement";
+import { AdminRoute } from "../Components/AdminRoute";
 
 export default function Router() {
   return (
@@ -11,7 +18,14 @@ export default function Router() {
       <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/verification" element={<Verification />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/books" element={<BookManagement />} />
+        </Route>
       </Routes>
       <Footer />
     </BrowserRouter>
