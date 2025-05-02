@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { apiRequest } from "../../utils/api";
+<<<<<<< HEAD
 import BookCoverImage from "../../assets/HeaderBooks/headerBook3.png";
 import {
   Mail,
@@ -10,6 +11,10 @@ import {
   ArrowLeft,
   RefreshCw,
 } from "lucide-react";
+=======
+import "../Login/Login.css";
+import BookCoverImage from "../../assets/HeaderBooks/headerBook3.png";
+>>>>>>> 7838768 (authentication)
 
 export default function Verification() {
   const [formData, setFormData] = useState({
@@ -93,6 +98,7 @@ export default function Verification() {
   };
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row relative">
         {/* Background decorative elements */}
@@ -235,10 +241,54 @@ export default function Verification() {
               ) : (
                 <Shield className="h-5 w-5 mr-2" />
               )}
+=======
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-image">
+          <img src={BookCoverImage} alt="Book cover" />
+        </div>
+        <div className="auth-form-container">
+          <h2>Verify Your Email</h2>
+          <p className="auth-subtitle">
+            Enter the verification code sent to your email
+          </p>
+
+          {error && <div className="auth-error">{error}</div>}
+          {success && <div className="auth-success">{success}</div>}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="token">Verification Code</label>
+              <input
+                type="text"
+                id="token"
+                name="token"
+                value={formData.token}
+                onChange={handleChange}
+                required
+                placeholder="Enter the 6-digit code"
+              />
+            </div>
+
+            <button type="submit" className="auth-button" disabled={loading}>
+>>>>>>> 7838768 (authentication)
               {loading ? "Verifying..." : "Verify Email"}
             </button>
           </form>
 
+<<<<<<< HEAD
           <div className="mt-6 text-center">
             <p className="text-sm text-stone-600 mb-4">
               Didn't receive the verification code?
@@ -264,6 +314,21 @@ export default function Verification() {
                 Sign in here
               </Link>
             </p>
+=======
+          <div className="auth-redirect">
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              className="text-button"
+              disabled={loading}
+            >
+              Didn't receive code? Resend verification email
+            </button>
+          </div>
+
+          <div className="auth-redirect">
+            Already verified? <Link to="/login">Sign in</Link>
+>>>>>>> 7838768 (authentication)
           </div>
         </div>
       </div>

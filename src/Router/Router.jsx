@@ -5,7 +5,10 @@ import Home from "../Pages/Home";
 import Login from "../Pages/Login/Login";
 import Verification from "../Pages/Verification/Verification";
 import Register from "../Pages/Register/Register";
+<<<<<<< HEAD
 import SignOut from "../Pages/SignOut/SignOut";
+=======
+>>>>>>> 7838768 (authentication)
 import NotFound from "../Pages/NotFound/NotFound";
 
 import AdminDashboard from "../Pages/Admin/AdminDashboard";
@@ -32,6 +35,10 @@ import Orders from "../Pages/Orders/Orders";
 import OrderDetail from "../Pages/Orders/OrderDetail";
 import { PodcastPage, PodcastDetailPage } from "../Pages/Podcast";
 
+import AdminDashboard from "../Pages/Admin/AdminDashboard";
+import BookManagement from "../Pages/Admin/BookManagement";
+import { AdminRoute } from "../Components/AdminRoute";
+
 export default function Router() {
   return (
     <BrowserRouter>
@@ -40,11 +47,15 @@ export default function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/register" element={<Register />} />
+<<<<<<< HEAD
         <Route path="/signout" element={<SignOut />} />
+=======
+>>>>>>> 7838768 (authentication)
         <Route path="*" element={<NotFound />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<BookManagement />} />
+<<<<<<< HEAD
           <Route path="/admin/categories" element={<CategoryManagement />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/orders" element={<OrderManagement />} />
@@ -69,6 +80,8 @@ export default function Router() {
             path="/order-confirmation/:orderId"
             element={<OrderConfirmation />}
           />
+=======
+>>>>>>> 7838768 (authentication)
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 console.log("API URL being used:", API_URL);
@@ -300,4 +301,20 @@ export async function fetchExternalQuote(category = "books") {
   // Return a random hardcoded quote
   const randomIndex = Math.floor(Math.random() * hardcodedQuotes.length);
   return hardcodedQuotes[randomIndex];
+=======
+// src/utils/api.js (open-library-fe)
+const API_URL = import.meta.env.VITE_API_URL;
+
+export async function apiRequest(endpoint, options = {}) {
+  const url = `${API_URL}/${endpoint}`;
+  const defaultHeaders = { "Content-Type": "application/json" };
+  const config = {
+    ...options,
+    headers: { ...defaultHeaders, ...options.headers },
+  };
+
+  const response = await fetch(url, config);
+  if (!response.ok) throw new Error(`Error: ${response.status}`);
+  return response.json();
+>>>>>>> 7838768 (authentication)
 }

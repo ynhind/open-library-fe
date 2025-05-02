@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { loginUser } from "../../utils/authApi";
 import { redirectBasedOnRole } from "../../utils/roleUtils";
 import FeaturedBook5 from "../../assets/FeaturedBooksImages/FeaturedBook5.png";
@@ -8,11 +9,21 @@ import { Eye, EyeOff, Mail, Lock, LogIn } from "lucide-react";
 export default function Login() {
   const [formData, setFormData] = useState({
     identifier: "",
+=======
+import { apiRequest } from "../../utils/api";
+import "./Login.css";
+import BookCoverImage from "../../assets/HeaderBooks/headerBook1.png";
+
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+>>>>>>> 7838768 (authentication)
     password: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showVerificationLink, setShowVerificationLink] = useState(false);
+<<<<<<< HEAD
   const [showPassword, setShowPassword] = useState(false);
   const [, setSessionExpired] = useState(false);
   const navigate = useNavigate();
@@ -29,6 +40,10 @@ export default function Login() {
     setShowPassword(!showPassword);
   };
 
+=======
+  const navigate = useNavigate();
+
+>>>>>>> 7838768 (authentication)
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -43,18 +58,30 @@ export default function Login() {
     setShowVerificationLink(false);
 
     try {
+<<<<<<< HEAD
       const response = await loginUser(formData);
+=======
+      const response = await apiRequest("auth/login", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+>>>>>>> 7838768 (authentication)
 
       // Store the token in localStorage
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
 
+<<<<<<< HEAD
       // Redirect based on user role
       if (response.user.role === "ADMIN") {
         navigate("/admin");
       } else {
         navigate("/");
       }
+=======
+      // Redirect to home page
+      navigate("/");
+>>>>>>> 7838768 (authentication)
       setShowVerificationLink(true);
     } catch (err) {
       console.error("Login error:", err);
@@ -72,6 +99,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+<<<<<<< HEAD
   // Remove JSX fragment that was outside the return statement
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
@@ -350,6 +378,80 @@ export default function Login() {
               Sign up
             </Link>
           </p>
+=======
+  // Add this state
+
+  // Then in your JSX after the auth-error div
+  {
+    showVerificationLink && (
+      <div className="auth-info">
+        <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+          Click here to verify your account
+        </Link>
+      </div>
+    );
+  }
+  return (
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-image">
+          <img src={BookCoverImage} alt="Book cover" />
+        </div>
+        <div className="auth-form-container">
+          <h2>Welcome Back</h2>
+          <p className="auth-subtitle">Sign in to continue to Open Library</p>
+
+          {error && <div className="auth-error">{error}</div>}
+          {showVerificationLink && (
+            <div className="auth-info">
+              <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+                Click here to verify your account
+              </Link>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+              />
+            </div>
+            <div className="form-options">
+              <div className="remember-me">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Remember me</label>
+              </div>
+              <Link to="/forgot-password" className="forgot-password">
+                Forgot Password?
+              </Link>
+            </div>
+            <button type="submit" className="auth-button" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+          <div className="auth-redirect">
+            Don't have an account? <Link to="/register">Sign up</Link>
+          </div>
+>>>>>>> 7838768 (authentication)
         </div>
       </div>
     </div>

@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import FeaturedBook7 from "../../assets/FeaturedBooksImages/FeaturedBook7.png";
 import { Eye, EyeOff, Mail, Lock, User, MapPin, UserPlus } from "lucide-react";
+=======
+import "./Register.css";
+import BookCoverImage from "../../assets/HeaderBooks/headerBook2.png";
+>>>>>>> 7838768 (authentication)
 
 import { registerUser } from "../../utils/authApi";
 
@@ -16,6 +21,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+<<<<<<< HEAD
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -28,6 +34,10 @@ export default function Register() {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+=======
+  const navigate = useNavigate();
+
+>>>>>>> 7838768 (authentication)
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -48,7 +58,11 @@ export default function Register() {
     }
 
     // Remove confirmPassword from payload
+<<<<<<< HEAD
     const { ...registerPayload } = formData;
+=======
+    const { confirmPassword, ...registerPayload } = formData;
+>>>>>>> 7838768 (authentication)
 
     try {
       await registerUser(registerPayload);
@@ -62,6 +76,7 @@ export default function Register() {
         navigate("/verification");
       }, 3000);
     } catch (err) {
+<<<<<<< HEAD
       console.error("Registration error:", err);
 
       // Handle specific error messages more user-friendly
@@ -80,12 +95,17 @@ export default function Register() {
       } else {
         setError(err.message || "Registration failed. Please try again.");
       }
+=======
+      setError(err.message || "Registration failed. Please try again.");
+      console.error("Registration error:", err);
+>>>>>>> 7838768 (authentication)
     } finally {
       setLoading(false);
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row relative">
         {/* Premium background decorative elements */}
@@ -276,10 +296,89 @@ export default function Register() {
                   required
                   placeholder="Enter your email"
                   className="block w-full pl-10 pr-3 py-3 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-amber-400 transition-colors"
+=======
+    <div className="auth-page">
+      <div className="auth-container register-container">
+        <div className="auth-image">
+          <img src={BookCoverImage} alt="Book cover" />
+        </div>
+        <div className="auth-form-container">
+          <h2>Create Account</h2>
+          <p className="auth-subtitle">Join Open Library today</p>
+
+          {error && <div className="auth-error">{error}</div>}
+          {success && <div className="auth-success">{success}</div>}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                placeholder="Choose a username"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="address">Address</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                placeholder="Enter your address"
+              />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Create password"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  placeholder="Confirm password"
+>>>>>>> 7838768 (authentication)
                 />
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className="space-y-1.5">
               <label
                 htmlFor="address"
@@ -463,6 +562,24 @@ export default function Register() {
               <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-700 to-amber-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
           </p>
+=======
+            <div className="form-agreement">
+              <input type="checkbox" id="agree" required />
+              <label htmlFor="agree">
+                I agree to the <Link to="/terms">Terms of Service</Link> and{" "}
+                <Link to="/privacy">Privacy Policy</Link>
+              </label>
+            </div>
+
+            <button type="submit" className="auth-button" disabled={loading}>
+              {loading ? "Creating Account..." : "Sign Up"}
+            </button>
+          </form>
+
+          <div className="auth-redirect">
+            Already have an account? <Link to="/login">Sign in</Link>
+          </div>
+>>>>>>> 7838768 (authentication)
         </div>
       </div>
     </div>

@@ -4,13 +4,18 @@ export const registerUser = async (data) => {
   try {
     const response = await apiRequest("auth/register", {
       method: "POST",
+<<<<<<< HEAD
       body: data, // apiRequest will handle JSON.stringify
+=======
+      body: JSON.stringify(data),
+>>>>>>> 7838768 (authentication)
     });
     return response;
   } catch (error) {
     throw new Error(error.message || "Registration failed");
   }
 };
+<<<<<<< HEAD
 
 export const loginUser = async (formData) => {
   try {
@@ -47,3 +52,16 @@ export const resendVerification = async (email) => {
     body: { email },
   });
 };
+=======
+export const loginUser = async (credentials) => {
+  try {
+    const response = await apiRequest("auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error.message || "Login failed");
+  }
+};
+>>>>>>> 7838768 (authentication)
