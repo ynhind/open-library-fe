@@ -11,12 +11,16 @@ export const registerUser = async (data) => {
     throw new Error(error.message || "Registration failed");
   }
 };
+
 export const loginUser = async (credentials) => {
   try {
+    // No mapping needed - just use the credentials directly
     const response = await apiRequest("auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
+    localStorage.setItem("token", response.token);
+
     return response;
   } catch (error) {
     throw new Error(error.message || "Login failed");

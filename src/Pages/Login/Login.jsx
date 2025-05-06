@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { apiRequest } from "../../utils/api";
+import { loginUser } from "../../utils/authApi";
 import "./Login.css";
 import BookCoverImage from "../../assets/HeaderBooks/headerBook1.png";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -28,10 +28,7 @@ export default function Login() {
     setShowVerificationLink(false);
 
     try {
-      const response = await apiRequest("auth/login", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const response = await loginUser(formData);
 
       // Store the token in localStorage
       localStorage.setItem("token", response.token);
@@ -62,7 +59,7 @@ export default function Login() {
   {
     showVerificationLink && (
       <div className="auth-info">
-        <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+        <Link to={`/verify?email=${encodeURIComponent(formData.identifier)}`}>
           Click here to verify your account
         </Link>
       </div>
@@ -81,7 +78,9 @@ export default function Login() {
           {error && <div className="auth-error">{error}</div>}
           {showVerificationLink && (
             <div className="auth-info">
-              <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+              <Link
+                to={`/verify?email=${encodeURIComponent(formData.identifier)}`}
+              >
                 Click here to verify your account
               </Link>
             </div>
@@ -91,10 +90,10 @@ export default function Login() {
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="identifier"
+                id="identifier"
+                name="identifier"
+                value={formData.identifier}
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"

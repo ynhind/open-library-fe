@@ -192,3 +192,23 @@
     grid-template-columns: 1fr;
   }
 }
+
+.category-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.category-checkbox {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+
+.category-checkbox input {
+  margin-right: 5px;
+}

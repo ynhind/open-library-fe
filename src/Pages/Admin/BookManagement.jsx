@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { apiRequest } from "../../utils/api";
 import "./Admin.css";
+import { getBooks, createBook } from "../../utils/bookApi";
 
 export default function BookManagement() {
   const [books, setBooks] = useState([]);
@@ -11,121 +12,130 @@ export default function BookManagement() {
     price: 0,
     quantity_available: 0,
     description: "",
+    publisher: "",
+    publishDate: "",
+    isbn: "",
+    format: "PAPERBACK", // Default value
     isAvailableOnline: false,
-    previewPages: 20,
+    previewPages: 0,
+    categories: [],
   });
   const [editingBookId, setEditingBookId] = useState(null);
-
-  const [bookFile, setBookFile] = useState(null);
-  const [coverImage, setCoverImage] = useState(null);
+  //   const [bookFile, setBookFile] = useState(null);
+  //   const [coverImage, setCoverImage] = useState(null);
+  const [error, setError] = useState("");
 
   // Fetch books on component load
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const data = await apiRequest("books");
-        setBooks(data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBooks();
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "number"
-          ? parseFloat(value)
-          : value,
-    });
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.name === "bookFile") {
-      setBookFile(e.target.files[0]);
-    } else if (e.target.name === "coverImage") {
-      setCoverImage(e.target.files[0]);
+  const fetchBooks = async () => {
+    try {
+      const data = await getBooks();
+      setBooks(data);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      setError("Failed to load books. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Update the form submission to use FormData
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    if (name === "categories" && type === "select-multiple") {
+      // Handle multi-select element differently
+      const selectedOptions = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
+      setFormData({
+        ...formData,
+        [name]: selectedOptions,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : type === "number"
+            ? parseFloat(value)
+            : value,
+      });
+    }
+    if (name === "publishDate") {
+      // Always store dates as ISO strings for the API
+      const dateValue = value ? new Date(value).toISOString() : "";
+      setFormData({ ...formData, [name]: dateValue });
+    } else {
+      // Handle other form fields normally
+      const fieldValue = type === "checkbox" ? checked : value;
+      setFormData({ ...formData, [name]: fieldValue });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
 
     try {
-      const formDataObj = new FormData();
+      console.log("Categories before processing:", formData.categories);
+      const bookData = {
+        ...formData,
 
-      // Add text fields
-      Object.keys(formData).forEach((key) => {
-        formDataObj.append(key, formData[key]);
-      });
+        price: Number(formData.price),
+        quantity_available: Number(formData.quantity_available),
 
-      // Add files if they exist
-      if (bookFile) {
-        formDataObj.append("bookFile", bookFile);
-      }
+        publishDate: formData.publishDate
+          ? new Date(formData.publishDate).toISOString()
+          : null,
+        previewPages: Number(formData.previewPages),
+        categories: Array.isArray(formData.categories)
+          ? formData.categories.map((id) => Number(id))
+          : [], // Provide a fallback empty array
+      };
+      console.log("Processed book data:", bookData);
 
-      if (coverImage) {
-        formDataObj.append("coverImage", coverImage);
-      }
-
-      const endpoint = editingBookId ? `books/${editingBookId}` : "books";
-      const method = editingBookId ? "PUT" : "POST";
-
-      // Custom fetch for FormData
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/${endpoint}`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formDataObj,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Reset file inputs
-      setBookFile(null);
-      setCoverImage(null);
-      document.getElementById("bookFileInput").value = "";
-      document.getElementById("coverImageInput").value = "";
-
-      // Refresh book list
-      const booksData = await apiRequest("books");
-      setBooks(booksData);
-
+      await createBook(bookData);
       // Reset form
       setFormData({
-        /* your reset values */
+        title: "",
+        author: "",
+        price: 0,
+        quantity_available: 0,
+        description: "",
+        publisher: "",
+        publishDate: "",
+        isbn: "",
+        format: "PAPERBACK", // Default value
+        isAvailableOnline: false,
+        previewPages: 0,
+        categories: [],
       });
       setEditingBookId(null);
+      // Refresh book list
+      await fetchBooks();
     } catch (error) {
       console.error("Error saving book:", error);
     }
-  }; // Close handleSubmit function
+  };
 
   const handleEdit = (book) => {
     setFormData({
       title: book.title,
       author: book.author,
-      price: book.price,
-      quantity_available: book.quantity_available,
+      price: book.price || 0,
+      quantity_available: book.quantity_available || 0,
       description: book.description || "",
       isAvailableOnline: book.isAvailableOnline || false,
       previewPages: book.previewPages || 20,
+      publisher: book.publisher || "",
+      publishDate: book.publishDate || "",
+      isbn: book.isbn || "",
+      format: book.format || "PAPERBACK",
+      categories: book.categories.map((category) => category.categoryId),
     });
     setEditingBookId(book.bookId);
   };
@@ -134,6 +144,12 @@ export default function BookManagement() {
     if (!window.confirm("Are you sure you want to delete this book?")) return;
 
     const token = localStorage.getItem("token");
+    if (!token) {
+      setError("You must be logged in to perform this action");
+      return;
+    }
+
+    setError("");
     try {
       await apiRequest(`books/${bookId}`, {
         method: "DELETE",
@@ -146,6 +162,7 @@ export default function BookManagement() {
       setBooks(books.filter((book) => book.bookId !== bookId));
     } catch (error) {
       console.error("Error deleting book:", error);
+      setError("Failed to delete book. Please try again.");
     }
   };
 
@@ -153,6 +170,8 @@ export default function BookManagement() {
     <div className="admin-page">
       <div className="admin-container">
         <h2>Book Management</h2>
+
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="admin-form">
           <h3>{editingBookId ? "Edit Book" : "Add New Book"}</h3>
@@ -218,6 +237,106 @@ export default function BookManagement() {
               rows="4"
             />
           </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="publisher">Publisher</label>
+              <input
+                type="text"
+                id="publisher"
+                name="publisher"
+                value={formData.publisher}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <input
+              type="date"
+              name="publishDate"
+              value={
+                formData.publishDate
+                  ? formData.publishDate.substring(0, 10)
+                  : ""
+              }
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="isbn">ISBN</label>
+              <input
+                type="text"
+                id="isbn"
+                name="isbn"
+                value={formData.isbn}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="format">Format</label>
+              <select
+                id="format"
+                name="format"
+                value={formData.format}
+                onChange={handleChange}
+              >
+                <option value="PAPERBACK">Paperback</option>
+                <option value="HARDCOVER">Hardcover</option>
+                <option value="EBOOK">Ebook</option>
+                <option value="AUDIOBOOK">Audiobook</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="isbn">Categories</label>
+              <select
+                id="categories"
+                name="categories"
+                value={formData.categories}
+                onChange={handleChange}
+                multiple
+              >
+                <option value="1">Fiction</option>
+                <option value="2">Non-Fiction</option>
+                <option value="3">Science</option>
+                <option value="4">History</option>
+                <option value="5">Biography</option>
+                <option value="6">Fantasy</option>
+                <option value="7">Mystery</option>
+
+                <option value="8">Romance</option>
+                <option value="9">Thriller</option>
+                <option value="10">Self-Help</option>
+                <option value="11">Health</option>
+                <option value="12">Travel</option>
+                <option value="13">Cookbooks</option>
+              </select>
+            </div>
+          </div>
+
+          {/* <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="bookFileInput">Book File (PDF)</label>
+              <input
+                type="file"
+                id="bookFileInput"
+                name="bookFile"
+                onChange={handleFileChange}
+                accept=".pdf"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="coverImageInput">Cover Image</label>
+              <input
+                type="file"
+                id="coverImageInput"
+                name="coverImage"
+                onChange={handleFileChange}
+                accept="image/jpeg, image/png"
+              />
+            </div>
+          </div> */}
 
           <div className="form-row">
             <div className="form-group">

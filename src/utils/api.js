@@ -9,7 +9,18 @@ export async function apiRequest(endpoint, options = {}) {
     headers: { ...defaultHeaders, ...options.headers },
   };
 
-  const response = await fetch(url, config);
-  if (!response.ok) throw new Error(`Error: ${response.status}`);
-  return response.json();
+  try {
+    const response = await fetch(url, config);
+
+    if (!response.ok) {
+      // Try to get error details from response
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `API Error: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`API request failed for ${endpoint}:`, error);
+    throw error;
+  }
 }
