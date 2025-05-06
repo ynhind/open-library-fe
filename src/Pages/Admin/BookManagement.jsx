@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { apiRequest } from "../../utils/api";
 import "./Admin.css";
 import { getBooks, createBook } from "../../utils/bookApi";
+import { updateBook } from "../../utils/bookApi";
+import { deleteBook } from "../../utils/bookApi";
 
 export default function BookManagement() {
   const [books, setBooks] = useState([]);
@@ -98,8 +99,15 @@ export default function BookManagement() {
       };
       console.log("Processed book data:", bookData);
 
-      await createBook(bookData);
-      // Reset form
+      if (editingBookId) {
+        // If we're editing an existing book
+        await updateBook(editingBookId, bookData);
+        console.log("Book updated successfully");
+      } else {
+        // If we're creating a new book
+        await createBook(bookData);
+        console.log("Book created successfully");
+      } // Reset form
       setFormData({
         title: "",
         author: "",
@@ -135,34 +143,21 @@ export default function BookManagement() {
       publishDate: book.publishDate || "",
       isbn: book.isbn || "",
       format: book.format || "PAPERBACK",
-      categories: book.categories.map((category) => category.categoryId),
+      categories: book.categories
+        ? book.categories.map((category) => category.categoryId)
+        : [],
     });
     setEditingBookId(book.bookId);
   };
-
   const handleDelete = async (bookId) => {
-    if (!window.confirm("Are you sure you want to delete this book?")) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You must be logged in to perform this action");
-      return;
-    }
-
-    setError("");
-    try {
-      await apiRequest(`books/${bookId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Update books list
-      setBooks(books.filter((book) => book.bookId !== bookId));
-    } catch (error) {
-      console.error("Error deleting book:", error);
-      setError("Failed to delete book. Please try again.");
+    if (window.confirm("Are you sure you want to delete this book?")) {
+      try {
+        await deleteBook(bookId);
+        console.log("Book deleted successfully");
+        await fetchBooks();
+      } catch (error) {
+        console.error("Error deleting book:", error);
+      }
     }
   };
 
