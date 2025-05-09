@@ -67,3 +67,55 @@ export default function Header() {
     </header>
   );
 }
+
+// import React from "react";
+// import "./Header.css";
+// import { headerBooks } from "../../Data/Data";
+// import { Link } from "react-router-dom";
+// import { Swiper, SwiperSlide } from "swiper/react";
+// import { Navigation, Pagination } from "swiper/modules";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faSearch, faShoppingBasket } from "@fortawesome/free-solid-svg-icons";
+
+// export default function Header() {
+//   return (
+//     <header className="vintage-header">
+//       <div className="header-container">
+//         <Swiper
+//           spaceBetween={50}
+//           slidesPerView={1}
+//           loop={true}
+//           modules={[Navigation, Pagination]}
+//           pagination={{ el: ".swiper-pagination", clickable: true }}
+//           navigation={{
+//             prevEl: ".button-prev-slide",
+//             nextEl: ".button-next-slide",
+//           }}
+//         >
+//           {headerBooks.map(({ title, info, img, btnLink }, index) => {
+//             return (
+//               <SwiperSlide key={index}>
+//                 <div className="header-wrapper container">
+//                   <div className="header-left">
+//                     <h1 className="vintage-title">{title}</h1>
+//                     <p
+//                       className="vintage-text"
+//                       dangerouslySetInnerHTML={{ __html: info }}
+//                     ></p>
+//                     <Link className="btn-vintage" to={btnLink}>
+//                       Explore Collection
+//                     </Link>
+//                   </div>
+//                   <div className="header-right">
+//                     <img src={img} alt="" className="vintage-image" />
+//                   </div>
+//                 </div>
+//               </SwiperSlide>
+//             );
+//           })}
+//           {/* Navigation buttons */}
+//         </Swiper>
+//       </div>
+//     </header>
+//   );
+// }

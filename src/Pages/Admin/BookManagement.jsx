@@ -1,12 +1,56 @@
 import React, { useState, useEffect } from "react";
 import "./Admin.css";
-import { getBooks, createBook } from "../../utils/bookApi";
+import { getBooks, createBook, searchBooks } from "../../utils/bookApi";
 import { updateBook } from "../../utils/bookApi";
 import { deleteBook } from "../../utils/bookApi";
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export default function BookManagement() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [searchParams, setSearchParams] = useState({
+    title: "",
+    author: "",
+    publisher: "",
+    categories: [],
+  });
+  const [isSearching, setIsSearching] = useState(false);
+
+  const debouncedSearchParams = useDebounce(searchParams, 500);
+  useEffect(() => {
+    // Check if any search parameter has a value
+    const hasSearchParams = Object.values(debouncedSearchParams).some(
+      (value) =>
+        value &&
+        (typeof value === "string" ? value.trim() !== "" : value.length > 0)
+    );
+
+    if (hasSearchParams) {
+      performSearch(debouncedSearchParams);
+      setIsSearching(true);
+    } else if (isSearching) {
+      // If search params were cleared, reset to all books
+      fetchBooks();
+      setIsSearching(false);
+    }
+  }, [debouncedSearchParams]);
+
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -76,6 +120,76 @@ export default function BookManagement() {
       const fieldValue = type === "checkbox" ? checked : value;
       setFormData({ ...formData, [name]: fieldValue });
     }
+  };
+  //   const handleFileChange = (e) => {
+  //     const { name, files } = e.target;
+  //     if (files && files[0]) {
+  //       if (name === "bookFile") {
+  //         setBookFile(files[0]);
+  //       } else if (name === "coverImage") {
+  //         setCoverImage(files[0]);
+  //       }
+  //     }
+  //   };
+
+  const handleSearchChange = (e) => {
+    const { name, value, type, selectedOptions } = e.target;
+
+    if (type === "select-multiple") {
+      const selectedValues = Array.from(
+        selectedOptions,
+        (option) => option.value
+      );
+      setSearchParams((prev) => ({
+        ...prev,
+        [name]: selectedValues,
+      }));
+    } else {
+      setSearchParams((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  // Perform the actual search
+  const performSearch = async (params) => {
+    setLoading(true);
+
+    try {
+      // Filter out empty search params
+      const filteredParams = Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (
+            value &&
+            (typeof value === "string" ? value.trim() !== "" : value.length > 0)
+          ) {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {}
+      );
+
+      const results = await searchBooks(filteredParams);
+      setBooks(results);
+    } catch (error) {
+      console.error("Error searching books:", error);
+      setError("Failed to search books. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearSearch = async () => {
+    setSearchParams({
+      title: "",
+      author: "",
+      publisher: "",
+      categories: [],
+    });
+    setIsSearching(false);
+    await fetchBooks(); // Reload all books
   };
 
   const handleSubmit = async (e) => {
@@ -282,6 +396,29 @@ export default function BookManagement() {
               </select>
             </div>
           </div>
+
+          {/* <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="bookFileInput">Book PDF File</label>
+              <input
+                type="file"
+                id="bookFileInput"
+                name="bookFile"
+                onChange={handleFileChange}
+                accept=".pdf"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="coverImageInput">Cover Image</label>
+              <input
+                type="file"
+                id="coverImageInput"
+                name="coverImage"
+                onChange={handleFileChange}
+                accept="image/jpeg, image/png"
+              />
+            </div>
+          </div> */}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="isbn">Categories</label>
@@ -354,6 +491,80 @@ export default function BookManagement() {
                 />
                 Available Online
               </label>
+            </div>
+          </div>
+
+          <div className="search-section">
+            <h3 className="section-title">Search Books</h3>
+            <div className="search-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="searchTitle">Title</label>
+                  <input
+                    type="text"
+                    id="searchTitle"
+                    name="title"
+                    value={searchParams.title}
+                    onChange={handleSearchChange}
+                    placeholder="Search by title"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="searchAuthor">Author</label>
+                  <input
+                    type="text"
+                    id="searchAuthor"
+                    name="author"
+                    value={searchParams.author}
+                    onChange={handleSearchChange}
+                    placeholder="Search by author"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="searchPublisher">Publisher</label>
+                  <input
+                    type="text"
+                    id="searchPublisher"
+                    name="publisher"
+                    value={searchParams.publisher}
+                    onChange={handleSearchChange}
+                    placeholder="Search by publisher"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="searchCategories">Categories</label>
+                  <select
+                    id="searchCategories"
+                    name="categories"
+                    multiple
+                    value={searchParams.categories}
+                    onChange={handleSearchChange}
+                  >
+                    {/* Your category options */}
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science">Science</option>
+                    <option value="History">History</option>
+                    <option value="Biography">Biography</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Self-Help">Self-Help</option>
+                  </select>
+                </div>
+              </div>
+              <div className="search-actions">
+                <button
+                  type="button"
+                  className="admin-button secondary"
+                  onClick={clearSearch}
+                >
+                  Clear Search
+                </button>
+              </div>
             </div>
           </div>
 

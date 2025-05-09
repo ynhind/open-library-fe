@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Prata&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200&family=Prata&display=swap");
-
+@import "@fortawesome/fontawesome-free/css/all.css";
 * {
   margin: 0;
   padding: 0;
@@ -9,8 +9,7 @@
   list-style: none;
   font-weight: 400;
 }
-:root {
-  /* --color-primary: #0d6efd; */
+/* :root {
   --color-black: #111111;
   --color-black-Ex: #222222;
   --color-dark: #7a7a7a;
@@ -25,6 +24,31 @@
   --font-family-Jakarta: "Plus Jakarta Sans", sans-serif;
 
   --transition: 0.4s ease;
+} */
+
+body {
+  background: linear-gradient(
+    to bottom right,
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3)
+  );
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0;
+}
+:root {
+  --color-primary: #8c7851; /* Muted gold/brass accent */
+  --color-black: #4f3733; /* Deeper brown for headers */
+  --color-black-Ex: #5d4037; /* Dark brown text, like old ink */
+  --color-dark: #795548; /* Softer brown for secondary text */
+  --color-dark-Ex: #d7ccc8; /* Light, aged paper border */
+  --color-light: #efebe9; /* Light stone/paper for cards */
+  --color-bg-1: #fdf6e3; /* Creamy, parchment-like background */
+  --color-bg-2: #f5f2e7; /* Slightly darker background */
+  --font-family-prata: "Playfair Display", serif;
+  --font-family-Jakarta: "Roboto", sans-serif;
+  --transition: 0.3s ease;
 }
 html {
   scroll-behavior: smooth;
@@ -32,7 +56,11 @@ html {
   color: var(--color-dark);
 }
 body {
-  background-color: var(--color-bg-1);
+  background: linear-gradient(135deg, #f8f0d7, #ede5d5, #d2edf1);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+body {
   font-family: var(--font-family-Jakarta);
   color: var(--color-dark);
   line-height: 1.6;
@@ -170,4 +198,100 @@ section {
   section {
     padding: 70px 0 !important;
   }
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #fdf6e3;
+  color: #5d4037;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-vintage-header {
+  font-family: "Playfair Display", serif;
+  color: #3e2723;
+}
+
+.vintage-accent-text {
+  color: #8c7851;
+}
+
+.vintage-secondary-text {
+  color: #795548;
+}
+
+.vintage-border {
+  border-color: #d7ccc8;
+}
+
+.vintage-bg-header-footer {
+  background-color: #d7ccc8;
+  border-bottom: 2px solid #bcaaa4;
+}
+
+.vintage-bg-card {
+  background-color: #efebe9;
+  border: 1px solid #d7ccc8;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card-hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-vintage {
+  background-color: #8c7851;
+  color: #fdf6e3;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid #795548;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-vintage:hover {
+  background-color: #795548;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-vintage-secondary {
+  background-color: #bcaaa4;
+  color: #3e2723;
+  border: 1px solid #8d6e63;
+}
+
+.btn-vintage-secondary:hover {
+  background-color: #a1887f;
+  color: #fdf6e3;
+}
+
+.search-input-vintage {
+  background-color: #efebe9;
+  color: #5d4037;
+  border: 1px solid #bcaaa4;
+  border-radius: 4px;
+  padding: 8px 12px;
+  padding-left: 36px;
+}
+
+.search-input-vintage::placeholder {
+  color: #a1887f;
+}
+
+.search-input-vintage:focus {
+  outline: none;
+  border-color: #8c7851;
+  box-shadow: 0 0 0 2px rgba(140, 120, 81, 0.3);
 }

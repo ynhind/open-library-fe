@@ -71,3 +71,43 @@ export const deleteBook = async (bookId) => {
     throw error;
   }
 };
+
+//search book
+export const searchBooks = async (searchParams = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    // Add all search parameters to query string
+    if (searchParams.title) {
+      queryParams.append("title", searchParams.title);
+    }
+
+    if (searchParams.author) {
+      queryParams.append("author", searchParams.author);
+    }
+
+    if (searchParams.publisher) {
+      queryParams.append("publisher", searchParams.publisher);
+    }
+
+    // Backend expects "names" parameter for category names
+    if (searchParams.categories && Array.isArray(searchParams.categories)) {
+      searchParams.categories.forEach((category) => {
+        queryParams.append("names", category);
+      });
+    }
+
+    const queryString = queryParams.toString();
+    const token = localStorage.getItem("token");
+
+    return await apiRequest(
+      `books/search${queryString ? `?${queryString}` : ""}`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+  } catch (error) {
+    console.error("Error searching books:", error);
+    throw error;
+  }
+};
