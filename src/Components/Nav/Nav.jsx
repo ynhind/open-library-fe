@@ -1,173 +1,241 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import Logo from "../../assets/logo.png";
-import { navLinks, navRight } from "../../Data/Data";
-import { VscMenu } from "react-icons/vsc";
-import { GrClose } from "react-icons/gr";
-import { useState } from "react";
-import "./Nav.css";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Book,
+  ShoppingCart,
+  User,
+  Search,
+  ChevronDown,
+  Menu,
+} from "lucide-react";
 
-export default function Footer() {
-  const [isNavLinksShowing, setIsNavLinksShowing] = useState(false);
+const Nav = () => {
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  if (innerWidth < 1024) {
-    window.addEventListener("scroll", () => {
-      document.querySelector(".nav-links").classList.add("navLinksHide");
-      setIsNavLinksShowing(false);
-    });
-    window.addEventListener("scroll", () => {
-      document
-        .querySelector("nav")
-        .classList.toggle("navShadow", window.scrollY > 0);
-    });
-  }
+  const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
+  const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const categories = [
+    "Classic Literature",
+    "History",
+    "Philosophy",
+    "Poetry",
+    "All Categories",
+  ];
+
+  const userMenuItems = [
+    { name: "My Account", path: "/account" },
+    { name: "My Orders", path: "/orders" },
+    { name: "Wishlist", path: "/wishlist" },
+    { name: "Sign Out", path: "/signout" },
+  ];
+
   return (
-    <nav>
-      <div className="container nav-container">
-        {
-          <Link to="/" className="logo">
-            <img src={Logo} alt="Logo" />
+    <nav className="bg-amber-50/95 border-b border-amber-200/20 shadow-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <Book className="text-amber-800" size={24} />
+            <span className="text-2xl font-serif font-bold text-stone-800">
+              Old<span className="text-amber-800">Tomes</span>
+            </span>
           </Link>
-        }
-        <ul
-          className={`nav-links ${
-            isNavLinksShowing ? "navLinksShow" : "navLinksHide"
-          }`}
-        >
-          {navLinks.map(({ name, path }, index) => {
-            return (
-              <li key={index}>
-                <NavLink
-                  to={path}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  {name}
-                </NavLink>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="nav-right">
-          {navRight.managements.map((item, index) => (
-            <Link key={index} target="_blank" className="management-icons">
-              <item.icon />
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link
+              to="/"
+              className="text-stone-700 hover:text-amber-800 transition-colors font-medium"
+            >
+              Home
             </Link>
-          ))}
-          <button
-            className="menu-button "
-            onClick={() => setIsNavLinksShowing(!isNavLinksShowing)}
-          >
-            {!isNavLinksShowing ? <VscMenu /> : <GrClose />}
-          </button>
+
+            {/* Categories Dropdown */}
+            <div className="relative">
+              <button
+                className="flex items-center gap-1 text-stone-700 hover:text-amber-800 transition-colors font-medium"
+                onClick={toggleCategories}
+              >
+                Categories
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${
+                    isCategoriesOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {isCategoriesOpen && (
+                <div className="absolute top-full right-0 mt-1 w-56 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in">
+                  {categories.map((category, index) => (
+                    <Link
+                      key={index}
+                      to={`/category/${category
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                      className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Link
+              to="/new-arrivals"
+              className="text-stone-700 hover:text-amber-800 transition-colors font-medium"
+            >
+              New Arrivals
+            </Link>
+
+            <Link
+              to="/my-library"
+              className="text-stone-700 hover:text-amber-800 transition-colors font-medium"
+            >
+              My Library
+            </Link>
+          </div>
+
+          {/* Right Side - Search, Cart, User */}
+          <div className="flex items-center">
+            {/* Search */}
+            <div className="hidden md:flex items-center relative mr-4">
+              <input
+                type="text"
+                placeholder="Search titles, authors..."
+                className="w-48 lg:w-64 h-9 pl-9 pr-4 rounded-full bg-amber-100/80 text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+              />
+              <Search size={16} className="absolute left-3 text-stone-500" />
+            </div>
+
+            {/* Cart */}
+            <Link
+              to="/cart"
+              className="relative p-2 text-stone-700 hover:text-amber-800 transition-colors"
+            >
+              <ShoppingCart size={20} />
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs bg-amber-800 text-white rounded-full">
+                3
+              </span>
+            </Link>
+
+            {/* User Menu */}
+            <div className="relative ml-4">
+              <button
+                className="p-2 text-stone-700 hover:text-amber-800 transition-colors"
+                onClick={toggleUserMenu}
+              >
+                <User size={20} />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="absolute top-full right-0 mt-1 w-48 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in">
+                  {userMenuItems.map((item, index) => (
+                    <React.Fragment key={index}>
+                      <Link
+                        to={item.path}
+                        className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
+                      >
+                        {item.name}
+                      </Link>
+                      {index === userMenuItems.length - 2 && (
+                        <div className="border-t border-amber-200 my-1"></div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 ml-4 text-stone-700 hover:text-amber-800 transition-colors"
+              onClick={toggleMobileMenu}
+            >
+              <Menu size={20} />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-amber-50 border-t border-amber-200 animate-fade-in">
+            <div className="p-4 space-y-1">
+              <div className="relative mb-4">
+                <input
+                  type="text"
+                  placeholder="Search titles, authors..."
+                  className="w-full h-10 pl-9 pr-4 rounded-full bg-amber-100/80 text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500"
+                />
+              </div>
+
+              <Link to="/" className="block py-2 text-stone-700">
+                Home
+              </Link>
+
+              <button
+                className="flex items-center justify-between w-full py-2 text-stone-700"
+                onClick={toggleCategories}
+              >
+                <span>Categories</span>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${
+                    isCategoriesOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {isCategoriesOpen && (
+                <div className="ml-4 mt-1 space-y-1 border-l border-amber-200 pl-4">
+                  {categories.map((category, index) => (
+                    <Link
+                      key={index}
+                      to={`/category/${category
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                      className="block py-2 text-sm text-stone-700"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <Link to="/new-arrivals" className="block py-2 text-stone-700">
+                New Arrivals
+              </Link>
+
+              <Link to="/my-library" className="block py-2 text-stone-700">
+                My Library
+              </Link>
+
+              <div className="border-t border-amber-200 my-2"></div>
+
+              {userMenuItems.map((item, index) => (
+                <Link
+                  key={index}
+                  to={item.path}
+                  className="block py-2 text-stone-700"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
-}
+};
 
-// import React, { useState } from "react";
-
-// const Nav = () => {
-//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-//   const [isMobileCategoriesOpen, setIsMobileCategoriesOpen] = useState(false);
-//   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-
-//   // Toggle mobile menu and control body scroll
-//   const toggleMobileMenu = () => {
-//     setIsMobileMenuOpen(!isMobileMenuOpen);
-//     document.body.style.overflow = !isMobileMenuOpen ? "hidden" : "";
-//   };
-
-//   // Toggle categories in mobile view
-//   const toggleMobileCategories = () => {
-//     setIsMobileCategoriesOpen(!isMobileCategoriesOpen);
-//   };
-
-//   // Toggle search in mobile view
-//   const toggleMobileSearch = () => {
-//     setIsMobileSearchOpen(!isMobileSearchOpen);
-//   };
-
-//   return (
-//     <>
-//       {/* Professional Vintage Navbar */}
-//       <header className="vintage-bg-header fixed w-full top-0 z-50 shadow-sm">
-//         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-//           <div className="flex items-center justify-between h-18">
-//             {/* Logo */}
-//             <div className="flex items-center">
-//               <a href="#" className="flex items-center">
-//                 <i className="fas fa-book-open text-2xl mr-2 vintage-accent-text"></i>
-//                 <span className="text-2xl font-bold logo-text">
-//                   Old<span className="vintage-accent-text">Tomes</span>
-//                 </span>
-//               </a>
-//             </div>
-
-//             {/* Desktop Navigation */}
-//             <nav className="hidden md:flex items-center space-x-8">
-//               <a href="#" className="nav-link text-gray-700">
-//                 Home
-//               </a>
-//               {/* Add other nav items here */}
-//             </nav>
-
-//             {/* Mobile menu button */}
-//             <button
-//               className="md:hidden vintage-button-outline p-2"
-//               onClick={toggleMobileMenu}
-//               aria-label="Menu"
-//             >
-//               <i className="fas fa-bars"></i>
-//             </button>
-//           </div>
-//         </div>
-//       </header>
-
-//       {/* Mobile Menu Overlay */}
-//       {isMobileMenuOpen && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-//           <div className="fixed right-0 top-0 w-4/5 h-full bg-white p-5 overflow-y-auto">
-//             <div className="flex justify-between items-center mb-6">
-//               <div className="text-xl font-bold">Menu</div>
-//               <button
-//                 className="vintage-button-outline p-2"
-//                 onClick={toggleMobileMenu}
-//                 aria-label="Close"
-//               >
-//                 <i className="fas fa-times"></i>
-//               </button>
-//             </div>
-//             {/* Mobile menu content */}
-//             <nav className="space-y-4">
-//               <a href="#" className="block nav-link">
-//                 Home
-//               </a>
-//               {/* Add other mobile nav items */}
-//             </nav>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Sample Page Content */}
-//       <main className="main-content">
-//         <section className="py-12 md:py-16 bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-50">
-//           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-//             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-//               <span className="font-vintage-header">Discover Timeless</span>{" "}
-//               <span className="font-vintage-header vintage-accent-text">
-//                 Knowledge.
-//               </span>
-//             </h1>
-//             <p className="text-lg vintage-secondary-text mb-8 max-w-2xl mx-auto">
-//               With a modernized navigation experience, browse our collection
-//               with ease.
-//             </p>
-//           </div>
-//         </section>
-//       </main>
-//     </>
-//   );
-// };
-
-// export default Nav;
+export default Nav;

@@ -6,8 +6,6 @@ import Login from "../Pages/Login/Login";
 import Verification from "../Pages/Verification/Verification";
 import Register from "../Pages/Register/Register";
 import NotFound from "../Pages/NotFound/NotFound";
-import Nav from "../Components/Nav/Nav";
-import Footer from "../Components/Footer/Footer";
 
 import AdminDashboard from "../Pages/Admin/AdminDashboard";
 import BookManagement from "../Pages/Admin/BookManagement";
@@ -16,7 +14,6 @@ import { AdminRoute } from "../Components/AdminRoute";
 export default function Router() {
   return (
     <BrowserRouter>
-      <Nav />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -28,7 +25,6 @@ export default function Router() {
           <Route path="/admin/books" element={<BookManagement />} />
         </Route>
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }

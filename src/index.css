@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 100% 96%;
+    --foreground: 30 25% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 48 100% 96%;
+    --popover-foreground: 30 25% 20%;
+
+    --primary: 30 60% 30%;
+    --primary-foreground: 48 100% 96%;
+
+    --secondary: 30 35% 85%;
+    --secondary-foreground: 30 60% 30%;
+
+    --muted: 30 35% 95%;
+    --muted-foreground: 30 25% 35%;
+
+    --accent: 30 60% 80%;
+    --accent-foreground: 30 80% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 15% 80%;
+    --input: 30 15% 80%;
+    --ring: 30 60% 30%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-amber-50 text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .book-card {
+    @apply bg-white rounded-lg overflow-hidden shadow-sm transition-transform hover:shadow-md relative;
+  }
+
+  .category-card {
+    @apply bg-white p-6 rounded-lg shadow-sm flex flex-col items-center justify-center gap-3 transition-all hover:shadow-md;
+  }
+
+  .nav-link {
+    @apply px-3 py-2 text-base font-medium hover:text-amber-800;
+  }
+
+  .footer-link {
+    @apply hover:text-amber-500 transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-amber-800 text-white px-5 py-3 rounded font-medium hover:bg-amber-900 transition-colors;
+  }
+
+  .star-rating {
+    @apply text-amber-500;
+  }
+
+  .wishlist-button {
+    @apply absolute top-3 right-3 bg-white bg-opacity-80 p-1.5 rounded-full shadow-sm z-10 transition-colors;
+  }
+
+  .add-to-cart {
+    @apply bg-amber-100 text-amber-800 p-2 rounded-full shadow hover:bg-amber-200 transition-all;
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}

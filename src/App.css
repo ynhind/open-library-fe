@@ -1,297 +1,41 @@
-@import url("https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Prata&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200&family=Prata&display=swap");
-@import "@fortawesome/fontawesome-free/css/all.css";
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  text-decoration: none;
-  list-style: none;
-  font-weight: 400;
-}
-/* :root {
-  --color-black: #111111;
-  --color-black-Ex: #222222;
-  --color-dark: #7a7a7a;
-  --color-dark-Ex: #e5e3da;
-  --color-light: #efeee8;
-
-  --color-primary: rgb(189, 61, 38);
-  --color-bg-1: #f5f5f5;
-  --color-bg-2: #eaeaea;
-
-  --font-family-prata: "Prata", serif;
-  --font-family-Jakarta: "Plus Jakarta Sans", sans-serif;
-
-  --transition: 0.4s ease;
-} */
-
-body {
-  background: linear-gradient(
-    to bottom right,
-    var(--gradient-color-1),
-    var(--gradient-color-2),
-    var(--gradient-color-3)
-  );
-  background-attachment: fixed;
-  min-height: 100vh;
-  margin: 0;
-}
-:root {
-  --color-primary: #8c7851; /* Muted gold/brass accent */
-  --color-black: #4f3733; /* Deeper brown for headers */
-  --color-black-Ex: #5d4037; /* Dark brown text, like old ink */
-  --color-dark: #795548; /* Softer brown for secondary text */
-  --color-dark-Ex: #d7ccc8; /* Light, aged paper border */
-  --color-light: #efebe9; /* Light stone/paper for cards */
-  --color-bg-1: #fdf6e3; /* Creamy, parchment-like background */
-  --color-bg-2: #f5f2e7; /* Slightly darker background */
-  --font-family-prata: "Playfair Display", serif;
-  --font-family-Jakarta: "Roboto", sans-serif;
-  --transition: 0.3s ease;
-}
-html {
-  scroll-behavior: smooth;
-  font-family: var(--font-family-Jakarta);
-  color: var(--color-dark);
-}
-body {
-  background: linear-gradient(135deg, #f8f0d7, #ede5d5, #d2edf1);
-  background-attachment: fixed;
-  min-height: 100vh;
-}
-body {
-  font-family: var(--font-family-Jakarta);
-  color: var(--color-dark);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-family-prata);
-  color: var(--color-dark);
-  text-transform: capitalize;
-}
-h1 {
-  font-size: 56px;
-  color: var(--color-black-Ex);
-}
-h2 {
-  font-size: 48px;
-  line-height: auto;
-  color: var(--color-black);
-}
-.h3-ex {
-  font-size: 26px !important;
-}
-h3 {
-  font-size: 28px;
-  line-height: auto;
-  color: var(--color-black);
-}
-h4 {
-  font-size: 22px;
-  line-height: auto;
-  color: var(--color-black);
-}
-h3 {
-  font-size: 17px;
-  color: var(--color-dark);
-}
-h5 span {
-  font: size 18px;
-  color: var(--color-primary);
-}
-p {
-  font-size: 16px;
-  line-height: 220%;
-  letter-spacing: 4%;
-}
-small {
-  font-size: 13px;
-  line-height: 16%;
-  color: var(--color-dark);
-}
-.btn {
-  display: inline-block;
-  width: fit-content;
-  color: var(--color-black);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 20px 35px;
-  text-transform: uppercase;
-  transition: var(--transition);
-  position: relative;
-}
-.btn::after {
-  content: " ";
-  width: 0%;
-  height: 100%;
-  background: var(--color-black-Ex);
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: -1;
-  transition: var(--transition);
-}
-.btn:hover::after {
-  width: 100%;
-}
-.btn:hover {
-  color: var(--color-bg-1);
-}
-.btn-border {
-  border: 1px solid var(--color-dark-Ex);
-}
-button {
-  background: transparent;
-  border: none;
-}
-img {
+#root {
   max-width: 100%;
-  object-fit: cover;
-}
-.container {
-  width: 90%;
   margin: 0 auto;
-  max-width: 1420px;
-}
-section {
-  padding: 100px 0 !important;
+  text-align: center;
 }
 
-@media (max-width: 1024px) {
-  h1 {
-    font-size: 60px !important;
-  }
-  h2 {
-    font-size: 38 px !important;
-  }
-  h3 {
-    font-size: 26px !important;
-  }
-  h5 {
-    font-size: 16px !important;
-  }
-  section {
-    padding: 100px 0 !important;
-  }
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
 }
-@media (max-width: 600px) {
-  h1 {
-    font-size: 40px !important;
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
   }
-  h2 {
-    font-size: 34 !important;
-  }
-  h3 {
-    font-size: 24px !important;
-  }
-  h4 {
-    font-size: 20px !important;
-  }
-  section {
-    padding: 70px 0 !important;
+  to {
+    transform: rotate(360deg);
   }
 }
 
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: #fdf6e3;
-  color: #5d4037;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
-h1,
-h2,
-h3,
-h4,
-.font-vintage-header {
-  font-family: "Playfair Display", serif;
-  color: #3e2723;
+.card {
+  padding: 2em;
 }
 
-.vintage-accent-text {
-  color: #8c7851;
-}
-
-.vintage-secondary-text {
-  color: #795548;
-}
-
-.vintage-border {
-  border-color: #d7ccc8;
-}
-
-.vintage-bg-header-footer {
-  background-color: #d7ccc8;
-  border-bottom: 2px solid #bcaaa4;
-}
-
-.vintage-bg-card {
-  background-color: #efebe9;
-  border: 1px solid #d7ccc8;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.card-hover-effect {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-hover-effect:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.btn-vintage {
-  background-color: #8c7851;
-  color: #fdf6e3;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 1px solid #795548;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.btn-vintage:hover {
-  background-color: #795548;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.btn-vintage-secondary {
-  background-color: #bcaaa4;
-  color: #3e2723;
-  border: 1px solid #8d6e63;
-}
-
-.btn-vintage-secondary:hover {
-  background-color: #a1887f;
-  color: #fdf6e3;
-}
-
-.search-input-vintage {
-  background-color: #efebe9;
-  color: #5d4037;
-  border: 1px solid #bcaaa4;
-  border-radius: 4px;
-  padding: 8px 12px;
-  padding-left: 36px;
-}
-
-.search-input-vintage::placeholder {
-  color: #a1887f;
-}
-
-.search-input-vintage:focus {
-  outline: none;
-  border-color: #8c7851;
-  box-shadow: 0 0 0 2px rgba(140, 120, 81, 0.3);
+.read-the-docs {
+  color: #888;
 }
