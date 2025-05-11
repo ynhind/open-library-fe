@@ -14,13 +14,20 @@ const Hero = () => {
           With a modernized navigation experience, browse our collection with
           ease.
         </p>
-
-        <Link
-          to="/categories"
-          className="inline-block px-8 py-3 bg-amber-800 hover:bg-amber-900 text-amber-50 rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-        >
-          Explore Collection
-        </Link>
+        <div className="flex justify-center gap-2 mb-8">
+          <Link
+            to="/categories"
+            className="inline-block px-8 py-3 bg-amber-800 hover:bg-amber-900 text-amber-50 rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+          >
+            Explore Collection
+          </Link>
+          <Link
+            to="/login"
+            className="inline-block px-8 py-3 bg-stone-800 hover:bg-stone-900 text-stone-50 rounded-md font-medium transition-all duration-300 shadow-md hover:shadow-lg ml-4"
+          >
+            Being a Member
+          </Link>
+        </div>
       </div>
     </section>
   );

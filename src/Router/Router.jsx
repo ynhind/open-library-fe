@@ -9,6 +9,7 @@ import NotFound from "../Pages/NotFound/NotFound";
 
 import AdminDashboard from "../Pages/Admin/AdminDashboard";
 import BookManagement from "../Pages/Admin/BookManagement";
+import { CategoryManagement } from "../Pages/Admin/CategoryManagement";
 import { AdminRoute } from "../Components/AdminRoute";
 
 export default function Router() {
@@ -23,6 +24,7 @@ export default function Router() {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<BookManagement />} />
+          <Route path="/admin/categories" element={<CategoryManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -143,3 +143,34 @@ export const searchBooks = async (searchParams = {}) => {
     throw error;
   }
 };
+
+//get categories
+export const getCategories = async () => {
+  try {
+    return await apiRequest("books/categories");
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+//create category
+// Create new category
+export const createCategory = async (categoryName) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    return await apiRequest("books/create-categories", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name: categoryName }),
+    });
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
+};

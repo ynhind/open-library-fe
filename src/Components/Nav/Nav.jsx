@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Book,
@@ -8,23 +8,46 @@ import {
   ChevronDown,
   Menu,
 } from "lucide-react";
+import { getCategories } from "../../utils/bookApi";
 
 const Nav = () => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [fetchedCategories, setFetchedCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const categoryTimeoutRef = useRef(null);
 
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
-  const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  const categories = [
-    "Classic Literature",
-    "History",
-    "Philosophy",
-    "Poetry",
-    "All Categories",
-  ];
+  useEffect(() => {
+    return () => {
+      if (categoryTimeoutRef.current) clearTimeout(categoryTimeoutRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchCategoriesData();
+  }, []);
+
+  const fetchCategoriesData = async () => {
+    if (fetchedCategories.length > 0) return; // Don't fetch if we already have categories
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getCategories();
+      setFetchedCategories(data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      setError("Failed to load categories");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const userMenuItems = [
     { name: "My Account", path: "/account" },
@@ -55,11 +78,12 @@ const Nav = () => {
             </Link>
 
             {/* Categories Dropdown */}
-            <div className="relative">
-              <button
-                className="flex items-center gap-1 text-stone-700 hover:text-amber-800 transition-colors font-medium"
-                onClick={toggleCategories}
-              >
+            <div
+              className="relative"
+              onMouseEnter={() => setIsCategoriesOpen(true)}
+              onMouseLeave={() => setIsCategoriesOpen(false)}
+            >
+              <button className="flex items-center gap-1 text-stone-700 hover:text-amber-800 transition-colors font-medium">
                 Categories
                 <ChevronDown
                   size={16}
@@ -71,17 +95,42 @@ const Nav = () => {
 
               {isCategoriesOpen && (
                 <div className="absolute top-full right-0 mt-1 w-56 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in">
-                  {categories.map((category, index) => (
-                    <Link
-                      key={index}
-                      to={`/category/${category
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                      className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
-                    >
-                      {category}
-                    </Link>
-                  ))}
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <Loader
+                        size={16}
+                        className="animate-spin text-amber-800"
+                      />
+                    </div>
+                  ) : error ? (
+                    <div className="px-4 py-3 text-sm text-red-500">
+                      {error}
+                    </div>
+                  ) : fetchedCategories.length > 0 ? (
+                    <>
+                      {fetchedCategories.map((category) => (
+                        <Link
+                          key={category.categoryId}
+                          to={`/category/${category.name
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
+                          className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
+                      <Link
+                        to="/categories"
+                        className="block px-4 py-2 text-sm font-medium text-amber-800 border-t border-amber-200 mt-1 hover:bg-amber-100"
+                      >
+                        View All Categories
+                      </Link>
+                    </>
+                  ) : (
+                    <div className="px-4 py-3 text-sm text-stone-500">
+                      No categories found
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -125,11 +174,12 @@ const Nav = () => {
             </Link>
 
             {/* User Menu */}
-            <div className="relative ml-4">
-              <button
-                className="p-2 text-stone-700 hover:text-amber-800 transition-colors"
-                onClick={toggleUserMenu}
-              >
+            <div
+              className="relative ml-4 "
+              onMouseEnter={() => setIsUserMenuOpen(true)}
+              onMouseLeave={() => setIsUserMenuOpen(false)}
+            >
+              <button className="p-2 text-stone-700 hover:text-amber-800 transition-colors">
                 <User size={20} />
               </button>
 

@@ -5,6 +5,7 @@ import {
   searchBooks,
   updateBook,
   deleteBook,
+  getCategories,
 } from "../../utils/bookApi";
 
 function useDebounce(value, delay) {
@@ -24,6 +25,18 @@ function useDebounce(value, delay) {
 }
 
 export default function BookManagement() {
+  //fetch categories
+  const [categories, setCategories] = useState([]);
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await getCategories();
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setError("Failed to load categories. Please try again.");
+    }
+  };
+
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useState({
@@ -83,6 +96,7 @@ export default function BookManagement() {
 
   useEffect(() => {
     fetchBooks();
+    fetchCategories();
   }, []);
 
   const fetchBooks = async () => {
@@ -626,19 +640,20 @@ export default function BookManagement() {
                         multiple
                         className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 h-24 bg-white"
                       >
-                        <option value="1">Fiction</option>
-                        <option value="2">Non-Fiction</option>
-                        <option value="3">Science</option>
-                        <option value="4">History</option>
-                        <option value="5">Biography</option>
-                        <option value="6">Fantasy</option>
-                        <option value="7">Mystery</option>
-                        <option value="8">Romance</option>
-                        <option value="9">Thriller</option>
-                        <option value="10">Self-Help</option>
-                        <option value="11">Health</option>
-                        <option value="12">Travel</option>
-                        <option value="13">Cookbooks</option>
+                        {categories.length > 0 ? (
+                          categories.map((category) => (
+                            <option
+                              key={category.categoryId}
+                              value={category.categoryId}
+                            >
+                              {category.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>
+                            Loading categories...
+                          </option>
+                        )}
                       </select>
                       <p className="text-xs text-stone-500 mt-1">
                         Hold Ctrl/Cmd to select multiple
@@ -793,16 +808,17 @@ export default function BookManagement() {
                 onChange={handleSearchChange}
                 className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 h-10 bg-white"
               >
-                <option value="Fiction">Fiction</option>
-                <option value="Non-Fiction">Non-Fiction</option>
-                <option value="Science">Science</option>
-                <option value="History">History</option>
-                <option value="Biography">Biography</option>
-                <option value="Fantasy">Fantasy</option>
-                <option value="Mystery">Mystery</option>
-                <option value="Romance">Romance</option>
-                <option value="Thriller">Thriller</option>
-                <option value="Self-Help">Self-Help</option>
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <option key={category.categoryId} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    Loading categories...
+                  </option>
+                )}
               </select>
             </div>
           </div>
@@ -897,6 +913,26 @@ export default function BookManagement() {
             </table>
           </div>
         )}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => (window.location.href = "/admin")}
+            className="flex items-center space-x-2 bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>Back to Admin Dashboard</span>
+          </button>
+        </div>
       </div>
     </div>
   );
