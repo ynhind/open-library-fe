@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
-import "./Admin.css";
-import { getBooks, createBook, searchBooks } from "../../utils/bookApi";
-import { updateBook } from "../../utils/bookApi";
-import { deleteBook } from "../../utils/bookApi";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  getBooks,
+  createBook,
+  searchBooks,
+  updateBook,
+  deleteBook,
+} from "../../utils/bookApi";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -23,7 +26,6 @@ function useDebounce(value, delay) {
 export default function BookManagement() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [searchParams, setSearchParams] = useState({
     title: "",
     author: "",
@@ -31,8 +33,37 @@ export default function BookManagement() {
     categories: [],
   });
   const [isSearching, setIsSearching] = useState(false);
-
   const debouncedSearchParams = useDebounce(searchParams, 500);
+
+  // File references
+  const fileInputRef = useRef(null);
+  const coverImageRef = useRef(null);
+
+  // Remaining state and hook logic (unchanged)
+  const [formData, setFormData] = useState({
+    title: "",
+    author: "",
+    price: 0,
+    quantity_available: 0,
+    description: "",
+    publisher: "",
+    publishDate: "",
+    isbn: "",
+    format: "PAPERBACK",
+    isAvailableOnline: false,
+    previewPages: 0,
+    categories: [],
+    file: null, // Add for PDF file
+    coverImage: null, // Add for cover image
+    filePreview: "", // For displaying file name
+    coverPreview: "", // For displaying cover preview
+  });
+
+  const [editingBookId, setEditingBookId] = useState(null);
+  const [error, setError] = useState("");
+  const [showAdvancedFields, setShowAdvancedFields] = useState(false);
+
+  // All effect hooks and handlers remain unchanged
   useEffect(() => {
     // Check if any search parameter has a value
     const hasSearchParams = Object.values(debouncedSearchParams).some(
@@ -40,7 +71,6 @@ export default function BookManagement() {
         value &&
         (typeof value === "string" ? value.trim() !== "" : value.length > 0)
     );
-
     if (hasSearchParams) {
       performSearch(debouncedSearchParams);
       setIsSearching(true);
@@ -51,26 +81,6 @@ export default function BookManagement() {
     }
   }, [debouncedSearchParams]);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    price: 0,
-    quantity_available: 0,
-    description: "",
-    publisher: "",
-    publishDate: "",
-    isbn: "",
-    format: "PAPERBACK", // Default value
-    isAvailableOnline: false,
-    previewPages: 0,
-    categories: [],
-  });
-  const [editingBookId, setEditingBookId] = useState(null);
-  //   const [bookFile, setBookFile] = useState(null);
-  //   const [coverImage, setCoverImage] = useState(null);
-  const [error, setError] = useState("");
-
-  // Fetch books on component load
   useEffect(() => {
     fetchBooks();
   }, []);
@@ -88,10 +98,27 @@ export default function BookManagement() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, files } = e.target;
 
-    if (name === "categories" && type === "select-multiple") {
-      // Handle multi-select element differently
+    if (name === "file" && files && files[0]) {
+      // Handle PDF file upload
+      setFormData({
+        ...formData,
+        file: files[0],
+        filePreview: files[0].name,
+      });
+    } else if (name === "coverImage" && files && files[0]) {
+      // Handle cover image upload
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData({
+          ...formData,
+          coverImage: files[0],
+          coverPreview: e.target.result,
+        });
+      };
+      reader.readAsDataURL(files[0]);
+    } else if (name === "categories" && type === "select-multiple") {
       const selectedOptions = Array.from(
         e.target.selectedOptions,
         (option) => option.value
@@ -111,30 +138,18 @@ export default function BookManagement() {
             : value,
       });
     }
+
     if (name === "publishDate") {
-      // Always store dates as ISO strings for the API
       const dateValue = value ? new Date(value).toISOString() : "";
       setFormData({ ...formData, [name]: dateValue });
-    } else {
-      // Handle other form fields normally
+    } else if (!["file", "coverImage"].includes(name)) {
       const fieldValue = type === "checkbox" ? checked : value;
       setFormData({ ...formData, [name]: fieldValue });
     }
   };
-  //   const handleFileChange = (e) => {
-  //     const { name, files } = e.target;
-  //     if (files && files[0]) {
-  //       if (name === "bookFile") {
-  //         setBookFile(files[0]);
-  //       } else if (name === "coverImage") {
-  //         setCoverImage(files[0]);
-  //       }
-  //     }
-  //   };
 
   const handleSearchChange = (e) => {
     const { name, value, type, selectedOptions } = e.target;
-
     if (type === "select-multiple") {
       const selectedValues = Array.from(
         selectedOptions,
@@ -152,12 +167,9 @@ export default function BookManagement() {
     }
   };
 
-  // Perform the actual search
   const performSearch = async (params) => {
     setLoading(true);
-
     try {
-      // Filter out empty search params
       const filteredParams = Object.entries(params).reduce(
         (acc, [key, value]) => {
           if (
@@ -170,7 +182,6 @@ export default function BookManagement() {
         },
         {}
       );
-
       const results = await searchBooks(filteredParams);
       setBooks(results);
     } catch (error) {
@@ -189,39 +200,50 @@ export default function BookManagement() {
       categories: [],
     });
     setIsSearching(false);
-    await fetchBooks(); // Reload all books
+    await fetchBooks();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate required files for new book
+    if (!editingBookId) {
+      if (!formData.file) {
+        setError("Please upload a PDF file for the book.");
+        return;
+      }
+      if (!formData.coverImage) {
+        setError("Please upload a cover image for the book.");
+        return;
+      }
+    }
+
     try {
-      console.log("Categories before processing:", formData.categories);
       const bookData = {
         ...formData,
-
         price: Number(formData.price),
         quantity_available: Number(formData.quantity_available),
-
         publishDate: formData.publishDate
           ? new Date(formData.publishDate).toISOString()
           : null,
         previewPages: Number(formData.previewPages),
         categories: Array.isArray(formData.categories)
           ? formData.categories.map((id) => Number(id))
-          : [], // Provide a fallback empty array
+          : [],
+        file: formData.file,
+        coverImage: formData.coverImage,
       };
-      console.log("Processed book data:", bookData);
 
       if (editingBookId) {
-        // If we're editing an existing book
         await updateBook(editingBookId, bookData);
-        console.log("Book updated successfully");
       } else {
-        // If we're creating a new book
-        await createBook(bookData);
-        console.log("Book created successfully");
-      } // Reset form
+        console.log("Sending book data:", bookData);
+        const result = await createBook(bookData);
+        console.log("Book created successfully:", result);
+        setError("");
+      }
+
+      // Reset form
       setFormData({
         title: "",
         author: "",
@@ -231,16 +253,27 @@ export default function BookManagement() {
         publisher: "",
         publishDate: "",
         isbn: "",
-        format: "PAPERBACK", // Default value
+        format: "PAPERBACK",
         isAvailableOnline: false,
         previewPages: 0,
         categories: [],
+        file: null,
+        coverImage: null,
+        filePreview: "",
+        coverPreview: "",
       });
+
+      // Reset file inputs
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (coverImageRef.current) coverImageRef.current.value = "";
+
       setEditingBookId(null);
+      setShowAdvancedFields(false);
       // Refresh book list
       await fetchBooks();
     } catch (error) {
       console.error("Error saving book:", error);
+      setError("Failed to save book. Please check your inputs and try again.");
     }
   };
 
@@ -260,14 +293,19 @@ export default function BookManagement() {
       categories: book.categories
         ? book.categories.map((category) => category.categoryId)
         : [],
+      file: null,
+      coverImage: null,
+      filePreview: "Current file will be kept if not changed",
+      coverPreview: book.coverImage || "",
     });
     setEditingBookId(book.bookId);
+    setShowAdvancedFields(true); // Show all fields when editing
   };
+
   const handleDelete = async (bookId) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
         await deleteBook(bookId);
-        console.log("Book deleted successfully");
         await fetchBooks();
       } catch (error) {
         console.error("Error deleting book:", error);
@@ -276,360 +314,578 @@ export default function BookManagement() {
   };
 
   return (
-    <div className="admin-page">
-      <div className="admin-container">
-        <h2>Book Management</h2>
+    <div className="min-h-screen bg-amber-50/50 py-10 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6 sm:p-8">
+        <h2 className="text-2xl md:text-3xl font-serif font-bold text-amber-800 mb-6">
+          Book Management
+        </h2>
 
-        {error && <div className="error-message">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="admin-form">
-          <h3>{editingBookId ? "Edit Book" : "Add New Book"}</h3>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="title">Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="author">Author</label>
-              <input
-                type="text"
-                id="author"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                required
-              />
-            </div>
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+            <p>{error}</p>
           </div>
+        )}
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="price">Price ($)</label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                step="0.01"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="quantity_available">Quantity Available</label>
-              <input
-                type="number"
-                id="quantity_available"
-                name="quantity_available"
-                value={formData.quantity_available}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+        {/* Simplified Book Form */}
+        <div className="mb-10">
+          <details
+            className="bg-amber-50/70 p-6 rounded-lg shadow-sm"
+            open={editingBookId !== null}
+          >
+            <summary className="text-xl font-serif font-semibold text-stone-800 mb-5 cursor-pointer">
+              {editingBookId ? "Edit Book" : "Add New Book"}
+            </summary>
 
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="4"
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="publisher">Publisher</label>
-              <input
-                type="text"
-                id="publisher"
-                name="publisher"
-                value={formData.publisher}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <input
-              type="date"
-              name="publishDate"
-              value={
-                formData.publishDate
-                  ? formData.publishDate.substring(0, 10)
-                  : ""
-              }
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="isbn">ISBN</label>
-              <input
-                type="text"
-                id="isbn"
-                name="isbn"
-                value={formData.isbn}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="format">Format</label>
-              <select
-                id="format"
-                name="format"
-                value={formData.format}
-                onChange={handleChange}
-              >
-                <option value="PAPERBACK">Paperback</option>
-                <option value="HARDCOVER">Hardcover</option>
-                <option value="EBOOK">Ebook</option>
-                <option value="AUDIOBOOK">Audiobook</option>
-              </select>
-            </div>
-          </div>
-
-          {/* <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="bookFileInput">Book PDF File</label>
-              <input
-                type="file"
-                id="bookFileInput"
-                name="bookFile"
-                onChange={handleFileChange}
-                accept=".pdf"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="coverImageInput">Cover Image</label>
-              <input
-                type="file"
-                id="coverImageInput"
-                name="coverImage"
-                onChange={handleFileChange}
-                accept="image/jpeg, image/png"
-              />
-            </div>
-          </div> */}
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="isbn">Categories</label>
-              <select
-                id="categories"
-                name="categories"
-                value={formData.categories}
-                onChange={handleChange}
-                multiple
-              >
-                <option value="1">Fiction</option>
-                <option value="2">Non-Fiction</option>
-                <option value="3">Science</option>
-                <option value="4">History</option>
-                <option value="5">Biography</option>
-                <option value="6">Fantasy</option>
-                <option value="7">Mystery</option>
-
-                <option value="8">Romance</option>
-                <option value="9">Thriller</option>
-                <option value="10">Self-Help</option>
-                <option value="11">Health</option>
-                <option value="12">Travel</option>
-                <option value="13">Cookbooks</option>
-              </select>
-            </div>
-          </div>
-
-          {/* <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="bookFileInput">Book File (PDF)</label>
-              <input
-                type="file"
-                id="bookFileInput"
-                name="bookFile"
-                onChange={handleFileChange}
-                accept=".pdf"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="coverImageInput">Cover Image</label>
-              <input
-                type="file"
-                id="coverImageInput"
-                name="coverImage"
-                onChange={handleFileChange}
-                accept="image/jpeg, image/png"
-              />
-            </div>
-          </div> */}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="previewPages">Preview Pages</label>
-              <input
-                type="number"
-                id="previewPages"
-                name="previewPages"
-                value={formData.previewPages}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="isAvailableOnline"
-                  checked={formData.isAvailableOnline}
-                  onChange={handleChange}
-                />
-                Available Online
-              </label>
-            </div>
-          </div>
-
-          <div className="search-section">
-            <h3 className="section-title">Search Books</h3>
-            <div className="search-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="searchTitle">Title</label>
+            <form onSubmit={handleSubmit}>
+              {/* File upload section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="file"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Book PDF{" "}
+                    {!editingBookId && <span className="text-red-500">*</span>}
+                  </label>
                   <input
-                    type="text"
-                    id="searchTitle"
-                    name="title"
-                    value={searchParams.title}
-                    onChange={handleSearchChange}
-                    placeholder="Search by title"
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept=".pdf"
+                    onChange={handleChange}
+                    ref={fileInputRef}
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    required={!editingBookId}
                   />
+                  {formData.filePreview && (
+                    <p className="text-xs text-stone-500 mt-1">
+                      {formData.filePreview}
+                    </p>
+                  )}
                 </div>
-                <div className="form-group">
-                  <label htmlFor="searchAuthor">Author</label>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="coverImage"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Cover Image{" "}
+                    {!editingBookId && <span className="text-red-500">*</span>}
+                  </label>
                   <input
-                    type="text"
-                    id="searchAuthor"
-                    name="author"
-                    value={searchParams.author}
-                    onChange={handleSearchChange}
-                    placeholder="Search by author"
+                    type="file"
+                    id="coverImage"
+                    name="coverImage"
+                    accept="image/*"
+                    onChange={handleChange}
+                    ref={coverImageRef}
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    required={!editingBookId}
                   />
+                  {formData.coverPreview && (
+                    <div className="mt-2">
+                      <img
+                        src={formData.coverPreview}
+                        alt="Cover preview"
+                        className="h-20 w-auto object-contain rounded"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="searchPublisher">Publisher</label>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="title"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Title
+                  </label>
                   <input
                     type="text"
-                    id="searchPublisher"
-                    name="publisher"
-                    value={searchParams.publisher}
-                    onChange={handleSearchChange}
-                    placeholder="Search by publisher"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="searchCategories">Categories</label>
-                  <select
-                    id="searchCategories"
-                    name="categories"
-                    multiple
-                    value={searchParams.categories}
-                    onChange={handleSearchChange}
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="author"
+                    className="text-sm font-medium text-stone-700 mb-1"
                   >
-                    {/* Your category options */}
-                    <option value="Fiction">Fiction</option>
-                    <option value="Non-Fiction">Non-Fiction</option>
-                    <option value="Science">Science</option>
-                    <option value="History">History</option>
-                    <option value="Biography">Biography</option>
-                    <option value="Fantasy">Fantasy</option>
-                    <option value="Mystery">Mystery</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Thriller">Thriller</option>
-                    <option value="Self-Help">Self-Help</option>
+                    Author
+                  </label>
+                  <input
+                    type="text"
+                    id="author"
+                    name="author"
+                    value={formData.author}
+                    onChange={handleChange}
+                    required
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="price"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Price ($)
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    step="0.01"
+                    required
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="quantity_available"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    id="quantity_available"
+                    name="quantity_available"
+                    value={formData.quantity_available}
+                    onChange={handleChange}
+                    required
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="format"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    Format
+                  </label>
+                  <select
+                    id="format"
+                    name="format"
+                    value={formData.format}
+                    onChange={handleChange}
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                  >
+                    <option value="PAPERBACK">Paperback</option>
+                    <option value="HARDCOVER">Hardcover</option>
+                    <option value="EBOOK">Ebook</option>
+                    <option value="AUDIOBOOK">Audiobook</option>
                   </select>
                 </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="isbn"
+                    className="text-sm font-medium text-stone-700 mb-1"
+                  >
+                    ISBN
+                  </label>
+                  <input
+                    type="text"
+                    id="isbn"
+                    name="isbn"
+                    value={formData.isbn}
+                    onChange={handleChange}
+                    required
+                    className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
               </div>
-              <div className="search-actions">
+
+              {/* Toggle for advanced fields */}
+              <div className="mb-6">
                 <button
                   type="button"
-                  className="admin-button secondary"
-                  onClick={clearSearch}
+                  onClick={() => setShowAdvancedFields(!showAdvancedFields)}
+                  className="text-amber-800 hover:text-amber-900 flex items-center text-sm font-medium"
                 >
-                  Clear Search
+                  {showAdvancedFields
+                    ? "Hide Advanced Fields"
+                    : "Show Advanced Fields"}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 ml-1 transform ${
+                      showAdvancedFields ? "rotate-180" : ""
+                    }`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
               </div>
+
+              {/* Advanced fields */}
+              {showAdvancedFields && (
+                <>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="description"
+                      className="text-sm font-medium text-stone-700 mb-1 block"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows="3"
+                      className="w-full border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="publisher"
+                        className="text-sm font-medium text-stone-700 mb-1"
+                      >
+                        Publisher
+                      </label>
+                      <input
+                        type="text"
+                        id="publisher"
+                        name="publisher"
+                        value={formData.publisher}
+                        onChange={handleChange}
+                        className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="publishDate"
+                        className="text-sm font-medium text-stone-700 mb-1"
+                      >
+                        Publish Date
+                      </label>
+                      <input
+                        type="date"
+                        id="publishDate"
+                        name="publishDate"
+                        value={
+                          formData.publishDate
+                            ? formData.publishDate.substring(0, 10)
+                            : ""
+                        }
+                        onChange={handleChange}
+                        className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="previewPages"
+                        className="text-sm font-medium text-stone-700 mb-1"
+                      >
+                        Preview Pages
+                      </label>
+                      <input
+                        type="number"
+                        id="previewPages"
+                        name="previewPages"
+                        value={formData.previewPages}
+                        onChange={handleChange}
+                        className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="categories"
+                        className="text-sm font-medium text-stone-700 mb-1"
+                      >
+                        Categories
+                      </label>
+                      <select
+                        id="categories"
+                        name="categories"
+                        value={formData.categories}
+                        onChange={handleChange}
+                        multiple
+                        className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 h-24 bg-white"
+                      >
+                        <option value="1">Fiction</option>
+                        <option value="2">Non-Fiction</option>
+                        <option value="3">Science</option>
+                        <option value="4">History</option>
+                        <option value="5">Biography</option>
+                        <option value="6">Fantasy</option>
+                        <option value="7">Mystery</option>
+                        <option value="8">Romance</option>
+                        <option value="9">Thriller</option>
+                        <option value="10">Self-Help</option>
+                        <option value="11">Health</option>
+                        <option value="12">Travel</option>
+                        <option value="13">Cookbooks</option>
+                      </select>
+                      <p className="text-xs text-stone-500 mt-1">
+                        Hold Ctrl/Cmd to select multiple
+                      </p>
+                    </div>
+
+                    <div className="flex items-center mt-4">
+                      <input
+                        type="checkbox"
+                        id="isAvailableOnline"
+                        name="isAvailableOnline"
+                        checked={formData.isAvailableOnline}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
+                      />
+                      <label
+                        htmlFor="isAvailableOnline"
+                        className="ml-2 text-sm font-medium text-stone-700"
+                      >
+                        Available Online
+                      </label>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="flex gap-4 mt-6">
+                <button
+                  type="submit"
+                  className="bg-amber-800 text-white px-5 py-2 rounded-md hover:bg-amber-900 transition-colors"
+                >
+                  {editingBookId ? "Update Book" : "Add Book"}
+                </button>
+                {editingBookId && (
+                  <button
+                    type="button"
+                    className="bg-stone-700 text-white px-5 py-2 rounded-md hover:bg-stone-800 transition-colors"
+                    onClick={() => {
+                      setEditingBookId(null);
+                      setFormData({
+                        title: "",
+                        author: "",
+                        price: 0,
+                        quantity_available: 0,
+                        description: "",
+                        isAvailableOnline: false,
+                        previewPages: 20,
+                        publisher: "",
+                        publishDate: "",
+                        isbn: "",
+                        format: "PAPERBACK",
+                        categories: [],
+                        file: null,
+                        coverImage: null,
+                        filePreview: "",
+                        coverPreview: "",
+                      });
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                      if (coverImageRef.current)
+                        coverImageRef.current.value = "";
+                      setShowAdvancedFields(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </details>
+        </div>
+
+        {/* Rest of the component remains unchanged */}
+        {/* Search Section */}
+        <div className="bg-white border border-amber-200 rounded-lg p-5 mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-serif font-medium text-stone-800">
+              Search Books
+            </h3>
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="text-sm text-amber-800 hover:text-amber-900"
+            >
+              Clear Search
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex flex-col">
+              <label
+                htmlFor="searchTitle"
+                className="text-sm font-medium text-stone-700 mb-1"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="searchTitle"
+                name="title"
+                value={searchParams.title}
+                onChange={handleSearchChange}
+                placeholder="Search by title"
+                className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="searchAuthor"
+                className="text-sm font-medium text-stone-700 mb-1"
+              >
+                Author
+              </label>
+              <input
+                type="text"
+                id="searchAuthor"
+                name="author"
+                value={searchParams.author}
+                onChange={handleSearchChange}
+                placeholder="Search by author"
+                className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="searchPublisher"
+                className="text-sm font-medium text-stone-700 mb-1"
+              >
+                Publisher
+              </label>
+              <input
+                type="text"
+                id="searchPublisher"
+                name="publisher"
+                value={searchParams.publisher}
+                onChange={handleSearchChange}
+                placeholder="Search by publisher"
+                className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label
+                htmlFor="searchCategories"
+                className="text-sm font-medium text-stone-700 mb-1"
+              >
+                Categories
+              </label>
+              <select
+                id="searchCategories"
+                name="categories"
+                multiple
+                value={searchParams.categories}
+                onChange={handleSearchChange}
+                className="border border-amber-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 h-10 bg-white"
+              >
+                <option value="Fiction">Fiction</option>
+                <option value="Non-Fiction">Non-Fiction</option>
+                <option value="Science">Science</option>
+                <option value="History">History</option>
+                <option value="Biography">Biography</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Self-Help">Self-Help</option>
+              </select>
             </div>
           </div>
+        </div>
 
-          <div className="form-actions">
-            <button type="submit" className="admin-button primary">
-              {editingBookId ? "Update Book" : "Add Book"}
-            </button>
-            {editingBookId && (
-              <button
-                type="button"
-                className="admin-button secondary"
-                onClick={() => {
-                  setEditingBookId(null);
-                  setFormData({
-                    title: "",
-                    author: "",
-                    price: 0,
-                    quantity_available: 0,
-                    description: "",
-                    isAvailableOnline: false,
-                    previewPages: 20,
-                  });
-                }}
-              >
-                Cancel Editing
-              </button>
-            )}
-          </div>
-        </form>
+        {/* Books Table */}
+        <h3 className="text-xl font-serif font-semibold text-stone-800 mb-4">
+          All Books
+        </h3>
 
-        <h3 className="section-title">All Books</h3>
         {loading ? (
-          <p>Loading books...</p>
+          <div className="flex justify-center items-center py-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amber-800"></div>
+          </div>
+        ) : books.length === 0 ? (
+          <div className="text-center py-8 bg-amber-50/30 rounded-lg border border-amber-100">
+            <p className="text-stone-600">
+              No books found. Try adjusting your search criteria.
+            </p>
+          </div>
         ) : (
-          <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
+          <div className="overflow-x-auto rounded-lg shadow">
+            <table className="min-w-full divide-y divide-amber-200">
+              <thead className="bg-amber-50">
                 <tr>
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Online</th>
-                  <th>Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Author
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Qty
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Format
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white divide-y divide-amber-100">
                 {books.map((book) => (
-                  <tr key={book.bookId}>
-                    <td>{book.bookId}</td>
-                    <td>{book.title}</td>
-                    <td>{book.author}</td>
-                    <td>${book.price}</td>
-                    <td>{book.quantity_available}</td>
-                    <td>{book.isAvailableOnline ? "Yes" : "No"}</td>
-                    <td>
+                  <tr
+                    key={book.bookId}
+                    className="hover:bg-amber-50/50 transition-colors"
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                      {book.bookId}
+                    </td>
+                    <td className="px-4 py-3 whitespace-normal text-sm font-medium text-stone-800 max-w-[200px] truncate">
+                      {book.title}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                      {book.author}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                      ${book.price}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                      {book.quantity_available}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                      <span className="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
+                        {book.format?.toLowerCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                       <button
-                        className="table-btn edit"
+                        className="bg-amber-600 text-white px-3 py-1 rounded mr-2 text-xs hover:bg-amber-700 transition-colors"
                         onClick={() => handleEdit(book)}
                       >
                         Edit
                       </button>
                       <button
-                        className="table-btn delete"
+                        className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors"
                         onClick={() => handleDelete(book.bookId)}
                       >
                         Delete

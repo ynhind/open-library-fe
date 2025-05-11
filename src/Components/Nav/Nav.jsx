@@ -41,7 +41,7 @@ const Nav = () => {
           <Link to="/" className="flex items-center gap-2">
             <Book className="text-amber-800" size={24} />
             <span className="text-2xl font-serif font-bold text-stone-800">
-              Old<span className="text-amber-800">Tomes</span>
+              Open<span className="text-amber-800">Library</span>
             </span>
           </Link>
 

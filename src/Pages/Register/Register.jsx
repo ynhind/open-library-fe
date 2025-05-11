@@ -153,7 +153,7 @@ export default function Register() {
             </button>
           </form>
 
-          <div className="auth-redirect">
+          <div className="auth-redirect text-stone-800">
             Already have an account? <Link to="/login">Sign in</Link>
           </div>
         </div>

@@ -11,6 +11,7 @@ export const getBooks = async () => {
   }
 };
 
+//create book with file upload
 export const createBook = async (bookData) => {
   try {
     const token = localStorage.getItem("token");
@@ -18,12 +19,43 @@ export const createBook = async (bookData) => {
       throw new Error("Authentication required. Please log in.");
     }
 
+    // Create FormData object for multipart/form-data request
+    const formData = new FormData();
+
+    // Add book file (PDF)
+    if (bookData.file) {
+      formData.append("file", bookData.file);
+    } else {
+      throw new Error("PDF file is required");
+    }
+
+    // Add cover image
+    if (bookData.coverImage) {
+      formData.append("coverImage", bookData.coverImage);
+    } else {
+      throw new Error("Cover image is required");
+    }
+
+    // Add all other book data fields
+    Object.keys(bookData).forEach((key) => {
+      // Skip file objects since we already handled them
+      if (key !== "file" && key !== "coverImage") {
+        // If the field is an array (like categories), join with commas
+        if (Array.isArray(bookData[key])) {
+          formData.append(key, bookData[key].join(","));
+        } else if (bookData[key] !== null && bookData[key] !== undefined) {
+          formData.append(key, bookData[key]);
+        }
+      }
+    });
+
     return await apiRequest("books/create", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+        // No Content-Type header - browser will set it with the correct boundary
       },
-      body: JSON.stringify(bookData),
+      body: formData,
     });
   } catch (error) {
     console.error("Error creating book:", error);
