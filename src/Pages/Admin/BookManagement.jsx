@@ -26,6 +26,7 @@ function useDebounce(value, delay) {
 
 export default function BookManagement() {
   //fetch categories
+
   const [categories, setCategories] = useState([]);
   const fetchCategories = async () => {
     try {
@@ -250,6 +251,7 @@ export default function BookManagement() {
 
       if (editingBookId) {
         await updateBook(editingBookId, bookData);
+        console.log("Book updated successfully:", bookData);
       } else {
         console.log("Sending book data:", bookData);
         const result = await createBook(bookData);

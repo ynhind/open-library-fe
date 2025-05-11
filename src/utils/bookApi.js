@@ -70,14 +70,37 @@ export const updateBook = async (bookId, bookData) => {
     if (!token) {
       throw new Error("Authentication required. Please log in.");
     }
+    // Create FormData object for multipart/form-data request
+    const formData = new FormData();
+    // Add book file (PDF)
+    if (bookData.file) {
+      formData.append("file", bookData.file);
+    }
+    // Add cover image
+    if (bookData.coverImage) {
+      formData.append("coverImage", bookData.coverImage);
+    }
+    // Add all other book data fields
+    Object.keys(bookData).forEach((key) => {
+      // Skip file objects since we already handled them
+      if (key !== "file" && key !== "coverImage") {
+        // If the field is an array (like categories), join with commas
+        if (Array.isArray(bookData[key])) {
+          formData.append(key, bookData[key].join(","));
+        } else if (bookData[key] !== null && bookData[key] !== undefined) {
+          formData.append(key, bookData[key]);
+        }
+      }
+    });
 
     return await apiRequest(`books/update/${bookId}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(bookData),
+      body: formData,
     });
+    console.log("Book updated successfully");
   } catch (error) {
     console.error("Error updating book:", error);
     throw error;
