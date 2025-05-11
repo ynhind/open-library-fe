@@ -135,7 +135,7 @@ export default function BookManagement() {
     } else if (name === "categories" && type === "select-multiple") {
       const selectedOptions = Array.from(
         e.target.selectedOptions,
-        (option) => option.value
+        (option) => parseInt(option.value, 10) // Convert to number
       );
       setFormData({
         ...formData,
@@ -156,7 +156,7 @@ export default function BookManagement() {
     if (name === "publishDate") {
       const dateValue = value ? new Date(value).toISOString() : "";
       setFormData({ ...formData, [name]: dateValue });
-    } else if (!["file", "coverImage"].includes(name)) {
+    } else if (!["file", "coverImage", "categories"].includes(name)) {
       const fieldValue = type === "checkbox" ? checked : value;
       setFormData({ ...formData, [name]: fieldValue });
     }
@@ -499,7 +499,6 @@ export default function BookManagement() {
                     <option value="PAPERBACK">Paperback</option>
                     <option value="HARDCOVER">Hardcover</option>
                     <option value="EBOOK">Ebook</option>
-                    <option value="AUDIOBOOK">Audiobook</option>
                   </select>
                 </div>
 

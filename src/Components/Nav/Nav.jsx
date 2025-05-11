@@ -247,15 +247,15 @@ const Nav = () => {
 
               {isCategoriesOpen && (
                 <div className="ml-4 mt-1 space-y-1 border-l border-amber-200 pl-4">
-                  {categories.map((category, index) => (
+                  {fetchedCategories.map((category, index) => (
                     <Link
                       key={index}
-                      to={`/category/${category
+                      to={`/category/${category.name
                         .toLowerCase()
                         .replace(/\s+/g, "-")}`}
                       className="block py-2 text-sm text-stone-700"
                     >
-                      {category}
+                      {category.name}
                     </Link>
                   ))}
                 </div>
