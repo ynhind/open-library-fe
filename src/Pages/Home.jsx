@@ -6,6 +6,7 @@ import FeaturedBooks from "../Components/FeaturesBook/FeaturedBooks";
 import CategorySection from "../Components/Category/CategorySection";
 import Newsletter from "../Components/Newsletter";
 import { featuredBooks, newArrivals, categories } from "../Data/mockData";
+import { FaStar } from "react-icons/fa";
 
 const Home = () => {
   return (
@@ -16,7 +17,12 @@ const Home = () => {
         <Hero />
 
         <FeaturedBooks
-          title="Featured Classics"
+          title={
+            <>
+              <FaStar className="text-amber-700 inline mr-2 mb-2" />
+              Top Trending Books{" "}
+            </>
+          }
           books={featuredBooks}
           viewAllLink="/category/classics"
         />
@@ -24,7 +30,12 @@ const Home = () => {
         <CategorySection categories={categories} />
 
         <FeaturedBooks
-          title="New Arrivals"
+          title={
+            <>
+              <FaStar className="text-amber-700 inline mr-2 mb-2" />
+              New Arrivals
+            </>
+          }
           books={newArrivals}
           viewAllLink="/new-arrivals"
         />

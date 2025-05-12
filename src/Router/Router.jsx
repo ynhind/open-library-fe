@@ -12,6 +12,9 @@ import BookManagement from "../Pages/Admin/BookManagement";
 import { CategoryManagement } from "../Pages/Admin/CategoryManagement";
 import { AdminRoute } from "../Components/AdminRoute";
 
+import Layout from "../Components/Layout/Layout";
+import BookCollection from "../Components/FeaturesBook/BookCollection";
+
 export default function Router() {
   return (
     <BrowserRouter>
@@ -25,6 +28,10 @@ export default function Router() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<BookManagement />} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
+        </Route>
+        <Route element={<Layout />}>
+          <Route path="/categories" element={<BookCollection />} />
+          {/* Add other routes that need Nav and Footer here */}
         </Route>
       </Routes>
     </BrowserRouter>

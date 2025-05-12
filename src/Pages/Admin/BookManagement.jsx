@@ -294,6 +294,16 @@ export default function BookManagement() {
   };
 
   const handleEdit = (book) => {
+    console.log("Editing book:", book);
+    const categoryNames = book.categories
+      ? Array.isArray(book.categories)
+        ? typeof book.categories[0] === "string"
+          ? book.categories // Already processed category names
+          : book.categories.map((cat) =>
+              cat.category ? cat.category.name : cat.name || ""
+            )
+        : []
+      : [];
     setFormData({
       title: book.title,
       author: book.author,
@@ -306,14 +316,22 @@ export default function BookManagement() {
       publishDate: book.publishDate || "",
       isbn: book.isbn || "",
       format: book.format || "PAPERBACK",
-      categories: book.categories
-        ? book.categories.map((category) => category.categoryId)
-        : [],
-      file: null,
-      coverImage: null,
+      categories:
+        categoryNames.length > 0
+          ? categories
+              .filter((cat) => categoryNames.includes(cat.name))
+              .map((cat) => cat.categoryId)
+          : [],
+      coverImage: book.coverImage || null,
       filePreview: "Current file will be kept if not changed",
       coverPreview: book.coverImage || "",
     });
+    console.log(
+      "Selected category IDs:",
+      categories
+        .filter((cat) => categoryNames.includes(cat.name))
+        .map((cat) => cat.categoryId)
+    );
     setEditingBookId(book.bookId);
     setShowAdvancedFields(true); // Show all fields when editing
   };
