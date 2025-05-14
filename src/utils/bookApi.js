@@ -100,7 +100,6 @@ export const updateBook = async (bookId, bookData) => {
       },
       body: formData,
     });
-    console.log("Book updated successfully");
   } catch (error) {
     console.error("Error updating book:", error);
     throw error;
@@ -194,6 +193,15 @@ export const createCategory = async (categoryName) => {
     });
   } catch (error) {
     console.error("Error creating category:", error);
+    throw error;
+  }
+};
+//get book by id
+export const getBookById = async (bookId) => {
+  try {
+    return await apiRequest(`books/${bookId}`);
+  } catch (error) {
+    console.error("Error fetching book by ID:", error);
     throw error;
   }
 };

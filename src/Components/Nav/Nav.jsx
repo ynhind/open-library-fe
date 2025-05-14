@@ -7,6 +7,7 @@ import {
   Search,
   ChevronDown,
   Menu,
+  Loader,
 } from "lucide-react";
 import { getCategories } from "../../utils/bookApi";
 

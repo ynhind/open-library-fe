@@ -1,5 +1,4 @@
 // Mock data for the OldTomes online library prototype
-
 // Book Cover Images - Using placeholder images
 const bookCovers = {
   prideAndPrejudice:
@@ -10,6 +9,8 @@ const bookCovers = {
   annaKarenina: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
   warAndPeace: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
 };
+//call api searchBooks
+// Mock data for books
 
 // Featured Books
 export const featuredBooks = [

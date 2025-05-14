@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Heart, Eye, BookOpen } from "lucide-react";
 
 const BookCard = ({ book }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const { id, title, author, coverImage, price, rating, ratingCount } = book;
@@ -47,7 +47,7 @@ const BookCard = ({ book }) => {
 
   return (
     <div
-      className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+      className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)] hover:border-amber-100 border border-transparent transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -75,7 +75,7 @@ const BookCard = ({ book }) => {
       </button>
 
       {/* Book cover */}
-      <div className="relative aspect-[4/5] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden w-full">
         <Link to={`/book/${id}`} className="block">
           <img
             src={coverImage}
@@ -84,26 +84,32 @@ const BookCard = ({ book }) => {
           />
 
           {/* Overlay with actions */}
+          {/* Update the overlay actions in BookCard.jsx */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-            <div className="flex gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-amber-800 py-2 px-3 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
-                aria-label="Preview book"
-              >
-                <Eye size={14} /> Preview
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-amber-500/90 hover:bg-amber-500 text-white py-2 px-3 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
-                aria-label={`Purchase for $${price.toFixed(2)}`}
-              >
-                <ShoppingCart size={14} /> Buy
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-amber-800 py-2 px-3 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
-                aria-label="Borrow book"
-              >
-                <BookOpen size={14} /> Borrow
-              </button>
+            {/* Stack buttons vertically for better fit */}
+            <div className="flex flex-col gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+              {/* First row: Preview and Buy buttons */}
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 flex items-center justify-center gap-1 bg-white/90 hover:bg-white text-amber-800 py-1.5 px-2 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
+                  aria-label="Preview book"
+                >
+                  <Eye size={12} /> Preview
+                </button>
+                <button
+                  className="flex-1 flex items-center justify-center gap-1 bg-amber-500/90 hover:bg-amber-500 text-white py-1.5 px-2 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
+                  aria-label={`Purchase for $${price.toFixed(2)}`}
+                >
+                  <ShoppingCart size={12} /> Buy
+                </button>
+                <button
+                  className="flex items-center justify-center gap-1 bg-white/90 hover:bg-white text-amber-800 py-1.5 px-2 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
+                  aria-label="Borrow book"
+                >
+                  <BookOpen size={12} /> Borrow
+                </button>
+              </div>
+              {/* Second row: Borrow button */}
             </div>
           </div>
         </Link>

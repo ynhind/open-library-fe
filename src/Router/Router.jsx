@@ -14,6 +14,8 @@ import { AdminRoute } from "../Components/AdminRoute";
 
 import Layout from "../Components/Layout/Layout";
 import BookCollection from "../Components/FeaturesBook/BookCollection";
+import BookOfCategories from "../Components/FeaturesBook/BookOfCategories";
+import BookDetails from "../Components/FeaturesBook/BookDetails";
 
 export default function Router() {
   return (
@@ -31,7 +33,8 @@ export default function Router() {
         </Route>
         <Route element={<Layout />}>
           <Route path="/categories" element={<BookCollection />} />
-          {/* Add other routes that need Nav and Footer here */}
+          <Route path="/category/:category" element={<BookOfCategories />} />
+          <Route path="/book/:id" element={<BookDetails />} />
         </Route>
       </Routes>
     </BrowserRouter>

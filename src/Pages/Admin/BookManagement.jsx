@@ -198,6 +198,7 @@ export default function BookManagement() {
         {}
       );
       const results = await searchBooks(filteredParams);
+      console.log("Search results:", results);
       setBooks(results);
     } catch (error) {
       console.error("Error searching books:", error);
