@@ -150,7 +150,6 @@
 
 .auth-button {
   background-color: var(--primary);
-  color: text-stone-800;
   padding: 0.75rem 1rem;
   border: none;
   border-radius: var(--radius);
