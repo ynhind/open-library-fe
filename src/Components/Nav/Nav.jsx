@@ -131,7 +131,7 @@ const Nav = () => {
               </button>
 
               {isCategoriesOpen && (
-                <div className="absolute top-full right-0 mt-1 w-56 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in">
+                <div className="absolute top-full right-0 mt-1 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in max-h-[60vh] overflow-y-auto">
                   {isLoading ? (
                     <div className="flex justify-center py-4">
                       <Loader
@@ -145,17 +145,19 @@ const Nav = () => {
                     </div>
                   ) : fetchedCategories.length > 0 ? (
                     <>
-                      {fetchedCategories.map((category) => (
-                        <Link
-                          key={category.categoryId}
-                          to={`/category/${category.name
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
-                          className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
-                        >
-                          {category.name}
-                        </Link>
-                      ))}
+                      <div className="grid grid-cols-1 md:grid-cols-2 w-[500px] p-2">
+                        {fetchedCategories.map((category) => (
+                          <Link
+                            key={category.categoryId}
+                            to={`/category/${category.name
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")}`}
+                            className="block px-4 py-2 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900 whitespace-nowrap"
+                          >
+                            {category.name}
+                          </Link>
+                        ))}
+                      </div>
                       <Link
                         to="/categories"
                         className="block px-4 py-2 text-sm font-medium text-amber-800 border-t border-amber-200 mt-1 hover:bg-amber-100"
@@ -283,18 +285,30 @@ const Nav = () => {
               </button>
 
               {isCategoriesOpen && (
-                <div className="ml-4 mt-1 space-y-1 border-l border-amber-200 pl-4">
-                  {fetchedCategories.map((category, index) => (
-                    <Link
-                      key={index}
-                      to={`/category/${category.name
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                      className="block py-2 text-sm text-stone-700"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
+                <div className="ml-4 mt-1 space-y-1 border-l border-amber-200 pl-4 max-h-[40vh] overflow-y-auto">
+                  {isLoading ? (
+                    <div className="flex justify-center py-2">
+                      <Loader size={16} className="animate-spin text-amber-800" />
+                    </div>
+                  ) : error ? (
+                    <div className="py-2 text-sm text-red-500">{error}</div>
+                  ) : fetchedCategories.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                      {fetchedCategories.map((category, index) => (
+                        <Link
+                          key={index}
+                          to={`/category/${category.name
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
+                          className="block py-2 text-sm text-stone-700"
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-2 text-sm text-stone-500">No categories found</div>
+                  )}
                 </div>
               )}
 
