@@ -5,7 +5,7 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getBookById } from "../../utils/bookApi";
 import { Document, Page } from "react-pdf";
 import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
@@ -27,6 +27,8 @@ import {
   X,
   Plus,
   Minus,
+  Check,
+  ShoppingBag,
 } from "lucide-react";
 
 // Set the worker directly from the import
@@ -34,7 +36,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,36 +55,7 @@ const BookDetails = () => {
   const userScrollTimeoutRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
-  const handleBuyNow = async () => {
-    if (!book || !book.bookId) {
-      toast.error("Cannot proceed with purchase: Invalid book information", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return;
-    }
-
-    try {
-      const bookId = parseInt(book.bookId, 10);
-
-      // Add item to cart first
-      await addToCart(bookId, quantity);
-
-      // Then redirect to checkout page
-      navigate("/checkout");
-
-      toast.success("Proceeding to checkout!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    } catch (error) {
-      console.error("Error during buy now process:", error);
-      toast.error(error.message || "Failed to process purchase", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  };
+  const [showCartModal, setShowCartModal] = useState(false);
 
   const handleAddToCart = async () => {
     if (!book || !book.bookId) {
@@ -102,6 +74,10 @@ const BookDetails = () => {
       console.log("Quantity:", quantity);
 
       await addToCart(bookId, quantity);
+      setShowCartModal(true);
+      setTimeout(() => {
+        setShowCartModal(false);
+      }, 5000); // Close the modal after 3 seconds
 
       toast.success(`${book.title} added to your cart!`, {
         position: "top-right",
@@ -134,8 +110,6 @@ const BookDetails = () => {
   const resetZoom = useCallback(() => setScale(1), []);
 
   // Optimized scroll handler with debouncing
-  // Replace your current handleScroll function with this improved version
-  // Improve the handleScroll function to better calculate which page is most visible
   const handleScroll = useCallback(
     (e) => {
       if (!numPages || isProgrammaticPageChange) return;
@@ -540,12 +514,12 @@ const BookDetails = () => {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse border border-amber-50">
             <div className="md:flex">
-              <div className="md:flex-shrink-0 bg-gradient-to-r from-amber-100/50 to-amber-200/30 h-96 md:w-1/3 flex items-center justify-center">
-                <div className="w-56 h-72 bg-amber-50 rounded shadow-sm"></div>
+              <div className="md:flex-shrink-0 bg-gradient-to-r from-amber-100/50 to-amber-200/30 h-80 md:w-1/4 flex items-center justify-center">
+                <div className="w-48 h-64 bg-amber-50 rounded shadow-sm"></div>
               </div>
-              <div className="p-8 md:w-2/3">
-                <div className="h-10 bg-amber-50 rounded w-3/4 mb-6"></div>
-                <div className="h-5 bg-amber-50 rounded w-1/2 mb-8"></div>
+              <div className="p-6 md:w-3/4">
+                <div className="h-8 bg-amber-50 rounded w-3/4 mb-6"></div>
+                <div className="h-5 bg-amber-50 rounded w-1/2 mb-4"></div>
                 <div className="flex mb-6">
                   {[...Array(5)].map((_, i) => (
                     <div
@@ -610,8 +584,8 @@ const BookDetails = () => {
   // No book found state
   if (!book) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-amber-100/30 flex items-center justify-center p-1">
-        <div className="text-center bg-white rounded-xl shadow-md p-5 max-w-md border border-amber-100 transform transition-all duration-300 hover:shadow-lg">
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-amber-100/30 flex items-center justify-center p-4">
+        <div className="text-center bg-white rounded-xl shadow-md p-10 max-w-md border border-amber-100 transform transition-all duration-300 hover:shadow-lg">
           <div className="w-24 h-24 mx-auto mb-6 text-amber-200 bg-amber-50 rounded-full flex items-center justify-center">
             <BookOpen size={48} className="text-amber-800/70" />
           </div>
@@ -634,86 +608,78 @@ const BookDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-amber-100/30 py-10">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-amber-100/30 py-8">
       <main className="container mx-auto px-4 max-w-7xl">
-        <div className="mb-6">
-          {/* Breadcrumb - moved to top with more compact design */}
-          <div className="mb-4 flex justify-between items-center bg-white/70 px-3 py-2 rounded shadow-sm border border-amber-50">
-            <nav className="flex flex-wrap text-xs md:text-sm items-center">
-              <Link
-                to="/"
-                className="text-amber-700 hover:text-amber-900 transition-colors duration-200 flex items-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                Home
-              </Link>
-              <span className="mx-1 text-stone-500">/</span>
-              {book.categories && book.categories.length > 0 && (
-                <>
-                  <Link
-                    to={`/category/${book.categories[0]
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
-                    className="text-amber-700 hover:text-amber-900 transition-colors duration-200"
-                  >
-                    {book.categories[0]}
-                  </Link>
-                  <span className="mx-1 text-stone-500">/</span>
-                </>
-              )}
-              <span className="text-stone-500 truncate max-w-[120px] sm:max-w-xs md:max-w-sm">
-                {book.title}
-              </span>
-            </nav>
+        {/* Compact breadcrumb navigation */}
+        <div className="mb-4 flex justify-between items-center bg-white/70 px-3 py-1.5 rounded-md shadow-sm border border-amber-50 text-xs sticky top-0 z-10">
+          <nav className="flex flex-wrap items-center overflow-hidden">
             <Link
               to="/"
-              className="inline-flex items-center text-amber-800 hover:text-amber-900 text-xs md:text-sm"
+              className="text-amber-700 hover:text-amber-900 transition-colors flex items-center"
             >
-              <ChevronLeft size={14} />
-              <span className="ml-1">Back</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 mr-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+              Home
             </Link>
-          </div>
+            <span className="mx-1 text-stone-400">/</span>
+            {book.categories && book.categories.length > 0 && (
+              <>
+                <Link
+                  to={`/category/${book.categories[0]
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  className="text-amber-700 hover:text-amber-900 transition-colors"
+                >
+                  {book.categories[0]}
+                </Link>
+                <span className="mx-1 text-stone-400">/</span>
+              </>
+            )}
+            <span className="text-stone-500 truncate max-w-[100px] sm:max-w-[200px] md:max-w-sm">
+              {book.title}
+            </span>
+          </nav>
+          <Link
+            to="/"
+            className="inline-flex items-center text-amber-800 hover:text-amber-900 ml-2"
+          >
+            <ChevronLeft size={12} />
+            <span className="ml-0.5">Back</span>
+          </Link>
+        </div>
 
+        <div className="mb-6">
           {/* Book Details */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-amber-100 transition-all duration-300 hover:shadow-xl">
             <div className="md:flex">
-              {/* Book Cover Image with larger size and Buy Now button */}
-              <div className="md:flex-shrink-0 bg-gradient-to-br from-amber-100 to-amber-50 flex flex-col items-center justify-center p-4 md:p-6 md:w-1/3 relative overflow-hidden">
+              {/* Book Cover Image with reduced padding */}
+              <div className="md:flex-shrink-0 bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center p-4 md:p-4 md:w-1/3 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(#f5d0a9_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
                 <img
                   src={book.coverImage}
                   alt={book.title}
-                  className="h-[26rem] w-auto object-contain shadow-xl rounded-lg transform transition-all duration-500 hover:scale-105"
+                  className="h-80 md:h-96 lg:h-[28rem] object-contain shadow-lg rounded-lg transform transition-all duration-500 hover:scale-105"
                   onError={(e) => {
                     e.target.src =
                       "https://placehold.co/300x450/amber-50/amber-800?text=No+Cover";
                   }}
                 />
-                <button
-                  onClick={handleBuyNow}
-                  className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 mt-6 w-full"
-                  aria-label={`Buy ${book.title} now`}
-                >
-                  <span className="animate-pulse">🔥</span>
-                  Buy Now
-                </button>
               </div>
 
               {/* Book Information with improved layout */}
-              <div className="p-6 md:p-8 md:w-2/3">
+              <div className="p-5 md:p-6 md:w-3/4">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start">
                   <div className="flex-1 pr-4">
                     <h1 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-stone-800 mb-2 leading-tight line-clamp-3">
@@ -745,8 +711,9 @@ const BookDetails = () => {
                     />
                   </button>
                 </div>
+
                 {/* Rating with enhanced visual */}
-                <div className="flex items-center mb-6 bg-amber-50/50 p-3 rounded-lg">
+                <div className="flex items-center mb-5 bg-amber-50/50 p-3 rounded-lg">
                   <div className="flex mr-2">
                     {renderRatingStars(averageRating)}
                   </div>
@@ -759,14 +726,15 @@ const BookDetails = () => {
                     </span>
                   )}
                 </div>
+
                 {/* Price and Buttons with improved styling */}
-                <div className="mb-8">
-                  <div className="flex flex-wrap items-center gap-4 mb-6">
-                    <p className="text-3xl font-bold text-amber-800 flex items-baseline">
+                <div className="mb-6">
+                  <div className="flex flex-wrap items-center gap-4 mb-5">
+                    <p className="text-2xl md:text-3xl font-bold text-amber-800 flex items-baseline">
                       ${book.price?.toFixed(2)}
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
-                          <span className="text-lg text-stone-500 line-through ml-2">
+                          <span className="text-base md:text-lg text-stone-500 line-through ml-2">
                             ${book.originalPrice.toFixed(2)}
                           </span>
                         )}
@@ -789,25 +757,26 @@ const BookDetails = () => {
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mb-4">
+
+                  <div className="flex flex-col sm:flex-row gap-3 mb-4">
                     <button
                       onClick={handleAddToCart}
-                      className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                      className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-2.5 px-5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
                       aria-label={`Add ${book.title} to cart`}
                     >
-                      <ShoppingCart size={18} className="animate-bounce" />
+                      <ShoppingCart size={18} />
                       Add to Cart
                     </button>
                     <button
                       onClick={() => setPreviewActive(true)}
-                      className="flex items-center justify-center gap-2 border-2 border-amber-200 bg-white hover:bg-amber-50 text-amber-800 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
+                      className="flex items-center justify-center gap-2 border-2 border-amber-100 bg-white hover:bg-amber-50 text-amber-800 py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
                       aria-label={`Preview ${book.title}`}
                     >
                       <BookOpen size={18} />
                       {isAvailableOnline ? "Preview" : "Preview (Limited)"}
                     </button>
                     <button
-                      className="flex items-center justify-center gap-2 border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
+                      className="flex items-center justify-center gap-2 border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
                       aria-label={`Borrow ${book.title}`}
                     >
                       <Bookmark size={18} />
@@ -815,8 +784,8 @@ const BookDetails = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-3 bg-amber-50/70 p-3 rounded-lg">
-                    <span className="text-stone-700 font-medium">
+                  <div className="flex items-center gap-3 bg-amber-50/70 p-2.5 rounded-lg">
+                    <span className="text-stone-700 font-medium text-sm">
                       Quantity:
                     </span>
                     <div className="flex items-center border border-amber-200 rounded-lg overflow-hidden">
@@ -824,30 +793,29 @@ const BookDetails = () => {
                         onClick={() =>
                           setQuantity((prev) => Math.max(1, prev - 1))
                         }
-                        className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors"
+                        className="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors"
                       >
                         <Minus size={16} />
                       </button>
-
-                      <span className="w-12 text-center font-medium text-amber-900">
+                      <span className="w-10 text-center font-medium text-amber-900">
                         {quantity}
                       </span>
-
                       <button
                         onClick={() => setQuantity((prev) => prev + 1)}
-                        className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors"
+                        className="p-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 transition-colors"
                       >
                         <Plus size={16} />
                       </button>
                     </div>
                   </div>
                 </div>
+
                 {/* Book Details List with improved styling */}
-                <div className="border-t border-amber-100 pt-6">
-                  <h2 className="text-xl font-serif font-medium text-stone-800 mb-4 flex items-center">
+                <div className="border-t border-amber-100 pt-5">
+                  <h2 className="text-lg font-serif font-medium text-stone-800 mb-3 flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-amber-700"
+                      className="h-4 w-4 mr-2 text-amber-700"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -861,10 +829,10 @@ const BookDetails = () => {
                     </svg>
                     Book Details
                   </h2>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 bg-amber-50/50 p-4 rounded-lg">
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 bg-amber-50/50 p-3 rounded-lg text-sm">
                     <div className="flex items-center">
                       <dt className="flex items-center text-stone-600 mr-2">
-                        <BookCopy size={16} className="mr-2 text-amber-700" />
+                        <BookCopy size={14} className="mr-1.5 text-amber-700" />
                         Format:
                       </dt>
                       <dd className="font-medium text-stone-800">
@@ -875,7 +843,7 @@ const BookDetails = () => {
                     {book?.isbn && (
                       <div className="flex items-center">
                         <dt className="flex items-center text-stone-600 mr-2">
-                          <Hash size={16} className="mr-2 text-amber-700" />
+                          <Hash size={14} className="mr-1.5 text-amber-700" />
                           ISBN:
                         </dt>
                         <dd className="font-medium text-stone-800">
@@ -887,7 +855,7 @@ const BookDetails = () => {
                     {book?.publisher && (
                       <div className="flex items-center">
                         <dt className="flex items-center text-stone-600 mr-2">
-                          <User size={16} className="mr-2 text-amber-700" />
+                          <User size={14} className="mr-1.5 text-amber-700" />
                           Publisher:
                         </dt>
                         <dd className="font-medium text-stone-800">
@@ -899,7 +867,10 @@ const BookDetails = () => {
                     {book?.publishDate && (
                       <div className="flex items-center">
                         <dt className="flex items-center text-stone-600 mr-2">
-                          <Calendar size={16} className="mr-2 text-amber-700" />
+                          <Calendar
+                            size={14}
+                            className="mr-1.5 text-amber-700"
+                          />
                           Published:
                         </dt>
                         <dd className="font-medium text-stone-800">
@@ -920,7 +891,7 @@ const BookDetails = () => {
                         <dt className="flex items-center text-stone-600 mr-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 mr-2 text-amber-700"
+                            className="h-4 w-4 mr-1.5 text-amber-700"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -953,7 +924,7 @@ const BookDetails = () => {
                         <dt className="flex items-center text-stone-600 mr-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 mr-2 text-amber-700"
+                            className="h-4 w-4 mr-1.5 text-amber-700"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -968,14 +939,14 @@ const BookDetails = () => {
                           Categories:
                         </dt>
                         <dd className="font-medium">
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1.5">
                             {book.categories.map((category, index) => (
                               <Link
                                 key={index}
                                 to={`/category/${category
                                   .toLowerCase()
                                   .replace(/\s+/g, "-")}`}
-                                className="inline-block bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm px-3 py-1 rounded-full transition-colors"
+                                className="inline-block bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs px-2.5 py-0.5 rounded-full transition-colors"
                               >
                                 {category}
                               </Link>
@@ -985,47 +956,19 @@ const BookDetails = () => {
                       </div>
                     )}
                   </dl>
-                </div>{" "}
-              </div>
-            </div>
-
-            {/* Book Description with improved styling */}
-            {book.description && (
-              <div className="bg-white rounded-xl shadow-md overflow-hidden mt-8 border border-amber-100 transition-all duration-300 hover:shadow-lg">
-                <div className="px-8 py-6">
-                  <h2 className="text-xl font-serif font-medium text-stone-800 mb-4 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-amber-700"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                      />
-                    </svg>
-                    Description
-                  </h2>
-                  <div className="prose prose-amber prose-stone max-w-none">
-                    <p className="text-stone-600 leading-relaxed whitespace-pre-line bg-amber-50/30 p-4 rounded-lg border-l-4 border-amber-200">
-                      {book.description}
-                    </p>
-                  </div>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* Reviews Section with improved styling */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden mt-8 border border-amber-100 transition-all duration-300 hover:shadow-lg">
-              <div className="px-8 py-6">
-                <h2 className="text-xl font-serif font-medium text-stone-800 mb-6 flex items-center">
+          {/* Book Description with improved styling */}
+          {book.description && (
+            <div className="bg-white rounded-xl shadow-md overflow-hidden mt-6 border border-amber-100 transition-all duration-300 hover:shadow-lg">
+              <div className="px-6 py-5">
+                <h2 className="text-lg font-serif font-medium text-stone-800 mb-3 flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-amber-700"
+                    className="h-4 w-4 mr-2 text-amber-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1034,130 +977,157 @@ const BookDetails = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                     />
                   </svg>
-                  Customer Reviews
-                  {averageRating > 0 && (
-                    <span className="ml-2 text-amber-800 font-medium bg-amber-100 px-2 py-1 rounded-full text-sm">
-                      {averageRating.toFixed(1)}/5 (
-                      {book.ratings ? book.ratings.length : 0})
-                    </span>
-                  )}
+                  Description
                 </h2>
+                <div className="prose prose-amber prose-stone max-w-none">
+                  <p className="text-stone-600 text-sm md:text-base leading-relaxed whitespace-pre-line bg-amber-50/30 p-4 rounded-lg border-l-4 border-amber-200">
+                    {book.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
-                {book.ratings && book.ratings.length > 0 ? (
-                  <div className="space-y-6 divide-y divide-amber-100">
-                    {book.ratings.map((review, index) => (
-                      <div
-                        key={
-                          review.ratingId ||
-                          review.id ||
-                          Math.random().toString()
-                        }
-                        className={`${index > 0 ? "pt-6" : ""} ${
-                          index !== book.ratings.length - 1 ? "pb-6" : ""
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="bg-gradient-to-br from-amber-100 to-amber-200 rounded-full h-12 w-12 flex items-center justify-center text-amber-800 font-medium mr-3 shadow-sm">
-                              {review.user && review.user.username
-                                ? review.user.username.charAt(0).toUpperCase()
-                                : "?"}
-                            </div>
-                            <div>
-                              <span className="font-medium text-stone-800 block">
-                                {review.user
-                                  ? review.user.username || "Anonymous"
-                                  : "Anonymous"}
-                              </span>
-                              {review.createdAt && (
-                                <span className="text-xs text-stone-500">
-                                  {new Date(
-                                    review.createdAt
-                                  ).toLocaleDateString(undefined, {
+          {/* Reviews Section with improved styling */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mt-6 border border-amber-100 transition-all duration-300 hover:shadow-lg">
+            <div className="px-6 py-5">
+              <h2 className="text-lg font-serif font-medium text-stone-800 mb-4 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2 text-amber-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+                Customer Reviews
+                {averageRating > 0 && (
+                  <span className="ml-2 text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-full text-xs">
+                    {averageRating.toFixed(1)}/5 (
+                    {book.ratings ? book.ratings.length : 0})
+                  </span>
+                )}
+              </h2>
+
+              {book.ratings && book.ratings.length > 0 ? (
+                <div className="space-y-5 divide-y divide-amber-100">
+                  {book.ratings.map((review, index) => (
+                    <div
+                      key={
+                        review.ratingId || review.id || Math.random().toString()
+                      }
+                      className={`${index > 0 ? "pt-5" : ""} ${
+                        index !== book.ratings.length - 1 ? "pb-5" : ""
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <div className="bg-gradient-to-br from-amber-100 to-amber-200 rounded-full h-10 w-10 flex items-center justify-center text-amber-800 font-medium mr-3 shadow-sm">
+                            {review.user && review.user.username
+                              ? review.user.username.charAt(0).toUpperCase()
+                              : "?"}
+                          </div>
+                          <div>
+                            <span className="font-medium text-stone-800 block text-sm">
+                              {review.user
+                                ? review.user.username || "Anonymous"
+                                : "Anonymous"}
+                            </span>
+                            {review.createdAt && (
+                              <span className="text-xs text-stone-500">
+                                {new Date(review.createdAt).toLocaleDateString(
+                                  undefined,
+                                  {
                                     year: "numeric",
                                     month: "long",
                                     day: "numeric",
-                                  })}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center bg-amber-50 px-3 py-1 rounded-lg">
-                            <div className="flex mr-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={16}
-                                  className={
-                                    i < review.rating
-                                      ? "fill-amber-500 text-amber-500"
-                                      : "text-gray-300"
                                   }
-                                />
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium text-amber-800">
-                              {review.rating}
-                            </span>
+                                )}
+                              </span>
+                            )}
                           </div>
                         </div>
-                        {review.review && (
-                          <div className="bg-amber-50/30 p-4 rounded-lg">
-                            <p className="text-stone-600 text-sm md:text-base leading-relaxed">
-                              {review.review}
-                            </p>
+                        <div className="flex items-center bg-amber-50 px-2 py-1 rounded-lg">
+                          <div className="flex mr-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={14}
+                                className={
+                                  i < review.rating
+                                    ? "fill-amber-500 text-amber-500"
+                                    : "text-gray-300"
+                                }
+                              />
+                            ))}
                           </div>
-                        )}
+                          <span className="text-xs font-medium text-amber-800">
+                            {review.rating}
+                          </span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-10 border-t border-amber-100">
-                    <div className="w-16 h-16 mx-auto mb-4 text-amber-200">
-                      <BookOpen size={64} />
+                      {review.review && (
+                        <div className="bg-amber-50/30 p-3 rounded-lg ml-12">
+                          <p className="text-stone-600 text-sm leading-relaxed">
+                            {review.review}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-stone-500 mb-4">
-                      No reviews yet. Be the first to review this book!
-                    </p>
-                    <button className="bg-amber-800 hover:bg-amber-900 text-white py-2 px-4 rounded-md transition-colors">
-                      Write a Review
-                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-t border-amber-100">
+                  <div className="w-14 h-14 mx-auto mb-3 text-amber-200">
+                    <BookOpen size={48} />
                   </div>
-                )}
+                  <p className="text-stone-500 mb-4 text-sm">
+                    No reviews yet. Be the first to review this book!
+                  </p>
+                  <button className="bg-amber-800 hover:bg-amber-900 text-white py-2 px-4 rounded-md transition-colors text-sm">
+                    Write a Review
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Related Books Section */}
+          {book.categories && book.categories.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-serif font-medium text-stone-800 mb-4">
+                You May Also Like
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {/* This would be populated with related books */}
+                <div className="animate-pulse bg-amber-50 h-56 rounded"></div>
+                <div className="animate-pulse bg-amber-50 h-56 rounded"></div>
+                <div className="animate-pulse bg-amber-50 h-56 rounded"></div>
+                <div className="animate-pulse bg-amber-50 h-56 rounded"></div>
+                <div className="animate-pulse bg-amber-50 h-56 rounded hidden lg:block"></div>
               </div>
             </div>
-
-            {/* Related Books Section */}
-            {book.categories && book.categories.length > 0 && (
-              <div className="mt-12">
-                <h2 className="text-2xl font-serif font-medium text-stone-800 mb-6">
-                  You May Also Like
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {/* This would be populated with related books */}
-                  <div className="animate-pulse bg-amber-50 h-64 rounded"></div>
-                  <div className="animate-pulse bg-amber-50 h-64 rounded"></div>
-                  <div className="animate-pulse bg-amber-50 h-64 rounded"></div>
-                  <div className="animate-pulse bg-amber-50 h-64 rounded"></div>
-                  <div className="animate-pulse bg-amber-50 h-64 rounded hidden lg:block"></div>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </main>
 
       {/* Newsletter signup */}
-      <section className="bg-amber-100/50 py-16">
+      <section className="bg-amber-100/50 py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-xl mx-auto text-center">
-            <h2 className="text-2xl font-serif font-bold text-stone-800 mb-4">
+            <h2 className="text-xl font-serif font-bold text-stone-800 mb-3">
               Stay updated with new releases
             </h2>
-            <p className="text-stone-600 mb-6">
+            <p className="text-stone-600 mb-5 text-sm">
               Join our newsletter and be the first to know about new book
               arrivals
             </p>
@@ -1165,16 +1135,49 @@ const BookDetails = () => {
               <input
                 type="email"
                 placeholder="Your email address"
-                className="px-4 py-3 flex-grow border border-amber-200 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-2.5 flex-grow border border-amber-200 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
               />
-              <button className="bg-amber-800 hover:bg-amber-900 text-white py-3 px-6 rounded-md transition-colors">
+              <button className="bg-amber-800 hover:bg-amber-900 text-white py-2.5 px-5 rounded-md transition-colors">
                 Subscribe
               </button>
             </div>
           </div>
         </div>
       </section>
-
+      {showCartModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black bg-opacity-30"
+            onClick={() => setShowCartModal(false)}
+          ></div>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 relative z-10 transform transition-all animate-fadeIn">
+            <div className="bg-green-100 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4">
+              <Check size={32} className="text-green-600" />
+            </div>
+            <h3 className="text-xl font-medium text-center text-gray-900 mb-2">
+              Added to Cart
+            </h3>
+            <p className="text-center text-gray-600 mb-4">
+              {book.title} has been added to your cart.
+            </p>
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={() => setShowCartModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Continue Shopping
+              </button>
+              <Link
+                to="/cart"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-800 text-white rounded-md hover:bg-amber-900 transition-colors"
+              >
+                <ShoppingBag size={18} />
+                View Cart
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Render PDF viewer if preview is active */}
       {renderPdfViewer()}
     </div>

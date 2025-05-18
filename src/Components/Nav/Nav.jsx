@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Book,
   ShoppingCart,
@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Menu,
   Loader,
+  ArrowLeft,
 } from "lucide-react";
 import { getCategories } from "../../utils/bookApi";
 
@@ -23,6 +24,9 @@ const Nav = () => {
 
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const location = useLocation();
+  const isCartPage = location.pathname === "/cart";
 
   useEffect(() => {
     return () => {
@@ -50,6 +54,38 @@ const Nav = () => {
     }
   };
 
+  if (isCartPage) {
+    return (
+      <nav className="bg-amber-50/95 border-b border-amber-200/20 shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            <div className="flex items-center gap-4">
+              <Link to="/" className="flex items-center gap-2">
+                <Book className="text-amber-800" size={24} />
+                <span className="text-2xl font-serif font-bold text-stone-800">
+                  Open<span className="text-amber-800">Library</span>
+                </span>
+              </Link>
+              <span className="text-stone-400">|</span>
+              <span className="font-serif text-lg">
+                <span className="text-2xl font-serif font-bold text-amber-800">
+                  Your Cart
+                </span>
+              </span>
+            </div>
+
+            <Link
+              to="/"
+              className="flex items-center gap-1 text-amber-800 hover:text-amber-900 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              <span className="font-medium">Continue Shopping</span>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
   const userMenuItems = [
     { name: "My Account", path: "/account" },
     { name: "My Orders", path: "/orders" },

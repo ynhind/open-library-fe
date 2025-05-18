@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart, Heart, Eye, BookOpen } from "lucide-react";
+import {
+  Star,
+  ShoppingCart,
+  Heart,
+  Eye,
+  BookOpen,
+  RefreshCw,
+} from "lucide-react";
 
-const BookCard = ({ book }) => {
+const BookCard = ({ book, className, isReloading }) => {
   const [, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -47,10 +54,18 @@ const BookCard = ({ book }) => {
 
   return (
     <div
-      className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)] hover:border-amber-100 border border-transparent transition-all duration-300"
+      className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(217,119,6,0.12)] hover:border-amber-100 border border-transparent transition-all duration-300 ${
+        className || ""
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {isReloading && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+          <RefreshCw className="text-amber-500 animate-spin" size={24} />
+        </div>
+      )}
+
       {/* Price tag - always visible, positioned at top-left */}
       <div className="absolute top-0 left-0 z-10">
         <div className="bg-amber-800 text-white text-sm font-medium py-1 px-3 rounded-br-lg shadow-sm">

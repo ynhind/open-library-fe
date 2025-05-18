@@ -15,7 +15,10 @@ import { AdminRoute } from "../Components/AdminRoute";
 import Layout from "../Components/Layout/Layout";
 import BookCollection from "../Components/FeaturesBook/BookCollection";
 import BookOfCategories from "../Components/FeaturesBook/BookOfCategories";
-import BookDetails from "../Components/FeaturesBook/BookDetails";
+import BookDetails from "../Components/FeaturesBook/BookDetails-Improved";
+import CartList from "../Components/Cart/CartList";
+import PaymentMethods from "../Components/Checkout/PaymentMethods";
+import OrderConfirmation from "../Components/Checkout/OrderConfirmation";
 
 export default function Router() {
   return (
@@ -35,6 +38,12 @@ export default function Router() {
           <Route path="/categories" element={<BookCollection />} />
           <Route path="/category/:category" element={<BookOfCategories />} />
           <Route path="/book/:id" element={<BookDetails />} />
+          <Route path="/cart" element={<CartList />} />
+          <Route path="/payment/:orderId" element={<PaymentMethods />} />
+          <Route
+            path="/order-confirmation/:orderId"
+            element={<OrderConfirmation />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
