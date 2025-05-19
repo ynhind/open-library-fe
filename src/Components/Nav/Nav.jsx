@@ -131,7 +131,7 @@ const Nav = () => {
               </button>
 
               {isCategoriesOpen && (
-                <div className="absolute top-full right-0 mt-1 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in max-h-[60vh] overflow-y-auto">
+                <div className="absolute top-full left-2/3 transform -translate-x-1/2 mt-1 bg-amber-50 border border-amber-200 rounded-md shadow-lg py-1 z-10 animate-fade-in max-h-[60vh] overflow-y-auto">
                   {isLoading ? (
                     <div className="flex justify-center py-4">
                       <Loader
@@ -145,7 +145,7 @@ const Nav = () => {
                     </div>
                   ) : fetchedCategories.length > 0 ? (
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 w-[500px] p-2">
+                      <div className="grid grid-cols-1 md:grid-cols-3 w-[500px] p-2">
                         {fetchedCategories.map((category) => (
                           <Link
                             key={category.categoryId}
@@ -288,7 +288,10 @@ const Nav = () => {
                 <div className="ml-4 mt-1 space-y-1 border-l border-amber-200 pl-4 max-h-[40vh] overflow-y-auto">
                   {isLoading ? (
                     <div className="flex justify-center py-2">
-                      <Loader size={16} className="animate-spin text-amber-800" />
+                      <Loader
+                        size={16}
+                        className="animate-spin text-amber-800"
+                      />
                     </div>
                   ) : error ? (
                     <div className="py-2 text-sm text-red-500">{error}</div>
@@ -307,7 +310,9 @@ const Nav = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="py-2 text-sm text-stone-500">No categories found</div>
+                    <div className="py-2 text-sm text-stone-500">
+                      No categories found
+                    </div>
                   )}
                 </div>
               )}

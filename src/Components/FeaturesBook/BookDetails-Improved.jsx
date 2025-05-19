@@ -5,13 +5,14 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getBookById } from "../../utils/bookApi";
 import { Document, Page } from "react-pdf";
 import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { pdfjs } from "react-pdf";
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
+import { buyNow } from "../../utils/orderApi.js";
 
 import {
   Star,
@@ -29,6 +30,7 @@ import {
   Minus,
   Check,
   ShoppingBag,
+  Zap,
 } from "lucide-react";
 
 // Set the worker directly from the import
@@ -36,6 +38,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const BookDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,12 +53,54 @@ const BookDetails = () => {
   const [pageInputValue, setPageInputValue] = useState("1");
   const [scale, setScale] = useState(1);
   const [quantity, setQuantity] = useState(1);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
 
   // References
   const userScrollTimeoutRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
   const [showCartModal, setShowCartModal] = useState(false);
+
+  const handleBuyNow = async () => {
+    if (!book || !book.bookId) {
+      toast.error("Cannot process purchase: Invalid book information", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    try {
+      setIsBuyingNow(true);
+      const bookId = parseInt(book.bookId, 10);
+
+      const response = await buyNow({ bookId, quantity });
+
+      if (response && response.success && response.order) {
+        navigate(`/payment/${response.order.orderId}`, {
+          state: {
+            totalAmount: book.price * quantity,
+            orderId: response.order.orderId,
+          },
+        });
+
+        toast.success("Proceeding to checkout!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        throw new Error("Failed to process purchase");
+      }
+    } catch (error) {
+      console.error("Error during buy now process:", error);
+      toast.error(error.message || "Failed to process purchase", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsBuyingNow(false);
+    }
+  };
 
   const handleAddToCart = async () => {
     if (!book || !book.bookId) {
@@ -766,6 +811,27 @@ const BookDetails = () => {
                     >
                       <ShoppingCart size={18} />
                       Add to Cart
+                    </button>
+                    <button
+                      onClick={handleBuyNow}
+                      className={`flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white py-2.5 px-5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden group ${
+                        isBuyingNow ? "cursor-not-allowed opacity-80" : ""
+                      }`}
+                      aria-label={`Buy ${book.title} now`}
+                      disabled={isBuyingNow}
+                    >
+                      {isBuyingNow ? (
+                        <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                      ) : (
+                        <Zap
+                          size={18}
+                          className="transition-transform group-hover:animate-pulse"
+                        />
+                      )}
+                      <span className="relative z-10">
+                        {isBuyingNow ? "Processing..." : "Buy Now"}
+                      </span>
+                      <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
                     </button>
                     <button
                       onClick={() => setPreviewActive(true)}
