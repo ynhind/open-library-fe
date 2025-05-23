@@ -5,6 +5,7 @@ import Home from "../Pages/Home";
 import Login from "../Pages/Login/Login";
 import Verification from "../Pages/Verification/Verification";
 import Register from "../Pages/Register/Register";
+import SignOut from "../Pages/SignOut/SignOut";
 import NotFound from "../Pages/NotFound/NotFound";
 
 import AdminDashboard from "../Pages/Admin/AdminDashboard";
@@ -28,6 +29,7 @@ export default function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/signout" element={<SignOut />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminDashboard />} />

@@ -205,3 +205,33 @@ export const getBookById = async (bookId) => {
     throw error;
   }
 };
+
+// Add a rating or review to a book
+export const addRating = async (bookId, ratingData) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    // Make sure bookId is a proper number
+    const numericBookId = Number(bookId);
+    if (isNaN(numericBookId)) {
+      throw new Error("Invalid book ID");
+    }
+
+    console.log("Sending rating for book ID:", numericBookId);
+
+    return await apiRequest(`books/${numericBookId}/rating`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ratingData),
+    });
+  } catch (error) {
+    console.error("Error adding rating:", error);
+    throw error;
+  }
+};

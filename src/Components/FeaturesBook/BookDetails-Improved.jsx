@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getBookById } from "../../utils/bookApi";
+import { getBookById, addRating } from "../../utils/bookApi";
 import { Document, Page } from "react-pdf";
 import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { pdfjs } from "react-pdf";
@@ -31,6 +31,7 @@ import {
   Check,
   ShoppingBag,
   Zap,
+  MessageSquare,
 } from "lucide-react";
 
 // Set the worker directly from the import
@@ -54,6 +55,10 @@ const BookDetails = () => {
   const [scale, setScale] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [userRating, setUserRating] = useState(5);
+  const [userReview, setUserReview] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // References
   const userScrollTimeoutRef = useRef(null);
@@ -140,6 +145,80 @@ const BookDetails = () => {
         closeOnClick: true,
         pauseOnHover: true,
       });
+    }
+  };
+
+  // Handle submitting a review
+  const handleSubmitReview = async () => {
+    try {
+      if (!book || !book.bookId) {
+        toast.error("Cannot submit review: Invalid book information");
+        return;
+      }
+
+      setIsSubmittingReview(true);
+
+      // Get user ID from localStorage or other auth state management
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("You must be logged in to submit a review");
+        navigate("/login");
+        return;
+      }
+
+      // Parse JWT to get userId (simple approach - in production you might want a more robust solution)
+      let userId;
+      try {
+        const tokenData = JSON.parse(atob(token.split(".")[1]));
+        userId = tokenData.userId;
+
+        if (!userId) {
+          toast.error("User identification failed. Please log in again.");
+          return;
+        }
+      } catch (error) {
+        console.error("Error parsing JWT token:", error);
+        toast.error("Authentication error. Please log in again.");
+        return;
+      }
+
+      const ratingData = {
+        userId,
+        newRating: userRating,
+        review: userReview,
+      };
+
+      console.log(
+        "Submitting review for book:",
+        book.title,
+        "with ID:",
+        book.bookId
+      );
+      console.log("Rating data:", ratingData);
+
+      try {
+        await addRating(book.bookId, ratingData);
+        console.log(ratingData);
+        // Refresh book details to show the new review
+        await fetchBookDetails();
+
+        // Reset form and close modal
+        setUserRating(5);
+        setUserReview("");
+        setShowReviewModal(false);
+
+        toast.success("Your review has been submitted!");
+      } catch (error) {
+        console.error("Detailed rating error:", error);
+        throw error; // Re-throw to be caught by the outer catch block
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error(
+        error.message || "Failed to submit review. Please try again."
+      );
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -290,6 +369,13 @@ const BookDetails = () => {
         setBook(data);
         setIsAvailableOnline(data.isAvailableOnline || false);
         setError(null);
+
+        // Log the ratings data for debugging
+        if (data.ratings && data.ratings.length > 0) {
+          console.log("Book ratings data:", data.ratings);
+        } else {
+          console.log("No ratings found for this book");
+        }
       } else {
         setError("Book not found");
       }
@@ -309,7 +395,10 @@ const BookDetails = () => {
   // Calculate average rating from ratings array
   const averageRating = useMemo(() => {
     if (!book?.ratings || book.ratings.length === 0) return 0;
-    const sum = book.ratings.reduce((acc, curr) => acc + curr.rating, 0);
+    const sum = book.ratings.reduce(
+      (acc, curr) => acc + (curr.rating || curr.score || 0),
+      0
+    );
     return sum / book.ratings.length;
   }, [book?.ratings]);
 
@@ -353,6 +442,17 @@ const BookDetails = () => {
   // Render PDF viewer
   const renderPdfViewer = useCallback(() => {
     if (!previewActive || !book) return null;
+
+    // Add animation to the tailwind.config.ts file if needed:
+    // keyframes: {
+    //   fadeIn: {
+    //     '0%': { opacity: '0', transform: 'translateY(10px)' },
+    //     '100%': { opacity: '1', transform: 'translateY(0)' }
+    //   },
+    // },
+    // animation: {
+    //   fadeIn: 'fadeIn 0.3s ease-out forwards',
+    // },
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -1060,106 +1160,195 @@ const BookDetails = () => {
           {/* Reviews Section with improved styling */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden mt-6 border border-amber-100 transition-all duration-300 hover:shadow-lg">
             <div className="px-6 py-5">
-              <h2 className="text-lg font-serif font-medium text-stone-800 mb-4 flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2 text-amber-700"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
-                Customer Reviews
-                {averageRating > 0 && (
-                  <span className="ml-2 text-amber-800 font-medium bg-amber-100 px-2 py-0.5 rounded-full text-xs">
-                    {averageRating.toFixed(1)}/5 (
-                    {book.ratings ? book.ratings.length : 0})
-                  </span>
-                )}
-              </h2>
+              <div className="border-b border-amber-100 pb-4 mb-6">
+                <h2 className="flex items-center text-lg font-serif font-medium text-stone-800 mb-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2 text-amber-700"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    />
+                  </svg>
+                  Customer Reviews
+                </h2>
+
+                {book.ratings && book.ratings.length > 0 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-amber-800">
+                          {averageRating.toFixed(1)}
+                        </div>
+                        <div className="flex mb-1 justify-center">
+                          {renderRatingStars(averageRating)}
+                        </div>
+                        <div className="text-xs text-stone-500">
+                          {book.ratings.length}{" "}
+                          {book.ratings.length === 1 ? "review" : "reviews"}
+                        </div>
+                      </div>
+
+                      <div className="hidden md:block h-16 w-px bg-amber-100 mx-2"></div>
+
+                      <div className="hidden md:flex flex-col gap-1">
+                        {[5, 4, 3, 2, 1].map((starCount) => {
+                          const count = book.ratings.filter(
+                            (r) =>
+                              Math.round(r.rating || r.score || 0) === starCount
+                          ).length;
+                          const percentage = book.ratings.length
+                            ? Math.round((count / book.ratings.length) * 100)
+                            : 0;
+
+                          return (
+                            <div
+                              key={starCount}
+                              className="flex items-center text-xs"
+                            >
+                              <span className="w-1 mr-2">{starCount}</span>
+                              <div className="w-24 bg-gray-200 rounded-full h-1.5 mr-2 overflow-hidden">
+                                <div
+                                  className="bg-amber-500 h-full rounded-full"
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-stone-500">{count}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setShowReviewModal(true)}
+                      className="bg-amber-800 hover:bg-amber-900 text-white py-2 px-5 rounded-md transition-colors flex items-center gap-2 shadow-sm"
+                    >
+                      <MessageSquare size={16} />
+                      Write a Review
+                    </button>
+                  </div>
+                ) : null}
+              </div>
 
               {book.ratings && book.ratings.length > 0 ? (
-                <div className="space-y-5 divide-y divide-amber-100">
-                  {book.ratings.map((review, index) => (
-                    <div
-                      key={
-                        review.ratingId || review.id || Math.random().toString()
-                      }
-                      className={`${index > 0 ? "pt-5" : ""} ${
-                        index !== book.ratings.length - 1 ? "pb-5" : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <div className="bg-gradient-to-br from-amber-100 to-amber-200 rounded-full h-10 w-10 flex items-center justify-center text-amber-800 font-medium mr-3 shadow-sm">
-                            {review.user && review.user.username
-                              ? review.user.username.charAt(0).toUpperCase()
-                              : "?"}
-                          </div>
-                          <div>
-                            <span className="font-medium text-stone-800 block text-sm">
-                              {review.user
-                                ? review.user.username || "Anonymous"
-                                : "Anonymous"}
-                            </span>
-                            {review.createdAt && (
-                              <span className="text-xs text-stone-500">
-                                {new Date(review.createdAt).toLocaleDateString(
-                                  undefined,
-                                  {
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-md font-medium text-stone-800">
+                      {book.ratings.length}{" "}
+                      {book.ratings.length === 1 ? "Review" : "Reviews"}
+                    </h3>
+                    <select className="text-sm border border-amber-200 rounded py-1 px-2 bg-amber-50/50 text-stone-700 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                      <option value="newest">Newest First</option>
+                      <option value="highest">Highest Rated</option>
+                      <option value="lowest">Lowest Rated</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-6">
+                    {book.ratings.map((review) => (
+                      <div
+                        key={
+                          review.ratingId ||
+                          review.id ||
+                          Math.random().toString()
+                        }
+                        className="bg-white rounded-lg shadow-sm border border-amber-50 p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center">
+                            <div className="bg-gradient-to-br from-amber-100 to-amber-200 rounded-full h-12 w-12 flex items-center justify-center text-amber-800 font-medium mr-3 shadow-sm">
+                              {review.user && review.user.username
+                                ? review.user.username.charAt(0).toUpperCase()
+                                : "?"}
+                            </div>
+                            <div>
+                              <span className="font-medium text-stone-800 block">
+                                {review.user
+                                  ? review.user.username || "Anonymous"
+                                  : "Anonymous"}
+                              </span>
+                              {(review.createdAt || review.created_at) && (
+                                <span className="text-xs text-stone-500">
+                                  {new Date(
+                                    review.createdAt || review.created_at
+                                  ).toLocaleDateString(undefined, {
                                     year: "numeric",
                                     month: "long",
                                     day: "numeric",
-                                  }
-                                )}
+                                  })}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <div className="flex items-center bg-amber-50 px-2 py-1 rounded-lg mb-1">
+                              <div className="flex mr-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={16}
+                                    className={
+                                      i < (review.rating || review.score || 0)
+                                        ? "fill-amber-500 text-amber-500"
+                                        : "text-gray-300"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-xs font-medium text-amber-800 ml-1">
+                                {review.rating || review.score || 0}
                               </span>
-                            )}
+                            </div>
+                            <span className="text-xs text-stone-400">
+                              Verified Purchase
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center bg-amber-50 px-2 py-1 rounded-lg">
-                          <div className="flex mr-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={14}
-                                className={
-                                  i < review.rating
-                                    ? "fill-amber-500 text-amber-500"
-                                    : "text-gray-300"
-                                }
-                              />
-                            ))}
+                        {(review.review || review.comment) && (
+                          <div className="bg-amber-50/30 p-4 rounded-lg">
+                            <p className="text-stone-700 leading-relaxed">
+                              {review.review || review.comment}
+                            </p>
                           </div>
-                          <span className="text-xs font-medium text-amber-800">
-                            {review.rating}
-                          </span>
-                        </div>
+                        )}
                       </div>
-                      {review.review && (
-                        <div className="bg-amber-50/30 p-3 rounded-lg ml-12">
-                          <p className="text-stone-600 text-sm leading-relaxed">
-                            {review.review}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 border-t border-amber-100">
-                  <div className="w-14 h-14 mx-auto mb-3 text-amber-200">
-                    <BookOpen size={48} />
+                    ))}
                   </div>
-                  <p className="text-stone-500 mb-4 text-sm">
-                    No reviews yet. Be the first to review this book!
+
+                  <div className="mt-8 flex justify-center">
+                    <button
+                      onClick={() => setShowReviewModal(true)}
+                      className="bg-amber-800 hover:bg-amber-900 text-white py-2.5 px-6 rounded-md transition-colors flex items-center gap-2 shadow-sm"
+                    >
+                      <MessageSquare size={18} />
+                      Write Your Review
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-10 border border-amber-100 rounded-lg bg-amber-50/30">
+                  <div className="w-16 h-16 mx-auto mb-4 text-amber-300">
+                    <BookOpen size={64} />
+                  </div>
+                  <h3 className="text-lg font-medium text-stone-800 mb-2">
+                    No Reviews Yet
+                  </h3>
+                  <p className="text-stone-500 mb-6 max-w-md mx-auto">
+                    Be the first to share your thoughts about this book with
+                    other readers!
                   </p>
-                  <button className="bg-amber-800 hover:bg-amber-900 text-white py-2 px-4 rounded-md transition-colors text-sm">
+                  <button
+                    onClick={() => setShowReviewModal(true)}
+                    className="bg-amber-800 hover:bg-amber-900 text-white py-2.5 px-6 rounded-md transition-colors flex items-center gap-2 mx-auto shadow-sm"
+                  >
+                    <MessageSquare size={18} />
                     Write a Review
                   </button>
                 </div>
@@ -1244,6 +1433,97 @@ const BookDetails = () => {
           </div>
         </div>
       )}
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black bg-opacity-30"
+            onClick={() => setShowReviewModal(false)}
+          ></div>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 relative z-10 transform transition-all animate-fadeIn">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-medium text-gray-900">
+                Write a Review
+              </h3>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your Rating
+              </label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setUserRating(star)}
+                    className="focus:outline-none"
+                  >
+                    <Star
+                      size={28}
+                      className={
+                        star <= userRating
+                          ? "fill-amber-500 text-amber-500"
+                          : "text-gray-300"
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label
+                htmlFor="review"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Your Review
+              </label>
+              <textarea
+                id="review"
+                rows={4}
+                value={userReview}
+                onChange={(e) => setUserReview(e.target.value)}
+                placeholder="Share your thoughts about this book..."
+                className="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowReviewModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitReview}
+                disabled={isSubmittingReview}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-800 text-white rounded-md hover:bg-amber-900 transition-colors disabled:opacity-70"
+              >
+                {isSubmittingReview ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Review"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Render PDF viewer if preview is active */}
       {renderPdfViewer()}
     </div>
