@@ -1,4 +1,3 @@
-cat > netlify.toml << 'EOL'
 [build]
   command = "npm run build"
   publish = "dist"
@@ -7,4 +6,3 @@ cat > netlify.toml << 'EOL'
   from = "/*"
   to = "/index.html"
   status = 200
-EOL
