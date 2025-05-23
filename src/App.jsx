@@ -1,6 +1,6 @@
 import "./App.css";
 
-import Router from "./Router/Router.jsx";
+import Router from "/src/Router/Router.jsx";
 
 export default function App() {
   console.log("App is rendering");
