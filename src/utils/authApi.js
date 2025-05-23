@@ -12,17 +12,33 @@ export const registerUser = async (data) => {
   }
 };
 
-export const loginUser = async (credentials) => {
+export const loginUser = async (formData) => {
   try {
-    // No mapping needed - just use the credentials directly
+    // For login, backend expects email and password
+    // In your form, you've named it "identifier" for username/email
+    const loginData = {
+      // Map the frontend field to what the backend expects
+      email: formData.identifier,
+      password: formData.password,
+    };
+
+    console.log("Sending login data", loginData);
+
     const response = await apiRequest("auth/login", {
       method: "POST",
-      body: JSON.stringify(credentials),
+      body: loginData,
     });
-    localStorage.setItem("token", response.token);
 
+    console.log("Login response:", response);
     return response;
   } catch (error) {
-    throw new Error(error.message || "Login failed");
+    console.error("Login error details:", error);
+    throw error;
   }
+};
+export const resendVerification = async (email) => {
+  return apiRequest("auth/resend-verification", {
+    method: "POST",
+    body: { email },
+  });
 };
