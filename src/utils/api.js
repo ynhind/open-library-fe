@@ -1,46 +1,8 @@
-// const API_URL =
-//   import.meta.env.VITE_API_URL || "https://open-library-api.onrender.com/api";
-// const API_URL = "https://open-library-api.onrender.com/api";
-// console.log("API URL:", API_URL);
-
-// export async function apiRequest(endpoint, options = {}) {
-//   const url = `${API_URL}/${endpoint}`;
-//   const defaultHeaders = { "Content-Type": "application/json" };
-//   const config = {
-//     ...options,
-//     headers: { ...defaultHeaders, ...options.headers },
-//   };
-
-//   // Process FormData before sending the request
-//   if (options.body instanceof FormData) {
-//     // Don't set Content-Type for FormData (browser will set it with boundary)
-//     delete config.headers["Content-Type"];
-//   } else if (options.body && typeof options.body === "object") {
-//     // Stringify JSON bodies
-//     config.body = JSON.stringify(options.body);
-//   }
-
-//   try {
-//     const response = await fetch(url, config);
-//     if (!response.ok) {
-//       // Try to get error details from response
-//       const errorData = await response.json().catch(() => ({}));
-//       throw new Error(errorData.message || `API Error: ${response.status}`);
-//     }
-
-//     return response.json();
-//   } catch (error) {
-//     console.error(`API request failed for ${endpoint}:`, error);
-//     throw error;
-//   }
-// }
 const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 console.log("API URL being used:", API_URL);
 
 export async function apiRequest(endpoint, options = {}) {
-  // Ensure we have the correct /api/ path in the URL
-
   const url = `${API_URL}/${endpoint}`;
   console.log("Making request to:", url);
 
@@ -49,17 +11,15 @@ export async function apiRequest(endpoint, options = {}) {
     "Content-Type": "application/json",
   };
 
-  // Configure the request
+  // Build fetch config
   const config = {
     ...options,
     headers: { ...defaultHeaders, ...options.headers },
-    // For CORS requests
     mode: "cors",
-    // Don't include credentials unless you're using cookies
-    credentials: "omit",
+    credentials: "include", // gửi cookie/session
   };
 
-  // Process request body
+  // Nếu body là FormData thì không set Content-Type (browser tự set)
   if (options.body instanceof FormData) {
     delete config.headers["Content-Type"];
   } else if (
@@ -67,6 +27,7 @@ export async function apiRequest(endpoint, options = {}) {
     typeof options.body === "object" &&
     !(options.body instanceof FormData)
   ) {
+    // JSON stringify body nếu là object bình thường
     config.body = JSON.stringify(options.body);
   }
 
@@ -74,6 +35,7 @@ export async function apiRequest(endpoint, options = {}) {
     const response = await fetch(url, config);
 
     if (!response.ok) {
+      // Cố gắng lấy message lỗi từ response JSON
       let errorMessage;
       try {
         const errorData = await response.json();
@@ -91,13 +53,12 @@ export async function apiRequest(endpoint, options = {}) {
   }
 }
 
-// Simple function to test API connectivity
+// Hàm test kết nối API đơn giản
 export async function testApiConnection() {
   try {
-    // Check an endpoint that exists (e.g. the root or auth endpoints)
-    const response = await fetch(`${API_URL}`, {
+    const response = await fetch(API_URL, {
       mode: "cors",
-      credentials: "omit",
+      credentials: "include",
     });
 
     if (response.ok) {
