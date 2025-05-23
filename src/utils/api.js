@@ -34,19 +34,14 @@
 //     throw error;
 //   }
 // }
-const API_URL =
-  import.meta.env.VITE_API_URL || "https://open-library-be.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 console.log("API URL being used:", API_URL);
 
 export async function apiRequest(endpoint, options = {}) {
   // Ensure we have the correct /api/ path in the URL
-  let baseUrl = API_URL;
-  if (!baseUrl.endsWith("/api") && !baseUrl.endsWith("/api/")) {
-    baseUrl = `${baseUrl}/api`;
-  }
 
-  const url = `${baseUrl}/${endpoint}`;
+  const url = `${API_URL}/${endpoint}`;
   console.log("Making request to:", url);
 
   // Default headers
@@ -83,7 +78,7 @@ export async function apiRequest(endpoint, options = {}) {
       try {
         const errorData = await response.json();
         errorMessage = errorData.message || `API Error: ${response.status}`;
-      } catch (e) {
+      } catch {
         errorMessage = `API Error: ${response.status}`;
       }
       throw new Error(errorMessage);
@@ -99,11 +94,17 @@ export async function apiRequest(endpoint, options = {}) {
 // Simple function to test API connectivity
 export async function testApiConnection() {
   try {
-    const response = await fetch(`${API_URL}/test`, {
+    // Check an endpoint that exists (e.g. the root or auth endpoints)
+    const response = await fetch(`${API_URL}`, {
       mode: "cors",
       credentials: "omit",
     });
-    return await response.text();
+
+    if (response.ok) {
+      return "API connection successful";
+    } else {
+      throw new Error(`API responded with status: ${response.status}`);
+    }
   } catch (error) {
     console.error("API connection test failed:", error);
     throw error;
