@@ -34,11 +34,9 @@
 //     throw error;
 //   }
 // }
-// API configuration
 const API_URL =
   import.meta.env.VITE_API_URL || "https://open-library-be.onrender.com";
 
-// Debug logging
 console.log("API URL being used:", API_URL);
 
 export async function apiRequest(endpoint, options = {}) {
@@ -48,33 +46,32 @@ export async function apiRequest(endpoint, options = {}) {
     baseUrl = `${baseUrl}/api`;
   }
 
-  // Build complete URL
   const url = `${baseUrl}/${endpoint}`;
-  console.log(`Making request to: ${url}`, options.method || "GET");
+  console.log("Making request to:", url);
 
-  // Default headers with content type
+  // Default headers
   const defaultHeaders = {
     "Content-Type": "application/json",
   };
 
-  // Create config with credentials and mode
+  // Configure the request
   const config = {
     ...options,
     headers: { ...defaultHeaders, ...options.headers },
-    credentials: "include",
+    // For CORS requests
     mode: "cors",
+    // Don't include credentials unless you're using cookies
+    credentials: "omit",
   };
 
   // Process request body
   if (options.body instanceof FormData) {
-    // Don't set Content-Type for FormData
     delete config.headers["Content-Type"];
   } else if (
     options.body &&
     typeof options.body === "object" &&
     !(options.body instanceof FormData)
   ) {
-    // Convert object to JSON string
     config.body = JSON.stringify(options.body);
   }
 
@@ -99,15 +96,16 @@ export async function apiRequest(endpoint, options = {}) {
   }
 }
 
-// Test API connection - remove in production
+// Simple function to test API connectivity
 export async function testApiConnection() {
   try {
-    const response = await fetch(`${API_URL}/test`);
-    const text = await response.text();
-    console.log("API test response:", text);
-    return text;
+    const response = await fetch(`${API_URL}/test`, {
+      mode: "cors",
+      credentials: "omit",
+    });
+    return await response.text();
   } catch (error) {
-    console.error("API test failed:", error);
+    console.error("API connection test failed:", error);
     throw error;
   }
 }

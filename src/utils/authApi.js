@@ -4,7 +4,7 @@ export const registerUser = async (data) => {
   try {
     const response = await apiRequest("auth/register", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data, // apiRequest will handle JSON.stringify
     });
     return response;
   } catch (error) {
@@ -15,14 +15,13 @@ export const registerUser = async (data) => {
 export const loginUser = async (formData) => {
   try {
     // For login, backend expects email and password
-    // In your form, you've named it "identifier" for username/email
+    // The frontend form has field named "identifier" for username/email
     const loginData = {
-      // Map the frontend field to what the backend expects
       email: formData.identifier,
       password: formData.password,
     };
 
-    console.log("Sending login data", loginData);
+    console.log("Sending login data:", loginData);
 
     const response = await apiRequest("auth/login", {
       method: "POST",
@@ -36,6 +35,14 @@ export const loginUser = async (formData) => {
     throw error;
   }
 };
+
+export const verifyEmail = async (token, email) => {
+  return apiRequest("auth/verify", {
+    method: "POST",
+    body: { token, email },
+  });
+};
+
 export const resendVerification = async (email) => {
   return apiRequest("auth/resend-verification", {
     method: "POST",
