@@ -14,10 +14,9 @@ export const registerUser = async (data) => {
 
 export const loginUser = async (formData) => {
   try {
-    // For login, backend expects email and password
-    // The frontend form has field named "identifier" for username/email
+    // Format data according to what backend expects
     const loginData = {
-      email: formData.identifier,
+      identifier: formData.identifier,
       password: formData.password,
     };
 
@@ -28,7 +27,6 @@ export const loginUser = async (formData) => {
       body: loginData,
     });
 
-    console.log("Login response:", response);
     return response;
   } catch (error) {
     console.error("Login error details:", error);
