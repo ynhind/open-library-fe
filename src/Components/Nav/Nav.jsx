@@ -111,7 +111,7 @@ const Nav = () => {
               to="/"
               className="text-stone-700 hover:text-amber-800 transition-colors font-medium"
             >
-              Home
+              Homeie
             </Link>
 
             {/* Categories Dropdown */}
