@@ -48,8 +48,13 @@ export const getCartItems = async () => {
 };
 
 // Update cart item quantity
-export const updateCartItem = async (bookId, quantity) => {
+export const updateCartItem = async (bookId, quantity, onOptimisticUpdate) => {
   try {
+    // update UI immediately for better UX
+    if (onOptimisticUpdate) {
+      onOptimisticUpdate(bookId, quantity);
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("Authentication required. Please log in.");
@@ -64,11 +69,15 @@ export const updateCartItem = async (bookId, quantity) => {
       body: JSON.stringify({ bookId, quantity }),
     });
 
-    // Dispatch an event to notify components that the cart has been updated
+    // Dispatch event sau khi API thành công
     window.dispatchEvent(new Event("cart-updated"));
-
     return result;
   } catch (error) {
+    // if API fail, rollback UI to the previous state
+    if (onOptimisticUpdate) {
+      // call rollback function or refresh data
+      window.dispatchEvent(new Event("cart-update-failed"));
+    }
     console.error("Error updating cart item:", error);
     throw error;
   }
