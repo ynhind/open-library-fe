@@ -72,11 +72,13 @@ export const removeCartItem = async (bookId) => {
       throw new Error("Authentication required. Please log in.");
     }
 
-    return await apiRequest(`cart/remove-item/${bookId}`, {
+    return await apiRequest("cart/remove-item", {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ bookId }),
     });
   } catch (error) {
     console.error("Error removing cart item:", error);

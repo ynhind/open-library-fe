@@ -13,6 +13,7 @@ import { pdfjs } from "react-pdf";
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
 import { buyNow } from "../../utils/orderApi.js";
+import { addToWishlist, removeFromWishlist } from "../../utils/wishlistApi.js";
 
 import {
   Star,
@@ -98,10 +99,38 @@ const BookDetails = () => {
       }
     } catch (error) {
       console.error("Error during buy now process:", error);
-      toast.error(error.message || "Failed to process purchase", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+
+      // Check if it's an authentication error
+      if (error.message && error.message.includes("Authentication required")) {
+        toast.error(
+          <div>
+            Please log in to make a purchase.{" "}
+            <a
+              href="/login"
+              className="font-bold underline"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+                toast.dismiss();
+              }}
+            >
+              Sign in
+            </a>
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+          }
+        );
+      } else {
+        toast.error(error.message || "Failed to process purchase", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     } finally {
       setIsBuyingNow(false);
     }
@@ -138,13 +167,42 @@ const BookDetails = () => {
       });
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add to cart. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-      });
+
+      // Check if it's an authentication error
+      if (error.message && error.message.includes("Authentication required")) {
+        toast.error(
+          <div>
+            Please log in to add items to your cart.{" "}
+            <a
+              href="/login"
+              className="font-bold underline"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+                toast.dismiss();
+              }}
+            >
+              Sign in
+            </a>
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+          }
+        );
+        setShowCartModal(false); // Don't show the cart modal for authentication errors
+      } else {
+        toast.error("Failed to add to cart. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+        });
+      }
     }
   };
 
@@ -302,6 +360,81 @@ const BookDetails = () => {
     setPageInputValue("1");
   }, []);
 
+  // Check wishlist status
+  // const checkWishlistStatus = useCallback(async () => {
+  //   try {
+  //     if (book && book.bookId) {
+  //       const inWishlist = await isInWishlist(book.bookId);
+  //       setIsFavorite(inWishlist);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking wishlist status:", error);
+  //   }
+  // }, [book]);
+
+  // Handle toggling wishlist status
+  const handleToggleWishlist = async () => {
+    try {
+      if (!book || !book.bookId) {
+        toast.error("Cannot update wishlist: Invalid book information", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+
+      if (isFavorite) {
+        await removeFromWishlist(book.bookId);
+        setIsFavorite(false);
+        toast.success(`${book.title} removed from your wishlist!`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        await addToWishlist(parseInt(book.bookId, 10));
+        setIsFavorite(true);
+        toast.success(`${book.title} added to your wishlist!`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+
+      // Handle authentication error
+      if (error.message && error.message.includes("Authentication required")) {
+        toast.error(
+          <div>
+            Please log in to manage your wishlist.{" "}
+            <a
+              href="/login"
+              className="font-bold underline"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+                toast.dismiss();
+              }}
+            >
+              Sign in
+            </a>
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+          }
+        );
+      } else {
+        toast.error("Failed to update wishlist. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    }
+  };
+
   // Calculate which pages to display in preview
   const numberOfPagesToDisplayInPreview = useMemo(() => {
     if (!book || typeof numPages !== "number") return 0;
@@ -389,8 +522,63 @@ const BookDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchBookDetails();
-  }, [fetchBookDetails]);
+    const fetchBook = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getBookById(id);
+        setBook(data);
+        setIsAvailableOnline(data?.pdfUrl ? true : false);
+      } catch (err) {
+        console.error("Error fetching book:", err);
+        setError(err.message || "Error fetching book details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
+
+  // Check wishlist status when book is loaded
+  // useEffect(() => {
+  //   if (book?.bookId) {
+  //     const checkWishlistStatus = async () => {
+  //       try {
+  //         const inWishlist = await isInWishlist(book.bookId);
+  //         setIsFavorite(inWishlist);
+  //       } catch (error) {
+  //         console.error("Error checking wishlist status:", error);
+  //       }
+  //     };
+
+  //     checkWishlistStatus();
+  //   }
+  // }, [book]);
+
+  // Reset state when component unmounts
+  useEffect(() => {
+    return () => {
+      setBook(null);
+      setLoading(true);
+      setError(null);
+      setIsFavorite(false);
+      setPreviewActive(false);
+      setNumPages(null);
+      setPageNumber(1);
+      setIsUserScrolling(false);
+      setIsAvailableOnline(false);
+      setIsProgrammaticPageChange(false);
+      setPageInputValue("1");
+      setScale(1);
+      setQuantity(1);
+      setIsBuyingNow(false);
+      setShowReviewModal(false);
+      setUserRating(5);
+      setUserReview("");
+      setIsSubmittingReview(false);
+    };
+  }, []);
 
   // Calculate average rating from ratings array
   const averageRating = useMemo(() => {
@@ -843,7 +1031,7 @@ const BookDetails = () => {
                         ? "bg-red-100 text-red-500 shadow-md"
                         : "bg-stone-100 text-stone-500 hover:bg-stone-200"
                     } self-end md:self-auto mt-2 md:mt-0 transition-all duration-300`}
-                    onClick={() => setIsFavorite(!isFavorite)}
+                    onClick={handleToggleWishlist}
                     aria-label={
                       isFavorite ? "Remove from favorites" : "Add to favorites"
                     }

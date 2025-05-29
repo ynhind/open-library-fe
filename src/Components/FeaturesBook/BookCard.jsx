@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Star,
@@ -8,12 +8,74 @@ import {
   BookOpen,
   RefreshCw,
 } from "lucide-react";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  isInWishlist,
+} from "../../utils/wishlistApi";
+import { toast } from "react-toastify";
 
 const BookCard = ({ book, className, isReloading }) => {
   const [, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
 
   const { id, title, author, coverImage, price, rating, ratingCount } = book;
+
+  // Check wishlist status when component mounts
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      try {
+        const inWishlist = await isInWishlist(id);
+        setIsFavorite(inWishlist);
+      } catch (err) {
+        console.error("Error checking wishlist status:", err);
+      }
+    };
+
+    checkWishlistStatus();
+  }, [id]);
+
+  // Handle toggling wishlist
+  const handleToggleWishlist = async (e) => {
+    e.preventDefault();
+
+    try {
+      setIsUpdatingWishlist(true);
+
+      if (isFavorite) {
+        await removeFromWishlist(id);
+        toast.success(`${title} removed from your wishlist!`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        await addToWishlist(id);
+        toast.success(`${title} added to your wishlist!`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error("Error updating wishlist:", err);
+      // Check if it's an authentication error
+      if (err.message && err.message.includes("Authentication required")) {
+        toast.error("Please log in to manage your wishlist", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error("Failed to update wishlist", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } finally {
+      setIsUpdatingWishlist(false);
+    }
+  };
 
   // Create rating stars
   const renderRatingStars = (rating) => {
@@ -80,11 +142,9 @@ const BookCard = ({ book, className, isReloading }) => {
             ? "bg-red-500/10 text-red-500"
             : "bg-black/5 text-gray-500 hover:bg-white/30"
         } transition-all duration-300`}
-        onClick={(e) => {
-          e.preventDefault();
-          setIsFavorite(!isFavorite);
-        }}
+        onClick={handleToggleWishlist}
         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        disabled={isUpdatingWishlist}
       >
         <Heart size={16} className={isFavorite ? "fill-red-500" : ""} />
       </button>

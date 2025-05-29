@@ -39,7 +39,11 @@ export async function apiRequest(endpoint, options = {}) {
       let errorMessage;
       try {
         const errorData = await response.json();
-        errorMessage = errorData.message || `API Error: ${response.status}`;
+        errorMessage =
+          errorData.error ||
+          errorData.message ||
+          `API Error: ${response.status}`;
+        console.log("API Error response:", errorData);
       } catch {
         errorMessage = `API Error: ${response.status}`;
       }

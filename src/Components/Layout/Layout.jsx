@@ -8,7 +8,8 @@ const Layout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Nav className="default" />
 
-      <main className="flex-grow">{children || <Outlet />}</main>
+      {/* Added pt-16 md:pt-20 to account for fixed navbar height */}
+      <main className="flex-grow pt-16 md:pt-20">{children || <Outlet />}</main>
 
       <Footer />
     </div>

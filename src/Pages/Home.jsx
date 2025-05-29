@@ -5,6 +5,7 @@ import Hero from "../Components/Hero/Hero";
 import FeaturedBooks from "../Components/FeaturesBook/FeaturedBooks";
 import CategorySection from "../Components/Category/CategorySection";
 import Newsletter from "../Components/Newsletter";
+import RandomQuote from "../Components/RandomQuote";
 import { searchBooks } from "../utils/bookApi";
 import { newArrivals as mockNewArrivals, categories } from "../Data/mockData";
 import { FaStar } from "react-icons/fa";
@@ -90,7 +91,7 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
       <Nav className="default" />
 
-      <main className="flex-grow">
+      <main className="flex-grow pt-16 md:pt-20">
         <Hero />
 
         <FeaturedBooks
@@ -122,6 +123,8 @@ const Home = () => {
           error={newArrivalsError}
           reloadHandler={reloadNewArrivals}
         />
+
+        <RandomQuote />
 
         <Newsletter />
       </main>

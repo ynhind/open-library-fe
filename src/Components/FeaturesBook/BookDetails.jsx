@@ -112,13 +112,41 @@ const BookDetails = () => {
       });
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add to cart. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-      });
+
+      // Check if it's an authentication error
+      if (error.message && error.message.includes("Authentication required")) {
+        toast.error(
+          <div>
+            Please log in to add items to your cart.{" "}
+            <a
+              href="/login"
+              className="font-bold underline"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+                toast.dismiss();
+              }}
+            >
+              Sign in
+            </a>
+          </div>,
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+          }
+        );
+      } else {
+        toast.error("Failed to add to cart. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+        });
+      }
     }
   };
 

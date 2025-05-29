@@ -21,6 +21,11 @@ import CartList from "../Components/Cart/CartList";
 import PaymentMethods from "../Components/Checkout/PaymentMethods";
 import OrderConfirmation from "../Components/Checkout/OrderConfirmation";
 
+import UserInfo from "../Pages/Account/UserInfo";
+import EditProfile from "../Pages/Account/EditProfile";
+import SearchResults from "../Pages/Search/SearchResults";
+import Wishlist from "../Pages/Wishlist/Wishlist";
+
 export default function Router() {
   return (
     <BrowserRouter>
@@ -42,6 +47,11 @@ export default function Router() {
           <Route path="/book/:id" element={<BookDetails />} />
           <Route path="/cart" element={<CartList />} />
           <Route path="/payment/:orderId" element={<PaymentMethods />} />
+          <Route path="/account" element={<UserInfo />} />
+          <Route path="/account/edit" element={<EditProfile />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          {/* Nested route for order confirmation */}
           <Route
             path="/order-confirmation/:orderId"
             element={<OrderConfirmation />}
