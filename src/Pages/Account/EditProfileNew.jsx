@@ -204,9 +204,7 @@ const EditProfile = () => {
       try {
         setLoading(true);
         console.log("Sending profile update data:", updateData);
-        console.log("Starting profile update with XMLHttpRequest...");
         const response = await updateUserProfile(updateData);
-        console.log("Profile update response:", response);
 
         // Handle the updated response format from the backend
         if (response && response.message) {
@@ -223,7 +221,6 @@ const EditProfile = () => {
         navigate("/account");
       } catch (err) {
         console.error("Failed to update profile:", err);
-        console.error("Error details:", JSON.stringify(err, null, 2));
         // Handle the updated error format from the backend
         const errorMessage =
           err.error ||

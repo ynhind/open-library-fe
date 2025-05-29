@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { getCategories, searchBooks } from "../../utils/bookApi";
+import { getCartItems } from "../../utils/cartApi";
 import { useDebounce } from "../../hooks/useDebounce";
 
 const Nav = () => {
@@ -36,6 +37,9 @@ const Nav = () => {
   const [showSearchResults, setShowSearchResults] = useState(false); // Add state for dropdown visibility
   const searchContainerRef = useRef(null); // Ref for click outside detection
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  // Cart state
+  const [cartItemsCount, setCartItemsCount] = useState(0);
 
   // Search type options
   const searchTypes = [
@@ -73,6 +77,42 @@ const Nav = () => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
+
+  // Fetch cart items count
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        if (isLoggedIn) {
+          const cartData = await getCartItems();
+          if (cartData && cartData.items) {
+            setCartItemsCount(cartData.items.length);
+          }
+        } else {
+          // Reset cart count if user is not logged in
+          setCartItemsCount(0);
+        }
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
+        // In case of error, don't update the count
+      }
+    };
+
+    // Fetch cart count on component mount and when login status changes
+    fetchCartCount();
+
+    // Listen for cart update events
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    // Add event listener for cart updates
+    window.addEventListener("cart-updated", handleCartUpdate);
+
+    // Clean up event listener when component unmounts
+    return () => {
+      window.removeEventListener("cart-updated", handleCartUpdate);
+    };
+  }, [isLoggedIn]);
 
   // Define fetchCategoriesData before using it
   const fetchCategoriesData = React.useCallback(async () => {
@@ -422,7 +462,7 @@ const Nav = () => {
               {/* Desktop Search Results Dropdown */}
               {showSearchResults && (
                 <div
-                  className="absolute top-full left-0 right-0 mt-2 bg-white shadow-lg border border-amber-200 rounded-lg max-h-60 overflow-y-auto z-10"
+                  className="absolute top-full left-0 right-0 mt-2 bg-white shadow-lg border border-amber-200 rounded-lg max-h-72 overflow-y-auto z-10"
                   ref={searchContainerRef}
                 >
                   <div className="p-2">
@@ -526,7 +566,7 @@ const Nav = () => {
                 className="text-amber-800 group-hover:scale-110 transition-transform"
               />
               <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs bg-amber-800 text-white rounded-full shadow-sm group-hover:animate-pulse">
-                3
+                {cartItemsCount}
               </span>
             </Link>
 
@@ -684,7 +724,7 @@ const Nav = () => {
                   {/* Mobile Search Results */}
                   {showSearchResults && (
                     <div
-                      className="bg-white shadow-lg border border-amber-200 rounded-lg max-h-52 overflow-y-auto mt-2"
+                      className="bg-white shadow-lg border border-amber-200 rounded-lg max-h-64 overflow-y-auto mt-2"
                       ref={searchContainerRef}
                     >
                       <div className="p-2">

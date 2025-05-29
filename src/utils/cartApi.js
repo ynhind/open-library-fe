@@ -9,7 +9,7 @@ export const addToCart = async (bookId, quantity) => {
       throw new Error("Authentication required. Please log in.");
     }
 
-    return await apiRequest("cart/add-item", {
+    const result = await apiRequest("cart/add-item", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -17,6 +17,11 @@ export const addToCart = async (bookId, quantity) => {
       },
       body: JSON.stringify({ bookId, quantity }),
     });
+
+    // Dispatch an event to notify components that the cart has been updated
+    window.dispatchEvent(new Event("cart-updated"));
+
+    return result;
   } catch (error) {
     console.error("Error adding book to cart:", error);
     throw error;
@@ -50,7 +55,7 @@ export const updateCartItem = async (bookId, quantity) => {
       throw new Error("Authentication required. Please log in.");
     }
 
-    return await apiRequest("cart/update-item", {
+    const result = await apiRequest("cart/update-item", {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -58,6 +63,11 @@ export const updateCartItem = async (bookId, quantity) => {
       },
       body: JSON.stringify({ bookId, quantity }),
     });
+
+    // Dispatch an event to notify components that the cart has been updated
+    window.dispatchEvent(new Event("cart-updated"));
+
+    return result;
   } catch (error) {
     console.error("Error updating cart item:", error);
     throw error;

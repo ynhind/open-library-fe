@@ -13,7 +13,11 @@ import { pdfjs } from "react-pdf";
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
 import { buyNow } from "../../utils/orderApi.js";
-import { addToWishlist, removeFromWishlist } from "../../utils/wishlistApi.js";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  isInWishlist,
+} from "../../utils/wishlistApi.js";
 
 import {
   Star,
@@ -541,20 +545,20 @@ const BookDetails = () => {
   }, [id]);
 
   // Check wishlist status when book is loaded
-  // useEffect(() => {
-  //   if (book?.bookId) {
-  //     const checkWishlistStatus = async () => {
-  //       try {
-  //         const inWishlist = await isInWishlist(book.bookId);
-  //         setIsFavorite(inWishlist);
-  //       } catch (error) {
-  //         console.error("Error checking wishlist status:", error);
-  //       }
-  //     };
+  useEffect(() => {
+    if (book?.bookId) {
+      const checkWishlistStatus = async () => {
+        try {
+          const inWishlist = await isInWishlist(book.bookId);
+          setIsFavorite(inWishlist);
+        } catch (error) {
+          console.error("Error checking wishlist status:", error);
+        }
+      };
 
-  //     checkWishlistStatus();
-  //   }
-  // }, [book]);
+      checkWishlistStatus();
+    }
+  }, [book]);
 
   // Reset state when component unmounts
   useEffect(() => {
