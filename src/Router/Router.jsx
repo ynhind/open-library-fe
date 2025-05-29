@@ -25,6 +25,8 @@ import UserInfo from "../Pages/Account/UserInfo";
 import EditProfile from "../Pages/Account/EditProfile";
 import SearchResults from "../Pages/Search/SearchResults";
 import Wishlist from "../Pages/Wishlist/Wishlist";
+import Orders from "../Pages/Orders/Orders";
+import OrderDetail from "../Pages/Orders/OrderDetail";
 
 export default function Router() {
   return (
@@ -51,6 +53,8 @@ export default function Router() {
           <Route path="/account/edit" element={<EditProfile />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:orderId" element={<OrderDetail />} />
           {/* Nested route for order confirmation */}
           <Route
             path="/order-confirmation/:orderId"

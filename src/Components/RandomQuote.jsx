@@ -181,8 +181,8 @@ const RandomQuote = () => {
         {/* Premium compact card design */}
         <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden border border-amber-200/80 relative transform transition-all duration-300 hover:translate-y-[-2px] hover:shadow-xl">
           {/* Refined gold frame accents */}
-          <div className="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300"></div>
-          <div className="absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300"></div>
+          <div className="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-amber-100 via-amber-200 to-amber-100"></div>
+          <div className="absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r rom-amber-100 via-amber-400 to-amber-100"></div>
           <div className="absolute left-0 top-0 h-full w-0.5 bg-gradient-to-b from-amber-300 via-amber-500/50 to-amber-300"></div>
           <div className="absolute right-0 top-0 h-full w-0.5 bg-gradient-to-b from-amber-300 via-amber-500/50 to-amber-300"></div>
           {/* Enhanced premium decorative elements */}

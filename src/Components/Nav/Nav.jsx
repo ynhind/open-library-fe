@@ -6,6 +6,7 @@ import {
   User,
   Search,
   ChevronDown,
+  ChevronRight,
   Menu,
   Loader,
   ArrowLeft,
@@ -51,6 +52,8 @@ const Nav = () => {
 
   const navigate = useNavigate();
   const categoryTimeoutRef = useRef(null);
+  const userMenuTimeoutRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const toggleCategories = () => setIsCategoriesOpen(!isCategoriesOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -315,8 +318,15 @@ const Nav = () => {
             {/* Categories Dropdown */}
             <div
               className="relative"
-              onMouseEnter={() => setIsCategoriesOpen(true)}
-              onMouseLeave={() => setIsCategoriesOpen(false)}
+              onMouseEnter={() => {
+                clearTimeout(categoryTimeoutRef.current);
+                setIsCategoriesOpen(true);
+              }}
+              onMouseLeave={() => {
+                categoryTimeoutRef.current = setTimeout(() => {
+                  setIsCategoriesOpen(false);
+                }, 300); // Delay closing to give users time to move to the menu
+              }}
             >
               <button
                 className={`flex items-center gap-1.5 transition-colors font-medium py-2 ${
@@ -336,7 +346,10 @@ const Nav = () => {
               </button>
 
               {isCategoriesOpen && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white backdrop-blur-sm border border-amber-200 rounded-xl shadow-xl py-4 z-10 animate-fade-in max-h-[65vh] overflow-y-auto">
+                <div
+                  className="absolute top-full left-1/2 transform -translate-x-1/2 mt-0.5 bg-white backdrop-blur-sm border border-amber-200 rounded-xl shadow-xl py-4 z-10 animate-fade-in max-h-[65vh] overflow-y-auto"
+                  style={{ minWidth: "520px" }}
+                >
                   {isLoading ? (
                     <div className="flex justify-center py-6">
                       <Loader
@@ -350,18 +363,19 @@ const Nav = () => {
                     </div>
                   ) : fetchedCategories.length > 0 ? (
                     <>
+                      {" "}
                       <div className="px-2">
                         <h3 className="text-sm font-semibold text-amber-800 mb-2 px-3">
                           Browse by Category
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 w-[520px] gap-1">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 px-2">
                           {fetchedCategories.map((category) => (
                             <Link
                               key={category.categoryId}
                               to={`/category/${category.name
                                 .toLowerCase()
                                 .replace(/\s+/g, "-")}`}
-                              className="block px-4 py-2.5 text-sm text-stone-700 hover:bg-amber-50 hover:text-amber-900 whitespace-nowrap rounded-md transition-colors"
+                              className="block px-4 py-3 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900 whitespace-nowrap rounded-md transition-colors font-medium border border-transparent hover:border-amber-200"
                             >
                               {category.name}
                             </Link>
@@ -373,7 +387,7 @@ const Nav = () => {
                         className="px-4 py-3 mt-3 text-sm font-medium text-amber-800 border-t border-amber-100 hover:bg-amber-50 transition-colors flex items-center justify-center"
                       >
                         View All Categories{" "}
-                        <ChevronDown size={14} className="ml-1 rotate-270" />
+                        <ChevronRight size={14} className="ml-1" />
                       </Link>
                     </>
                   ) : (
@@ -573,9 +587,19 @@ const Nav = () => {
             {/* User Menu */}
             <div
               className="relative ml-4"
-              onMouseEnter={() => setIsUserMenuOpen(true)}
-              onMouseLeave={() => setIsUserMenuOpen(false)}
+              onMouseEnter={() => {
+                clearTimeout(userMenuTimeoutRef.current);
+                setIsUserMenuOpen(true);
+              }}
+              onMouseLeave={() => {
+                userMenuTimeoutRef.current = setTimeout(() => {
+                  setIsUserMenuOpen(false);
+                }, 400); // Longer delay before closing gives users more time
+              }}
             >
+              {/* Add an invisible element to increase the hit area between the button and menu */}
+              <div className="absolute w-full h-4 bottom-0 left-0 translate-y-full"></div>
+
               <button className="p-2 bg-amber-50 hover:bg-amber-100 rounded-full transition-all relative">
                 <User size={20} className="text-amber-800" />
                 {isLoggedIn && (
@@ -584,7 +608,19 @@ const Nav = () => {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute top-full right-0 mt-2 w-60 bg-white backdrop-blur-sm border border-amber-200 rounded-xl shadow-xl py-3 z-10 animate-fade-in">
+                <div
+                  ref={userMenuRef}
+                  onMouseEnter={() => {
+                    clearTimeout(userMenuTimeoutRef.current);
+                    setIsUserMenuOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    userMenuTimeoutRef.current = setTimeout(() => {
+                      setIsUserMenuOpen(false);
+                    }, 300);
+                  }}
+                  className="absolute top-full right-0 mt-2 w-60 bg-white backdrop-blur-sm border border-amber-200 rounded-xl shadow-xl py-3 z-10 animate-fade-in"
+                >
                   {isLoggedIn && (
                     <div className="px-5 py-3 mb-1 border-b border-amber-200/50">
                       <div className="flex items-center justify-between">
@@ -884,26 +920,27 @@ const Nav = () => {
                       {error}
                     </div>
                   ) : fetchedCategories.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {fetchedCategories.map((category, index) => (
                         <Link
                           key={index}
                           to={`/category/${category.name
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
-                          className="block py-2 text-sm text-stone-700 hover:text-amber-900 transition-colors"
+                          className="block py-3 px-3 text-sm font-medium text-stone-700 hover:bg-amber-50 hover:text-amber-900 transition-colors rounded-md border border-transparent hover:border-amber-200"
+                          onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {category.name}
                         </Link>
                       ))}
 
-                      <div className="col-span-1 sm:col-span-2 pt-2 mt-1">
+                      <div className="col-span-1 sm:col-span-2 pt-3 mt-2 border-t border-amber-100">
                         <Link
                           to="/categories"
                           className="inline-flex items-center text-sm text-amber-700 font-medium hover:text-amber-900"
                         >
                           View all categories{" "}
-                          <ChevronDown size={14} className="ml-1 rotate-270" />
+                          <ChevronRight size={14} className="ml-1" />
                         </Link>
                       </div>
                     </div>

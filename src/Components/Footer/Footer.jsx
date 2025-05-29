@@ -23,10 +23,10 @@ const Footer = () => {
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Book className="text-amber-500" size={24} />
               <span className="text-xl font-serif font-bold text-amber-50">
-                Old<span className="text-amber-500">Tomes</span>
+                Open<span className="text-amber-500">Library</span>
               </span>
             </Link>
-            <p className="mb-4 text-sm leading-relaxed">
+            <p className="mb-4  text-sm leading-relaxed">
               Specializing in rare and vintage books since 1985. Our carefully
               curated collection brings literary treasures from the past to your
               modern bookshelf.
@@ -169,11 +169,11 @@ const Footer = () => {
                   size={18}
                   className="text-amber-500 mr-2 flex-shrink-0"
                 />
-                <span>(555) 123-4567</span>
+                <span>(084)xxxxxxx</span>
               </li>
               <li className="flex items-center">
                 <Mail size={18} className="text-amber-500 mr-2 flex-shrink-0" />
-                <span>info@oldtomes.com</span>
+                <span>info@openlibrary.com</span>
               </li>
             </ul>
             <div className="mt-4">
@@ -190,7 +190,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-stone-400 mb-4 md:mb-0">
-              &copy; {currentYear} OldTomes. All rights reserved.
+              &copy; {currentYear} OpenLibrary. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-stone-400">
               <Link
