@@ -207,7 +207,10 @@ const OrderConfirmation = () => {
             <div className="flex justify-between font-bold text-lg text-amber-800">
               <span>Total:</span>
               <span>
-                ${(order?.total_amount || order?.total)?.toFixed(2) || "0.00"}
+                {(order?.total_amount || order?.total)?.toLocaleString(
+                  "vi-VN"
+                ) || "0"}{" "}
+                VND
               </span>
             </div>
           </div>

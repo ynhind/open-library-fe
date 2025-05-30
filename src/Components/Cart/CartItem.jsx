@@ -56,7 +56,7 @@ const CartItem = ({
           {book.title}
         </h3>
         <p className="text-amber-700 font-medium mt-1">
-          ${book.price?.toFixed(2)}
+          {book.price.toLocaleString("vi-VN")} VND
         </p>
 
         {/* Out of stock notification */}

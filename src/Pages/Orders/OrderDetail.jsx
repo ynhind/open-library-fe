@@ -401,7 +401,10 @@ const OrderDetail = () => {
                               <span className="bg-stone-50 px-2 py-1 rounded text-stone-600 border border-stone-100">
                                 Unit Price:{" "}
                                 <span className="text-amber-700 font-medium">
-                                  ${item.price_per_unit?.toFixed(2) || "0.00"}
+                                  {item.price_per_unit?.toLocaleString(
+                                    "vi-VN"
+                                  ) || "0"}{" "}
+                                  VND
                                 </span>
                               </span>
                               {item.book?.category && (
@@ -423,10 +426,10 @@ const OrderDetail = () => {
                             </div>
                             <div className="flex-shrink-0">
                               <p className="text-base font-medium text-amber-800 bg-clip-text text-transparent bg-gradient-to-r from-amber-800 to-amber-600">
-                                $
-                                {(item.price_per_unit * item.quantity).toFixed(
-                                  2
-                                )}
+                                {(
+                                  item.price_per_unit * item.quantity
+                                ).toLocaleString("vi-VN")}{" "}
+                                VND
                               </p>
                             </div>
                           </div>

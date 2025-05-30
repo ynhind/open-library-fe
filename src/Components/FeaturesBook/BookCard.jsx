@@ -131,7 +131,7 @@ const BookCard = ({ book, className, isReloading }) => {
       {/* Price tag - always visible, positioned at top-left */}
       <div className="absolute top-0 left-0 z-10">
         <div className="bg-amber-800 text-white text-sm font-medium py-1 px-3 rounded-br-lg shadow-sm">
-          ${price.toFixed(2)}
+          {price.toLocaleString("vi-VN")} VND
         </div>
       </div>
 
@@ -173,7 +173,9 @@ const BookCard = ({ book, className, isReloading }) => {
                 </button>
                 <button
                   className="flex-1 flex items-center justify-center gap-1 bg-amber-500/90 hover:bg-amber-500 text-white py-1.5 px-2 rounded-md text-xs font-medium backdrop-blur-sm transition-colors"
-                  aria-label={`Purchase for $${price.toFixed(2)}`}
+                  aria-label={`Purchase for ${price.toLocaleString(
+                    "vi-VN"
+                  )} VND`}
                 >
                   <ShoppingCart size={12} /> Buy
                 </button>
@@ -199,9 +201,11 @@ const BookCard = ({ book, className, isReloading }) => {
           <p className="text-stone-500 text-sm mb-2">{author}</p>
         </Link>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div className="flex items-center gap-1.5">
-            <div className="flex gap-0.5">{renderRatingStars(rating)}</div>
+            <div className="flex items-center gap-0.5">
+              {renderRatingStars(rating)}
+            </div>
             <span className="text-xs text-stone-400">({ratingCount})</span>
           </div>
         </div>

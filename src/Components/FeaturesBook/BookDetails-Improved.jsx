@@ -1105,11 +1105,11 @@ const BookDetails = () => {
                 <div className="mb-6">
                   <div className="flex flex-wrap items-center gap-4 mb-5">
                     <p className="text-2xl md:text-3xl font-bold text-amber-800 flex items-baseline">
-                      ${book.price?.toFixed(2)}
+                      {book.price?.toLocaleString("vi-VN")} VND
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
                           <span className="text-base md:text-lg text-stone-500 line-through ml-2">
-                            ${book.originalPrice.toFixed(2)}
+                            {book.originalPrice.toLocaleString("vi-VN")} VND
                           </span>
                         )}
                     </p>

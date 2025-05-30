@@ -79,8 +79,8 @@ const CartList = () => {
         )
     : 0;
 
-  const shipping = cartSubtotal > 50 ? 0 : 4.99;
-  const selectedItemsShipping = selectedItemsSubtotal > 50 ? 0 : 4.99;
+  const shipping = cartSubtotal > 1200000 ? 0 : 120000; // 50 USD = 1,200,000 VND, 4.99 USD = 120,000 VND
+  const selectedItemsShipping = selectedItemsSubtotal > 1200000 ? 0 : 120000;
 
   const cartTotal = cartSubtotal + shipping;
   const selectedItemsTotal = selectedItemsSubtotal + selectedItemsShipping;
@@ -134,7 +134,12 @@ const CartList = () => {
       } catch (err) {
         console.error("Error fetching cart:", err);
         // Check if it's an authentication error
-        if (err.message && err.message.includes("Authentication required")) {
+        if (err.message && err.message.includes("Token has been expired")) {
+          setError("token_expired");
+        } else if (
+          err.message &&
+          err.message.includes("Authentication required")
+        ) {
           setError("authentication_required");
         } else {
           setError("Failed to load your cart. Please try again.");
@@ -322,6 +327,108 @@ const CartList = () => {
 
   // Error state
   if (error) {
+    if (error === "token_expired") {
+      // Token expired - user needs to sign in again
+      return (
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Premium header with gradient background */}
+          <div className="bg-gradient-to-r from-amber-100 via-amber-50 to-white rounded-2xl p-6 mb-10 shadow-sm border border-amber-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full -mr-10 -mt-10"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-300/10 rounded-full -ml-8 -mb-8"></div>
+
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center">
+                <Link
+                  to="/"
+                  className="mr-4 p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-sm"
+                >
+                  <ChevronLeft size={20} className="text-amber-800" />
+                </Link>
+                <div>
+                  <h1 className="text-3xl font-serif font-medium text-stone-800">
+                    My Shopping Cart
+                  </h1>
+                  <p className="text-stone-500 mt-1">
+                    Your selected books for checkout
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Token expired state */}
+          <div className="bg-white border border-amber-50 shadow-sm rounded-xl p-12 text-center relative overflow-hidden">
+            {/* Premium top accent */}
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100"></div>
+
+            {/* Decorative elements */}
+            <div className="absolute bottom-0 right-0 w-32 h-32 bg-amber-50 rounded-full opacity-70 -mb-12 -mr-12"></div>
+            <div className="absolute top-1/4 left-1/6 w-16 h-16 bg-amber-50 rounded-full opacity-50 blur-sm"></div>
+            <div className="absolute bottom-1/3 left-1/5 w-8 h-8 bg-amber-100 rounded-full opacity-30"></div>
+            <div className="absolute top-1/3 right-1/4 w-12 h-12 bg-amber-100 rounded-full opacity-40 blur-sm"></div>
+
+            {/* Premium cart icon */}
+            <div className="relative w-28 h-28 mx-auto mb-8">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-white rounded-full shadow-inner flex items-center justify-center">
+                <ShoppingCart className="text-amber-500" size={46} />
+              </div>
+              <div className="absolute -inset-1.5 bg-amber-300/30 rounded-full blur-sm animate-pulse"></div>
+              <div className="absolute -inset-3 bg-amber-200/20 rounded-full blur-md"></div>
+
+              {/* Decorative circles */}
+              <div className="absolute -right-2 -top-2 w-5 h-5 bg-amber-100 rounded-full shadow-inner"></div>
+              <div className="absolute -left-1 -bottom-1 w-3 h-3 bg-amber-200 rounded-full shadow-inner"></div>
+            </div>
+
+            <h2 className="text-3xl font-serif font-medium mb-4 relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-amber-800 to-amber-600">
+              Your session has expired
+            </h2>
+
+            <p className="text-stone-600 mb-10 max-w-lg mx-auto relative z-10 leading-relaxed">
+              For your security, your session has expired. Please sign in again
+              to access your cart and continue shopping.
+              <span className="block mt-2 italic text-amber-700 font-serif">
+                Your saved items will be restored after you sign in.
+              </span>
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 relative z-10">
+              <Link
+                to="/login"
+                className="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all inline-flex items-center gap-2.5 font-medium shadow-md hover:shadow-lg group"
+              >
+                <LogIn
+                  size={18}
+                  className="group-hover:scale-110 transition-transform"
+                />
+                <span>Sign In Again</span>
+                <span className="ml-1 text-amber-200 group-hover:ml-2 transition-all">
+                  →
+                </span>
+              </Link>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.href = "/login";
+                }}
+                className="px-8 py-3.5 bg-white text-amber-800 border border-amber-200 rounded-lg hover:bg-amber-50 hover:border-amber-300 transition-all inline-flex items-center gap-2 font-medium shadow-sm hover:shadow"
+              >
+                <LogIn size={18} />
+                Clear Session & Login
+              </button>
+            </div>
+
+            {/* Premium recommendation text */}
+            <div className="mt-8 text-stone-400 text-sm italic relative z-10 flex items-center justify-center">
+              <span className="inline-block w-12 h-px bg-stone-200 mr-3"></span>
+              Secure sessions protect your data
+              <span className="inline-block w-12 h-px bg-stone-200 ml-3"></span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (error === "authentication_required") {
       // Authentication error - user is not logged in
       return (
@@ -852,7 +959,7 @@ const CartList = () => {
                         Selected items subtotal:
                       </span>
                       <span className="font-medium">
-                        ${selectedItemsSubtotal.toFixed(2)}
+                        {selectedItemsSubtotal.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
                     <div className="flex justify-between text-stone-700">
@@ -869,12 +976,14 @@ const CartList = () => {
                       >
                         {selectedItemsShipping === 0
                           ? "Free"
-                          : `$${selectedItemsShipping.toFixed(2)}`}
+                          : `${selectedItemsShipping.toLocaleString(
+                              "vi-VN"
+                            )} VND`}
                       </span>
                     </div>
                     {selectedItemsShipping > 0 && (
                       <div className="text-xs text-amber-700 italic pl-6">
-                        Free shipping on orders over $50
+                        Free shipping on orders over 1,200,000 VND
                       </div>
                     )}
                   </>
@@ -886,7 +995,7 @@ const CartList = () => {
                         Subtotal:
                       </span>
                       <span className="font-medium">
-                        ${cartSubtotal.toFixed(2)}
+                        {cartSubtotal.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
                     <div className="flex justify-between text-stone-700">
@@ -899,12 +1008,14 @@ const CartList = () => {
                           shipping === 0 ? "text-green-600 font-medium" : ""
                         }
                       >
-                        {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                        {shipping === 0
+                          ? "Free"
+                          : `${shipping.toLocaleString("vi-VN")} VND`}
                       </span>
                     </div>
                     {shipping > 0 && (
                       <div className="text-xs text-amber-700 italic pl-6">
-                        Free shipping on orders over $50
+                        Free shipping on orders over 1,200,000 VND
                       </div>
                     )}
                   </>
@@ -925,10 +1036,10 @@ const CartList = () => {
                     </span>
                     <div>
                       <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-amber-800 to-amber-600">
-                        $
                         {selectedItems.length > 0
-                          ? selectedItemsTotal.toFixed(2)
-                          : cartTotal.toFixed(2)}
+                          ? selectedItemsTotal.toLocaleString("vi-VN")
+                          : cartTotal.toLocaleString("vi-VN")}{" "}
+                        VND
                       </span>
                       <div className="h-px w-full bg-gradient-to-r from-amber-400 to-amber-200 mt-1"></div>
                     </div>

@@ -64,15 +64,27 @@ const Wishlist = () => {
       setError(err.message || "Failed to load wishlist");
 
       // Handle authentication error
-      if (err.message && err.message.includes("Authentication required")) {
+      if (
+        err.message &&
+        (err.message.includes("Authentication required") ||
+          err.message.includes("Token has been expired"))
+      ) {
+        // Determine if it's an expired token or no authentication
+        const isExpired = err.message.includes("Token has been expired");
+
         toast.error(
           <div>
-            Please log in to view your wishlist.{" "}
+            {isExpired
+              ? "Your session has expired. Please log in again."
+              : "Please log in to view your wishlist."}{" "}
             <a
               href="/login"
               className="font-bold underline"
               onClick={(e) => {
                 e.preventDefault();
+                if (isExpired) {
+                  localStorage.removeItem("token");
+                }
                 navigate("/login");
                 toast.dismiss();
               }}
@@ -128,15 +140,26 @@ const Wishlist = () => {
       console.error("Error adding to cart:", error);
 
       // Handle authentication error
-      if (error.message && error.message.includes("Authentication required")) {
+      if (
+        error.message &&
+        (error.message.includes("Authentication required") ||
+          error.message.includes("Token has been expired"))
+      ) {
+        const isExpired = error.message.includes("Token has been expired");
+
         toast.error(
           <div>
-            Please log in to add items to your cart.{" "}
+            {isExpired
+              ? "Your session has expired. Please log in again."
+              : "Please log in to add items to your cart."}{" "}
             <a
               href="/login"
               className="font-bold underline"
               onClick={(e) => {
                 e.preventDefault();
+                if (isExpired) {
+                  localStorage.removeItem("token");
+                }
                 navigate("/login");
                 toast.dismiss();
               }}
@@ -685,12 +708,15 @@ const Wishlist = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="text-white font-semibold text-lg">
-                        ${book.price ? book.price.toFixed(2) : "N/A"}
+                        {book.price
+                          ? book.price.toLocaleString("vi-VN")
+                          : "N/A"}{" "}
+                        VND
                       </span>
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
                           <span className="text-white/70 text-sm line-through ml-2">
-                            ${book.originalPrice.toFixed(2)}
+                            {book.originalPrice.toLocaleString("vi-VN")} VND
                           </span>
                         )}
                     </div>
