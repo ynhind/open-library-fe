@@ -43,22 +43,186 @@ const UserInfo = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/80 to-amber-100/40 py-10 flex items-center justify-center">
-        <div className="relative">
-          {/* Premium Loading Animation */}
-          <div className="relative w-24 h-24">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 animate-pulse opacity-20"></div>
-            <div className="absolute inset-2 bg-white rounded-full shadow-inner"></div>
-            <div className="absolute inset-0 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-
-            {/* Decorative elements */}
-            <div className="absolute -top-2 -right-2 w-4 h-4 bg-amber-200 rounded-full shadow-inner"></div>
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-amber-300 rounded-full shadow-inner"></div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-yellow-50/60 py-10">
+        <div className="container mx-auto px-4 max-w-4xl">
+          {/* Animated floating particles background */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-amber-200/30 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animation: `float ${
+                    3 + Math.random() * 2
+                  }s ease-in-out infinite`,
+                  animationDelay: `${Math.random() * 2}s`,
+                }}
+              />
+            ))}
           </div>
-          <p className="mt-6 text-amber-800 font-medium tracking-wide animate-pulse">
-            Loading your profile...
-          </p>
+
+          {/* Loading skeleton with same layout as actual content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+            {/* Left column skeleton - User card */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-amber-100 relative h-full">
+                {/* Animated golden accent line */}
+                <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">
+                  <div className="h-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-pulse"></div>
+                </div>
+
+                {/* Floating decorative elements */}
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-amber-50 rounded-full opacity-70 -mb-12 -mr-12 animate-pulse"></div>
+                <div className="absolute top-1/4 left-1/6 w-16 h-16 bg-amber-50 rounded-full opacity-50 blur-sm animate-pulse"></div>
+
+                <div className="px-6 py-8 flex flex-col items-center relative z-10">
+                  {/* Avatar skeleton with pulsing rings */}
+                  <div className="relative w-24 h-24 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-amber-50 rounded-full animate-pulse"></div>
+                    <div className="absolute -inset-1 bg-amber-300/20 rounded-full blur-sm animate-ping"></div>
+                    <div className="absolute -inset-2 bg-amber-200/10 rounded-full blur-md animate-pulse"></div>
+                  </div>
+
+                  {/* Username skeleton */}
+                  <div className="h-6 bg-amber-100 rounded-lg w-32 mb-2 animate-pulse"></div>
+
+                  {/* Member badge skeleton */}
+                  <div className="h-5 bg-amber-50 rounded-full w-20 mb-4 animate-pulse"></div>
+
+                  {/* Join date skeleton */}
+                  <div className="h-4 bg-stone-100 rounded w-28 mb-6 animate-pulse"></div>
+
+                  {/* Edit button skeleton */}
+                  <div className="w-full h-12 bg-gradient-to-r from-amber-100 to-amber-50 rounded-lg animate-pulse"></div>
+                </div>
+
+                {/* Stats skeleton */}
+                <div className="px-6 py-4 bg-amber-50/50 border-t border-amber-100">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="h-6 bg-amber-100 rounded w-8 mx-auto mb-1 animate-pulse"></div>
+                      <div className="h-3 bg-stone-100 rounded w-16 mx-auto animate-pulse"></div>
+                    </div>
+                    <div className="text-center">
+                      <div className="h-6 bg-amber-100 rounded w-8 mx-auto mb-1 animate-pulse"></div>
+                      <div className="h-3 bg-stone-100 rounded w-16 mx-auto animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column skeleton - Details */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-amber-100 relative h-full">
+                {/* Header skeleton */}
+                <div className="px-8 py-6 border-b border-amber-100 bg-gradient-to-r from-amber-50/80 to-white">
+                  <div className="h-7 bg-amber-100 rounded-lg w-48 animate-pulse"></div>
+                </div>
+
+                {/* Content skeleton */}
+                <div className="px-8 py-8">
+                  <div className="space-y-6">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="flex items-start">
+                        <div className="h-10 w-10 rounded-md bg-amber-50 mr-4 animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-3 bg-stone-100 rounded w-20 mb-2 animate-pulse"></div>
+                          <div className="h-5 bg-stone-150 rounded w-48 animate-pulse"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bottom buttons skeleton */}
+                <div className="flex px-8 py-6 bg-amber-50/40 border-t border-amber-100 gap-4">
+                  <div className="flex-1 h-12 bg-amber-100 rounded-lg animate-pulse"></div>
+                  <div className="flex-1 h-12 bg-amber-100 rounded-lg animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Premium card skeleton */}
+              {/* <div className="mt-6 bg-gradient-to-r from-amber-200 to-amber-300 rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-60 h-60 bg-amber-100/20 rounded-full -mr-20 -mt-20 blur-md animate-pulse"></div>
+                <div className="flex items-start relative z-10">
+                  <div className="flex-1">
+                    <div className="h-6 bg-white/30 rounded w-48 mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-white/20 rounded w-64 mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-white/20 rounded w-32 mb-4 animate-pulse"></div>
+                    <div className="h-10 bg-white/40 rounded-lg w-28 animate-pulse"></div>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse"></div>
+                </div>
+              </div> */}
+            </div>
+          </div>
+
+          {/* Central loading indicator */}
+          <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-20">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-amber-200/50">
+              <div className="flex flex-col items-center">
+                {/* Multi-ring spinner */}
+                <div className="relative w-16 h-16 mb-4">
+                  <div className="absolute inset-0 rounded-full border-4 border-amber-200"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin"></div>
+                  <div
+                    className="absolute inset-2 rounded-full border-2 border-amber-300 border-b-transparent animate-spin animation-reverse"
+                    style={{ animationDuration: "1.5s" }}
+                  ></div>
+                  <div
+                    className="absolute inset-4 rounded-full border border-amber-400 border-l-transparent animate-spin"
+                    style={{ animationDuration: "2s" }}
+                  ></div>
+                </div>
+
+                {/* Loading text with typewriter effect */}
+                <div className="text-center">
+                  <h3 className="text-lg font-serif font-semibold text-amber-800 mb-2">
+                    Loading Your Profile
+                  </h3>
+                  <div className="flex items-center justify-center space-x-1">
+                    <span className="text-stone-600">
+                      Preparing your account
+                    </span>
+                    <div className="flex space-x-1">
+                      <div
+                        className="w-1 h-1 bg-amber-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      ></div>
+                      <div
+                        className="w-1 h-1 bg-amber-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      ></div>
+                      <div
+                        className="w-1 h-1 bg-amber-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* CSS for additional animations */}
+        <style jsx>{`
+          @keyframes float {
+            0%,
+            100% {
+              transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+              transform: translateY(-20px) rotate(180deg);
+            }
+          }
+          .animation-reverse {
+            animation-direction: reverse;
+          }
+        `}</style>
       </div>
     );
   }

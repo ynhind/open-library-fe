@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getUserOrders } from "../../utils/orderApi";
-import Layout from "../../Components/Layout/Layout";
 import { BookOpen, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 
 // Inject global CSS for animations
@@ -104,7 +103,7 @@ const Orders = () => {
     }
   };
   return (
-    <Layout>
+    <>
       <AnimationStyles />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow-xl rounded-xl overflow-hidden border border-amber-100">
@@ -271,7 +270,7 @@ const Orders = () => {
                 <div className="absolute top-1/3 right-1/4 w-12 h-12 bg-amber-100 rounded-full opacity-40 blur-sm"></div>
 
                 <div className="relative mb-3">
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-50 to-white rounded-full shadow-inner flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-50 to-white rounded-full shadow-inner flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="28"
@@ -279,7 +278,7 @@ const Orders = () => {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="1"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       className="text-amber-500 animate-spin"
@@ -946,7 +945,7 @@ const Orders = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

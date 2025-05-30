@@ -284,6 +284,19 @@ const BookDetails = () => {
     }
   };
 
+  // Calculate which pages to display in preview (moved before handleScroll)
+  const numberOfPagesToDisplayInPreview = useMemo(() => {
+    if (!book || typeof numPages !== "number") return 0;
+
+    if (isAvailableOnline) {
+      return book.previewPages && book.previewPages > 0
+        ? Math.min(numPages, book.previewPages)
+        : numPages;
+    }
+
+    return Math.min(numPages, 20);
+  }, [book, numPages, isAvailableOnline]);
+
   // Zoom controls
   const zoomIn = useCallback(
     () => setScale((prev) => Math.min(prev + 0.2, 2.5)),
@@ -305,53 +318,77 @@ const BookDetails = () => {
         clearTimeout(userScrollTimeoutRef.current);
       }
 
-      const container = e.target;
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-
-      // Calculate which page is most visible in the viewport
-      const pageHeight = scrollHeight / numPages;
-      const viewportMiddle = scrollTop + clientHeight / 2;
-      const currentVisiblePage = Math.ceil(viewportMiddle / pageHeight);
-
-      // Only update if we're actually changing pages and not in the middle of a programmatic change
-      if (
-        currentVisiblePage !== pageNumber &&
-        currentVisiblePage <= numPages &&
-        currentVisiblePage > 0 &&
-        !isProgrammaticPageChange
-      ) {
-        setPageNumber(currentVisiblePage);
-        // Update the input value to match the current page
-        setPageInputValue(currentVisiblePage.toString());
-      }
-
       setIsUserScrolling(true);
+
+      // Debounce the page calculation to avoid frequent updates
       userScrollTimeoutRef.current = setTimeout(() => {
+        const container = e.target;
+
+        // Get all page elements and find which one is most visible
+        const pageElements = container.querySelectorAll("[data-page-number]");
+        let mostVisiblePage = 1;
+        let maxVisibleArea = 0;
+
+        pageElements.forEach((pageElement) => {
+          const pageRect = pageElement.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+
+          // Calculate how much of the page is visible in the viewport
+          const visibleTop = Math.max(pageRect.top, containerRect.top);
+          const visibleBottom = Math.min(pageRect.bottom, containerRect.bottom);
+          const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+          if (visibleHeight > maxVisibleArea) {
+            maxVisibleArea = visibleHeight;
+            mostVisiblePage = parseInt(
+              pageElement.getAttribute("data-page-number")
+            );
+          }
+        });
+
+        // Only update if we're actually changing pages and not in the middle of a programmatic change
+        if (
+          mostVisiblePage !== pageNumber &&
+          mostVisiblePage <= numberOfPagesToDisplayInPreview &&
+          mostVisiblePage > 0 &&
+          !isProgrammaticPageChange &&
+          maxVisibleArea > 100 // Only update if there's significant visible area
+        ) {
+          setPageNumber(mostVisiblePage);
+          setPageInputValue(mostVisiblePage.toString());
+        }
+
         setIsUserScrolling(false);
-      }, 150);
+      }, 300); // Increased debounce time
     },
-    [numPages, pageNumber, isProgrammaticPageChange]
+    [
+      numPages,
+      pageNumber,
+      isProgrammaticPageChange,
+      numberOfPagesToDisplayInPreview,
+    ]
   );
 
   // Add this improved effect to ensure proper scrolling when using buttons
   useEffect(() => {
     if (scrollContainerRef.current && numPages && isProgrammaticPageChange) {
-      const scrollHeight = scrollContainerRef.current.scrollHeight;
-      const pageHeight = scrollHeight / numPages;
-      const scrollTarget = (pageNumber - 1) * pageHeight;
+      // Find the specific page element to scroll to
+      const targetPageElement = scrollContainerRef.current.querySelector(
+        `[data-page-number="${pageNumber}"]`
+      );
 
-      // Scroll to the target page
-      scrollContainerRef.current.scrollTo({
-        top: scrollTarget,
-        behavior: "smooth",
-      });
+      if (targetPageElement) {
+        // Scroll to the target page element
+        targetPageElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
 
       // Reset the programmatic flag after a longer delay to prevent scroll handler from overriding
       const timer = setTimeout(() => {
         setIsProgrammaticPageChange(false);
-      }, 600); // Increased from 300ms to 600ms
+      }, 1000); // Increased from 600ms to 1000ms
 
       return () => clearTimeout(timer);
     }
@@ -439,19 +476,6 @@ const BookDetails = () => {
     }
   };
 
-  // Calculate which pages to display in preview
-  const numberOfPagesToDisplayInPreview = useMemo(() => {
-    if (!book || typeof numPages !== "number") return 0;
-
-    if (isAvailableOnline) {
-      return book.previewPages && book.previewPages > 0
-        ? Math.min(numPages, book.previewPages)
-        : numPages;
-    }
-
-    return Math.min(numPages, 20);
-  }, [book, numPages, isAvailableOnline]);
-
   // Handle page input change
   const handlePageInputChange = useCallback((e) => {
     setPageInputValue(e.target.value);
@@ -460,22 +484,25 @@ const BookDetails = () => {
   // Handle page input submit (on blur or Enter key)
   const handlePageInputSubmit = useCallback(() => {
     const page = parseInt(pageInputValue);
-    if (!isNaN(page) && page >= 1 && page <= (numPages || 1)) {
+    const maxPage = Math.min(numPages || 1, numberOfPagesToDisplayInPreview);
+
+    if (!isNaN(page) && page >= 1 && page <= maxPage) {
       setPageNumber(page);
       setIsProgrammaticPageChange(true);
     } else {
       // Reset to current page if invalid
       setPageInputValue(pageNumber.toString());
     }
-  }, [pageInputValue, numPages, pageNumber]);
+  }, [pageInputValue, numPages, pageNumber, numberOfPagesToDisplayInPreview]);
 
   // Navigate to next page
   const goToNextPage = useCallback(() => {
-    const newPage = Math.min(numPages || 1, pageNumber + 1);
+    const maxPage = Math.min(numPages || 1, numberOfPagesToDisplayInPreview);
+    const newPage = Math.min(maxPage, pageNumber + 1);
     setPageNumber(newPage);
     setPageInputValue(newPage.toString());
     setIsProgrammaticPageChange(true);
-  }, [pageNumber, numPages]);
+  }, [pageNumber, numPages, numberOfPagesToDisplayInPreview]);
 
   // Navigate to previous page
   const goToPrevPage = useCallback(() => {
@@ -532,7 +559,8 @@ const BookDetails = () => {
         setError(null);
         const data = await getBookById(id);
         setBook(data);
-        setIsAvailableOnline(data?.pdfUrl ? true : false);
+        // Use the isAvailableOnline field from the API, not just pdfUrl
+        setIsAvailableOnline(data?.isAvailableOnline || false);
       } catch (err) {
         console.error("Error fetching book:", err);
         setError(err.message || "Error fetching book details");
@@ -737,7 +765,11 @@ const BookDetails = () => {
               {Array.from(
                 new Array(numberOfPagesToDisplayInPreview),
                 (_, index) => (
-                  <div key={`page_${index + 1}`} className="mb-6">
+                  <div
+                    key={`page_${index + 1}`}
+                    className="mb-6"
+                    data-page-number={index + 1}
+                  >
                     <Page
                       pageNumber={index + 1}
                       renderTextLayer={false}
@@ -769,7 +801,7 @@ const BookDetails = () => {
               <input
                 type="text"
                 min="1"
-                max={numPages || 1}
+                max={Math.min(numPages || 1, numberOfPagesToDisplayInPreview)}
                 value={pageInputValue}
                 onChange={handlePageInputChange}
                 onBlur={handlePageInputSubmit}
@@ -781,12 +813,17 @@ const BookDetails = () => {
                 className="w-16 border border-amber-200 rounded-md px-2 py-1 text-center"
                 aria-label="Page number"
               />
-              <span className="mx-2">of {numPages || 1}</span>
+              <span className="mx-2">
+                of {Math.min(numPages || 1, numberOfPagesToDisplayInPreview)}
+              </span>
             </div>
 
             <button
               onClick={goToNextPage}
-              disabled={pageNumber >= (numPages || 1)}
+              disabled={
+                pageNumber >=
+                Math.min(numPages || 1, numberOfPagesToDisplayInPreview)
+              }
               className="px-2 py-1 bg-amber-100 text-amber-800 rounded hover:bg-amber-200 disabled:opacity-50"
             >
               Next

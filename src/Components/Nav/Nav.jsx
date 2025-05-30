@@ -234,10 +234,50 @@ const Nav = () => {
                   className="text-amber-800 group-hover:text-amber-700 transition-colors"
                   size={24}
                 />
-                <span className="text-2xl font-serif font-bold text-stone-800">
-                  Open
-                  <span className="text-amber-800 group-hover:text-amber-700 transition-colors">
-                    Library
+                <span className="text-2xl font-serif font-bold text-stone-800 flex items-center">
+                  OpenLib
+                  <span className="relative ml-2 group-hover:scale-110 transition-all duration-500">
+                    {/* Outer glow ring */}
+                    <span className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 rounded-full blur-sm opacity-75 group-hover:opacity-100 animate-pulse"></span>
+
+                    {/* Main badge container */}
+                    <span className="relative inline-flex items-center justify-center w-14 h-7 bg-gradient-to-br from-amber-600 via-yellow-500 to-orange-600 rounded-full shadow-2xl border-2 border-yellow-300/50 overflow-hidden transform rotate-12 group-hover:rotate-0 transition-all duration-500">
+                      {/* Animated shine effect */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+
+                      {/* Premium mesh pattern overlay */}
+                      <span
+                        className="absolute inset-0 opacity-20"
+                        style={{
+                          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 1px, transparent 0)`,
+                          backgroundSize: "6px 6px",
+                        }}
+                      ></span>
+
+                      {/* The "88" text */}
+                      <span className="relative text-white font-black text-base tracking-tighter drop-shadow-lg z-10">
+                        88
+                      </span>
+
+                      {/* Floating sparkles */}
+                      <span
+                        className="absolute top-1 left-2 w-1.5 h-1.5 bg-yellow-200 rounded-full opacity-90 animate-bounce"
+                        style={{ animationDelay: "0s" }}
+                      ></span>
+                      <span
+                        className="absolute bottom-1 right-2 w-1 h-1 bg-white rounded-full opacity-80 animate-bounce"
+                        style={{ animationDelay: "0.5s" }}
+                      ></span>
+                      <span
+                        className="absolute top-1.5 right-3 w-0.5 h-0.5 bg-yellow-100 rounded-full opacity-70 animate-ping"
+                        style={{ animationDelay: "1s" }}
+                      ></span>
+                    </span>
+
+                    {/* Premium label */}
+                    <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-amber-700 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                      PREMIUM
+                    </span>
                   </span>
                 </span>
               </Link>
@@ -296,10 +336,50 @@ const Nav = () => {
                 size={22}
               />
             </div>
-            <span className="text-2xl font-serif font-bold text-stone-800">
-              Open
-              <span className="text-amber-800 group-hover:text-amber-700 transition-colors">
-                Library
+            <span className="text-2xl font-serif font-bold text-stone-800 flex items-center">
+              OpenLib
+              <span className="relative ml-2 group-hover:scale-110 transition-all duration-500">
+                {/* Outer glow ring */}
+                <span className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 rounded-full blur-sm opacity-75 group-hover:opacity-100 animate-pulse"></span>
+
+                {/* Main badge container */}
+                <span className="relative inline-flex items-center justify-center w-14 h-7 bg-gradient-to-br from-amber-600 via-yellow-500 to-orange-600 rounded-full shadow-2xl border-2 border-yellow-300/50 overflow-hidden transform rotate-12 group-hover:rotate-0 transition-all duration-500">
+                  {/* Animated shine effect */}
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+
+                  {/* Premium mesh pattern overlay */}
+                  <span
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 1px, transparent 0)`,
+                      backgroundSize: "6px 6px",
+                    }}
+                  ></span>
+
+                  {/* The "88" text */}
+                  <span className="relative text-white font-black text-base tracking-tighter drop-shadow-lg z-10">
+                    88
+                  </span>
+
+                  {/* Floating sparkles */}
+                  <span
+                    className="absolute top-1 left-2 w-1.5 h-1.5 bg-yellow-200 rounded-full opacity-90 animate-bounce"
+                    style={{ animationDelay: "0s" }}
+                  ></span>
+                  <span
+                    className="absolute bottom-1 right-2 w-1 h-1 bg-white rounded-full opacity-80 animate-bounce"
+                    style={{ animationDelay: "0.5s" }}
+                  ></span>
+                  <span
+                    className="absolute top-1.5 right-3 w-0.5 h-0.5 bg-yellow-100 rounded-full opacity-70 animate-ping"
+                    style={{ animationDelay: "1s" }}
+                  ></span>
+                </span>
+
+                {/* Premium label */}
+                <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-amber-700 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                  PREMIUM
+                </span>
               </span>
             </span>
           </Link>
@@ -677,7 +757,7 @@ const Nav = () => {
                         Create Account
                       </Link>
                       <p className="text-xs text-stone-500 mt-1">
-                        New to OpenLibrary?{" "}
+                        New to OpenLib88?{" "}
                         <Link
                           to="/register"
                           className="text-amber-800 font-medium hover:underline"

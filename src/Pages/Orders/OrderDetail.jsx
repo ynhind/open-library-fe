@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getOrderById } from "../../utils/orderApi";
-import Layout from "../../Components/Layout/Layout";
 import {
   ChevronLeft,
   BookOpen,
@@ -121,7 +120,7 @@ const OrderDetail = () => {
   };
 
   return (
-    <Layout>
+    <>
       <AnimationStyles />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Premium header with gradient background */}
@@ -756,7 +755,7 @@ const OrderDetail = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   );
 };
 

@@ -108,6 +108,7 @@ const CartList = () => {
               price: item.price,
               coverImage: item.coverImage,
               author: item.author || "Unknown author",
+              quantity_available: item.quantity_available,
             },
             quantity: item.quantity,
           }));
@@ -121,6 +122,8 @@ const CartList = () => {
               price: item.price || item.book?.price,
               coverImage: item.coverImage || item.book?.coverImage,
               author: item.author || item.book?.author || "Unknown author",
+              quantity_available:
+                item.quantity_available || item.book?.quantity_available,
             },
             quantity: item.quantity,
           }));

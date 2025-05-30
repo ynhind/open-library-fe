@@ -22,8 +22,27 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Book className="text-amber-500" size={24} />
-              <span className="text-xl font-serif font-bold text-amber-50">
-                Open<span className="text-amber-500">Library</span>
+              <span className="text-xl font-serif font-bold text-amber-50 flex items-center">
+                OpenLib
+                <span className="relative ml-2">
+                  {/* Outer glow ring for footer */}
+                  <span className="absolute -inset-0.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 rounded-full blur-sm opacity-60 animate-pulse"></span>
+
+                  {/* Main badge container for footer */}
+                  <span className="relative inline-flex items-center justify-center w-12 h-6 bg-gradient-to-br from-amber-500 via-yellow-400 to-orange-500 rounded-full shadow-xl border border-yellow-200/30 overflow-hidden transform rotate-6">
+                    {/* Animated shine effect */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-pulse"></span>
+
+                    {/* The "88" text */}
+                    <span className="relative text-amber-900 font-black text-sm tracking-tighter drop-shadow-sm z-10">
+                      88
+                    </span>
+
+                    {/* Small sparkles */}
+                    <span className="absolute top-0.5 left-1.5 w-1 h-1 bg-yellow-100 rounded-full opacity-80 animate-ping"></span>
+                    <span className="absolute bottom-0.5 right-1.5 w-0.5 h-0.5 bg-amber-200 rounded-full opacity-70 animate-bounce"></span>
+                  </span>
+                </span>
               </span>
             </Link>
             <p className="mb-4  text-sm leading-relaxed">
@@ -173,7 +192,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Mail size={18} className="text-amber-500 mr-2 flex-shrink-0" />
-                <span>info@openlibrary.com</span>
+                <span>info@openlib88.com</span>
               </li>
             </ul>
             <div className="mt-4">
@@ -190,7 +209,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-stone-400 mb-4 md:mb-0">
-              &copy; {currentYear} OpenLibrary. All rights reserved.
+              &copy; {currentYear} OpenLib88. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-stone-400">
               <Link

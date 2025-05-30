@@ -139,8 +139,8 @@ const OrderConfirmation = () => {
             <div className="flex justify-between pb-2 border-b border-amber-100">
               <span className="font-medium text-stone-600">Date:</span>
               <span className="text-stone-800">
-                {order?.createdAt
-                  ? new Date(order.createdAt).toLocaleDateString("en-US", {
+                {order?.order_date
+                  ? new Date(order.order_date).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -162,11 +162,47 @@ const OrderConfirmation = () => {
                 Payment Method:
               </span>
               <span className="text-stone-800 capitalize">
-                {order?.payment?.payment_method
-                  ?.toLowerCase()
-                  .replace("_", " ") || "N/A"}
+                {order?.payments && order.payments.length > 0
+                  ? order.payments[0].payment_method
+                      ?.toLowerCase()
+                      .replace("_", " ")
+                  : "N/A"}
               </span>
             </div>
+
+            {order?.payments && order.payments.length > 0 && (
+              <div className="flex justify-between pb-2 border-b border-amber-100">
+                <span className="font-medium text-stone-600">
+                  Payment Date:
+                </span>
+                <span className="text-stone-800">
+                  {order.payments[0].payment_date
+                    ? new Date(
+                        order.payments[0].payment_date
+                      ).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "N/A"}
+                </span>
+              </div>
+            )}
+
+            {order?.payments &&
+              order.payments.length > 0 &&
+              order.payments[0].transaction_id && (
+                <div className="flex justify-between pb-2 border-b border-amber-100">
+                  <span className="font-medium text-stone-600">
+                    Transaction ID:
+                  </span>
+                  <span className="text-stone-800 font-mono text-sm">
+                    {order.payments[0].transaction_id}
+                  </span>
+                </div>
+              )}
 
             <div className="flex justify-between font-bold text-lg text-amber-800">
               <span>Total:</span>

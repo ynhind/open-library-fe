@@ -176,7 +176,7 @@ export default function Register() {
               </h1>
             </div>
             <div className="h-px w-20 bg-amber-200 my-3 ml-12"></div>
-            <p className="text-stone-600 ml-12">Join Open Library today</p>
+            <p className="text-stone-600 ml-12">Join OpenLib88 today</p>
           </div>
 
           {error && (

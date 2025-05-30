@@ -1,5 +1,5 @@
 import React from "react";
-import { Trash2, Minus, Plus } from "lucide-react";
+import { Trash2, Minus, Plus, AlertTriangle } from "lucide-react";
 
 const CartItem = ({
   item,
@@ -13,19 +13,25 @@ const CartItem = ({
   }
 
   const { book, quantity } = item;
+  const isOutOfStock = book.quantity_available === 0;
 
   // Calculate subtotal for this item
   const subtotal = book.price * quantity;
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center border-b border-amber-100 py-4 gap-4">
+    <div
+      className={`flex flex-col sm:flex-row items-start sm:items-center border-b border-amber-100 py-4 gap-4 ${
+        isOutOfStock ? "opacity-75 bg-gray-50" : ""
+      }`}
+    >
       <div className="flex items-center">
         <input
           type="checkbox"
           id={`item-${book.bookId}`}
           checked={isSelected}
           onChange={() => toggleSelection(book.bookId)}
-          className="w-5 h-5 accent-amber-600 cursor-pointer rounded"
+          disabled={isOutOfStock}
+          className="w-5 h-5 accent-amber-600 cursor-pointer rounded disabled:cursor-not-allowed disabled:opacity-50"
         />
         <label htmlFor={`item-${book.bookId}`} className="sr-only">
           Select {book.title}
@@ -49,10 +55,19 @@ const CartItem = ({
         <h3 className="font-medium text-lg text-stone-800 truncate">
           {book.title}
         </h3>
-        <p className="text-stone-600">{book.author}</p>
         <p className="text-amber-700 font-medium mt-1">
           ${book.price?.toFixed(2)}
         </p>
+
+        {/* Out of stock notification */}
+        {isOutOfStock && (
+          <div className="flex items-center gap-2 mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+            <AlertTriangle size={16} className="text-red-600" />
+            <span className="text-sm  text-red-700 font-medium">
+              Out of Stock
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Quantity controls */}

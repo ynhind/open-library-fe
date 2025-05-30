@@ -137,7 +137,7 @@ export default function Login() {
             </div>
             <div className="h-px w-20 bg-amber-200 my-3 ml-12"></div>
             <p className="text-stone-600 ml-12">
-              Sign in to continue to Open Library
+              Sign in to continue to OpenLib88
             </p>
           </div>
 
