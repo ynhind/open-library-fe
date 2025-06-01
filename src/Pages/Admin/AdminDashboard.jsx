@@ -7,15 +7,25 @@ import {
   Tag,
   BarChart3,
   Settings,
+  Home,
 } from "lucide-react";
 
 export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-amber-50/50 py-10 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6 sm:p-8">
-        <h2 className="text-2xl md:text-3xl font-serif font-bold text-amber-800 mb-8">
-          Admin Dashboard
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-amber-800 mb-4 sm:mb-0">
+            Admin Dashboard
+          </h2>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition-colors text-sm font-medium"
+          >
+            <Home className="h-4 w-4" />
+            Go to Home
+          </Link>
+        </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">

@@ -622,7 +622,7 @@ const Orders = () => {
 
                     <div className="px-8 py-6 border-b border-amber-100 flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-amber-50/30 via-white to-white">
                       <div>
-                        <span className="text-xs text-stone-500 block mb-1 flex items-center">
+                        <span className="text-xs text-stone-500 mb-1 flex items-center">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="12"
