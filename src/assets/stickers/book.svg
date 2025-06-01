@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Main book shape -->
+    <path d="M30,30 L90,30 L90,90 L30,90 Z" fill="#673AB7" stroke="#4527A0"/>
+    <!-- Book pages -->
+    <path d="M30,30 L30,90 C50,85 70,85 90,90 L90,30 C70,35 50,35 30,30 Z" fill="#EDE7F6" stroke="#4527A0"/>
+    <!-- Page divider -->
+    <path d="M60,35 L60,85" stroke="#4527A0" stroke-dasharray="2,2"/>
+    <!-- Bookmark -->
+    <path d="M45,35 L45,60 L40,55 L35,60 L35,35" fill="#E57373" stroke="#C62828"/>
+    <!-- Glasses -->
+    <circle cx="50" cy="55" r="8" stroke="#795548" fill="none"/>
+    <circle cx="70" cy="55" r="8" stroke="#795548" fill="none"/>
+    <path d="M58,55 L62,55" stroke="#795548" stroke-width="1"/>
+  </g>
+</svg>

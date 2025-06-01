@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Cat body -->
+    <ellipse cx="60" cy="70" rx="25" ry="20" fill="#E0E0E0" stroke="#9E9E9E"/>
+    <!-- Ears -->
+    <path d="M40,55 L50,65 L60,55" stroke="#9E9E9E" fill="#E0E0E0" stroke-linecap="round"/>
+    <path d="M80,55 L70,65 L60,55" stroke="#9E9E9E" fill="#E0E0E0" stroke-linecap="round"/>
+    <!-- Inner ears -->
+    <path d="M45,58 L50,65" stroke="#FFCDD2" stroke-width="4" stroke-linecap="round"/>
+    <path d="M75,58 L70,65" stroke="#FFCDD2" stroke-width="4" stroke-linecap="round"/>
+    <!-- Face -->
+    <circle cx="50" cy="65" r="2" fill="#333"/>
+    <circle cx="70" cy="65" r="2" fill="#333"/>
+    <!-- Nose -->
+    <path d="M58,70 L60,72 L62,70" stroke="#333" stroke-linecap="round" fill="#FFCDD2"/>
+    <!-- Whiskers -->
+    <path d="M55,72 L40,70 M55,74 L42,76 M65,72 L80,70 M65,74 L78,76" stroke="#9E9E9E" stroke-linecap="round"/>
+    <!-- Mouth -->
+    <path d="M58,74 C59,76 61,76 62,74" stroke="#333" stroke-linecap="round"/>
+    <!-- Book -->
+    <rect x="30" y="80" width="20" height="15" rx="2" fill="#4FC3F7" stroke="#0277BD"/>
+  </g>
+</svg>

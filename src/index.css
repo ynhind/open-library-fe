@@ -4,6 +4,35 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes swing {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes flip {
+  0%, 100% { transform: rotateY(0deg); }
+  50% { transform: rotateY(-35deg); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
 @layer base {
   :root {
     --background: 48 100% 96%;
@@ -103,4 +132,36 @@
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Mobile PDF viewer optimizations */
+@layer utilities {
+  .pdf-viewer-mobile {
+    /* Improve touch scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+  }
+
+  /* Ensure PDF pages are properly sized on mobile */
+  .react-pdf__Page {
+    @apply max-w-full;
+  }
+
+  .react-pdf__Page__canvas {
+    @apply max-w-full h-auto;
+  }
+
+  /* Touch-friendly buttons */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent zoom on input focus on iOS */
+  @media screen and (max-width: 768px) {
+    input[type="number"] {
+      font-size: 16px;
+    }
+  }
 }

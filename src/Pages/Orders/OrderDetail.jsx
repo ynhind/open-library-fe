@@ -518,7 +518,9 @@ const OrderDetail = () => {
                                   </dt>
                                   <dd className="text-stone-800 font-medium flex items-center">
                                     <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-2"></span>
-                                    {payment.method || "Not specified"}
+                                    {payment.payment_method ? 
+                                      payment.payment_method.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) 
+                                      : "Not specified"}
                                   </dd>
                                 </div>
 
@@ -579,7 +581,7 @@ const OrderDetail = () => {
                                   </dt>
                                   <dd className="text-amber-800 font-medium text-lg flex items-center">
                                     <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-2"></span>
-                                    ${payment.amount?.toFixed(2) || "0.00"}
+                                    {payment.amount.toLocaleString("vi-VN")} VND
                                   </dd>
                                 </div>
 
@@ -605,7 +607,7 @@ const OrderDetail = () => {
                                   </dt>
                                   <dd className="text-stone-800 font-medium flex items-center">
                                     <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-2"></span>
-                                    {payment.paymentId || "Not available"}
+                                    {payment.transaction_id || "Not available"}
                                   </dd>
                                 </div>
                               </dl>
@@ -635,7 +637,7 @@ const OrderDetail = () => {
                         <div className="flex items-center justify-between">
                           <dt className="text-sm text-stone-600">Subtotal</dt>
                           <dd className="text-sm font-medium text-stone-800">
-                            ${calculateSubtotal().toFixed(2)}
+                            {calculateSubtotal().toLocaleString("vi-VN")} VND
                           </dd>
                         </div>
                         {/* Add shipping, taxes, discounts here if applicable */}
@@ -644,7 +646,7 @@ const OrderDetail = () => {
                             Order Total
                           </dt>
                           <dd className="text-base font-medium text-amber-800">
-                            ${order.total_amount.toFixed(2)}
+                            {order.total_amount.toLocaleString("vi-VN")} VND
                           </dd>
                         </div>
                       </dl>
@@ -683,7 +685,7 @@ const OrderDetail = () => {
                         )}
                         <Link
                           to="/orders"
-                          className="w-full block text-center bg-white border border-amber-200 rounded-lg shadow-sm py-3.5 px-4 text-base font-medium text-stone-700 hover:bg-amber-50 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200 group flex items-center justify-center space-x-2"
+                          className="w-full text-center bg-white border border-amber-200 rounded-lg shadow-sm py-3.5 px-4 text-base font-medium text-stone-700 hover:bg-amber-50 hover:border-amber-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200 group flex items-center justify-center space-x-2"
                         >
                           <ChevronLeft
                             size={18}

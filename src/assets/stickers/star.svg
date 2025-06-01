@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Star body -->
+    <path d="M60,20 L70,45 L95,50 L75,70 L80,95 L60,80 L40,95 L45,70 L25,50 L50,45 Z" fill="#FFEB3B" stroke="#FFA000"/>
+    <!-- Face -->
+    <circle cx="54" cy="60" r="2" fill="#333"/>
+    <circle cx="66" cy="60" r="2" fill="#333"/>
+    <path d="M55,70 C58,72 62,72 65,70" stroke="#333" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

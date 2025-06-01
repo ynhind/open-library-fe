@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Worm body -->
+    <path d="M40,50 C45,35 65,40 60,55 C55,70 75,75 80,60" stroke="#8BC34A" fill="#AED581" stroke-linecap="round"/>
+    <!-- Book -->
+    <rect x="30" y="60" width="25" height="35" rx="2" fill="#FF9800" stroke="#E65100"/>
+    <path d="M30,65 L55,65 M30,70 L55,70" stroke="#E65100" stroke-linecap="round"/>
+    <!-- Worm face -->
+    <circle cx="82" cy="58" r="8" fill="#AED581" stroke="#8BC34A"/>
+    <circle cx="80" cy="56" r="1" fill="#333"/>
+    <circle cx="84" cy="56" r="1" fill="#333"/>
+    <path d="M80,61 C81,62 83,62 84,61" stroke="#333" stroke-linecap="round" fill="none"/>
+    <!-- Glasses -->
+    <circle cx="80" cy="56" r="3" stroke="#795548" fill="none"/>
+    <circle cx="84" cy="56" r="3" stroke="#795548" fill="none"/>
+    <path d="M77,56 L75,55 M83,56 L85,56" stroke="#795548" stroke-linecap="round"/>
+  </g>
+</svg>

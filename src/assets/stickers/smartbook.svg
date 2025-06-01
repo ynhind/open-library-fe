@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Page shape -->
+    <path d="M30,30 C40,20 80,20 90,30 C100,40 100,80 90,90 C80,100 40,100 30,90 C20,80 20,40 30,30 Z" fill="#FFECB3" stroke="#FFC107"/>
+    <!-- Eyes -->
+    <ellipse cx="45" cy="55" rx="5" ry="7" fill="#FFFFFF" stroke="#FFC107"/>
+    <ellipse cx="75" cy="55" rx="5" ry="7" fill="#FFFFFF" stroke="#FFC107"/>
+    <circle cx="45" cy="55" r="2.5" fill="#5D4037"/>
+    <circle cx="75" cy="55" r="2.5" fill="#5D4037"/>
+    <!-- Glasses frame -->
+    <path d="M40,50 C30,48 30,62 40,60 M50,55 L70,55 M80,50 C90,48 90,62 80,60" stroke="#795548" fill="none"/>
+    <!-- Mouth -->
+    <path d="M50,75 C55,80 65,80 70,75" stroke="#5D4037" fill="none" stroke-linecap="round"/>
+    <!-- Bookmark -->
+    <path d="M90,50 L100,45 L100,65 L90,60 Z" fill="#FF5722" stroke="#E64A19"/>
+  </g>
+</svg>

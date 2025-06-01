@@ -10,6 +10,13 @@ import { getBookById, addRating } from "../../utils/bookApi";
 import { Document, Page } from "react-pdf";
 import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { pdfjs } from "react-pdf";
+import PdfStickers from "../UI/PdfStickers";
+import AnimatedBackground from "../UI/AnimatedBackground";
+import CuteLoadingAnimation from "../UI/CuteLoadingAnimation";
+import ScrollIndicator from "../UI/ScrollIndicator";
+import PageCounter from "../UI/PageCounter";
+import BookmarkRibbon from "../UI/BookmarkRibbon";
+import FloatingEmojis from "../UI/FloatingEmojis";
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
 import { buyNow } from "../../utils/orderApi.js";
@@ -59,6 +66,7 @@ const BookDetails = () => {
     useState(false);
   const [pageInputValue, setPageInputValue] = useState("1");
   const [scale, setScale] = useState(1);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -346,6 +354,13 @@ const BookDetails = () => {
             );
           }
         });
+        
+        // Calculate scroll progress for the scroll indicator
+        if (container.scrollHeight > container.clientHeight) {
+          const scrollableHeight = container.scrollHeight - container.clientHeight;
+          const scrollProgress = Math.min(100, Math.max(0, Math.round((container.scrollTop / scrollableHeight) * 100)));
+          setScrollProgress(scrollProgress);
+        }
 
         // Only update if we're actually changing pages and not in the middle of a programmatic change
         if (
@@ -660,40 +675,73 @@ const BookDetails = () => {
     return stars;
   }, []);
 
+  // Handle window resize for mobile orientation changes
+  useEffect(() => {
+    const handleResize = () => {
+      // Force re-render of PDF viewer on orientation change
+      if (previewActive) {
+        // Debounce resize events
+        const resizeTimer = setTimeout(() => {
+          // Trigger a small scale change to force re-render
+          setScale((prev) => prev);
+        }, 300);
+
+        return () => clearTimeout(resizeTimer);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, [previewActive]);
+
+  // Mobile-responsive PDF page width calculation
+  const calculatePdfWidth = useCallback(() => {
+    const screenWidth = window.innerWidth;
+
+    // Mobile-first responsive width calculation
+    if (screenWidth < 640) {
+      // sm breakpoint
+      return Math.min(screenWidth - 32, 350) * scale; // 16px padding on each side
+    } else if (screenWidth < 768) {
+      // md breakpoint
+      return Math.min(screenWidth * 0.9, 500) * scale;
+    } else if (screenWidth < 1024) {
+      // lg breakpoint
+      return Math.min(screenWidth * 0.8, 650) * scale;
+    } else {
+      return Math.min(screenWidth * 0.7, 800) * scale; // Desktop
+    }
+  }, [scale]);
+
   // Render PDF viewer
   const renderPdfViewer = useCallback(() => {
     if (!previewActive || !book) return null;
 
-    // Add animation to the tailwind.config.ts file if needed:
-    // keyframes: {
-    //   fadeIn: {
-    //     '0%': { opacity: '0', transform: 'translateY(10px)' },
-    //     '100%': { opacity: '1', transform: 'translateY(0)' }
-    //   },
-    // },
-    // animation: {
-    //   fadeIn: 'fadeIn 0.3s ease-out forwards',
-    // },
-
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-2 sm:p-4">
-        <div className="bg-white rounded-lg w-full max-w-5xl flex flex-col h-[95vh]">
-          {/* Header with controls */}
-          <div className="flex justify-between items-center p-4 border-b border-amber-100">
-            <h2 className="text-xl font-serif font-bold truncate">
+      <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-1 sm:p-2 md:p-4">
+        <div className="bg-white rounded-lg w-full h-full sm:h-[98vh] md:h-[95vh] sm:max-w-sm md:max-w-3xl lg:max-w-5xl flex flex-col">
+          {/* Header with controls - Mobile optimized */}
+          <div className="flex flex-col sm:flex-row justify-between items-center p-2 sm:p-4 border-b border-amber-100 gap-2 sm:gap-0">
+            <h2 className="text-lg sm:text-xl font-serif font-bold truncate w-full sm:w-auto text-center sm:text-left">
               {book.title} - Preview
             </h2>
-            <div className="flex items-center gap-2">
-              <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
+              {/* Modern zoom controls with premium styling */}
+              <div className="flex bg-gradient-to-r from-stone-50 to-amber-50 rounded-xl shadow-sm border border-amber-100/50 overflow-hidden">
                 <button
                   onClick={zoomOut}
-                  className="p-1 hover:bg-amber-100 rounded-l-md"
+                  className="px-3 py-2 hover:bg-gradient-to-r hover:from-amber-100 hover:to-amber-50 transition-all duration-200 touch-manipulation text-amber-700 hover:text-amber-800"
                   aria-label="Zoom out"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -706,22 +754,24 @@ const BookDetails = () => {
                     <line x1="8" y1="11" x2="14" y2="11" />
                   </svg>
                 </button>
+                <div className="w-px bg-amber-200/60"></div>
                 <button
                   onClick={resetZoom}
-                  className="p-1 hover:bg-amber-100 text-xs font-medium"
+                  className="px-4 py-2 hover:bg-gradient-to-r hover:from-amber-100 hover:to-amber-50 text-xs font-medium min-w-[70px] transition-all duration-200 touch-manipulation text-amber-700 hover:text-amber-800"
                   aria-label="Reset zoom"
                 >
                   {Math.round(scale * 100)}%
                 </button>
+                <div className="w-px bg-amber-200/60"></div>
                 <button
                   onClick={zoomIn}
-                  className="p-1 hover:bg-amber-100 rounded-r-md"
+                  className="px-3 py-2 hover:bg-gradient-to-r hover:from-amber-100 hover:to-amber-50 transition-all duration-200 touch-manipulation text-amber-700 hover:text-amber-800"
                   aria-label="Zoom in"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -738,27 +788,45 @@ const BookDetails = () => {
               </div>
               <button
                 onClick={() => setPreviewActive(false)}
-                className="p-2 hover:bg-red-100 rounded-full flex-shrink-0"
+                className="p-2.5 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 touch-manipulation text-stone-500 hover:shadow-sm border border-transparent hover:border-red-100"
                 aria-label="Close preview"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
           </div>
 
-          {/* PDF content */}
+          {/* PDF content - Mobile optimized */}
           <div
             ref={scrollContainerRef}
-            className="flex-grow overflow-auto p-2 flex flex-col items-center justify-center bg-gray-50 relative"
+            className="flex-grow overflow-auto p-1 sm:p-2 flex flex-col items-center justify-center bg-gray-50 relative pdf-viewer-mobile"
             onScroll={handleScroll}
           >
+            {/* Animated background */}
+            <AnimatedBackground />
+            
+            {/* Floating emojis */}
+            <FloatingEmojis />
+            
+            {/* Cute stickers around PDF */}
+            <PdfStickers />
+            
+            {/* Bookmark ribbon */}
+            <BookmarkRibbon />
+            
+            {/* Scroll progress indicator */}
+            <ScrollIndicator progress={scrollProgress} />
+            
+            {/* Page counter */}
+            <PageCounter currentPage={pageNumber} totalPages={Math.min(numPages || 1, numberOfPagesToDisplayInPreview)} />
             <Document
               file={book.filePath}
               onLoadSuccess={onDocumentLoadSuccess}
-              loading={<div className="text-center py-10">Loading PDF...</div>}
+              loading={<CuteLoadingAnimation />}
               error={
-                <div className="text-center py-10 text-red-500">
-                  Failed to load PDF
+                <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-100 p-4 shadow-sm">
+                  <p className="font-medium mb-2">Oops! Failed to load PDF</p>
+                  <p className="text-sm">Please try refreshing or select another book</p>
                 </div>
               }
               className="max-h-full"
@@ -768,15 +836,15 @@ const BookDetails = () => {
                 (_, index) => (
                   <div
                     key={`page_${index + 1}`}
-                    className="mb-6"
+                    className="mb-4 sm:mb-6"
                     data-page-number={index + 1}
                   >
                     <Page
                       pageNumber={index + 1}
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
-                      width={Math.min(window.innerWidth * 0.85, 800) * scale}
-                      className="shadow-md min-h-[500px]"
+                      width={calculatePdfWidth()}
+                      className="shadow-md min-h-[300px] sm:min-h-[500px] mx-auto"
                     />
                     <p className="text-center text-xs text-gray-500 mt-2">
                       Page {index + 1}
@@ -787,20 +855,37 @@ const BookDetails = () => {
             </Document>
           </div>
 
-          {/* Page navigation controls */}
-          <div className="flex items-center justify-center gap-4 my-4">
+          {/* Page navigation controls - Modern premium styling */}
+          <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 my-3 sm:my-4 p-3 overflow-x-auto">
             <button
               onClick={goToPrevPage}
               disabled={pageNumber <= 1}
-              className="px-2 py-1 bg-amber-100 text-amber-800 rounded hover:bg-amber-200 disabled:opacity-50"
+              className="group relative flex-shrink-0 px-3 sm:px-6 py-2.5 bg-gradient-to-r from-amber-50 to-stone-50 text-amber-800 rounded-xl hover:from-amber-100 hover:to-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow border border-amber-100/60 disabled:hover:shadow-none font-medium text-sm"
             >
-              Previous
+              <span className="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+                <span className="hidden sm:inline">Previous</span>
+              </span>
             </button>
 
-            <div className="flex items-center">
-              <span className="mr-2">Page</span>
+            <div className="flex items-center flex-shrink-0 justify-center bg-gradient-to-r from-stone-50 to-amber-50 rounded-xl px-2 sm:px-4 py-2 shadow-sm border border-amber-100/60">
+              <span className="mr-1 sm:mr-3 text-xs sm:text-sm font-medium text-amber-700">
+                Page
+              </span>
               <input
-                type="text"
+                type="number"
                 min="1"
                 max={Math.min(numPages || 1, numberOfPagesToDisplayInPreview)}
                 value={pageInputValue}
@@ -811,10 +896,10 @@ const BookDetails = () => {
                     handlePageInputSubmit();
                   }
                 }}
-                className="w-16 border border-amber-200 rounded-md px-2 py-1 text-center"
+                className="w-10 sm:w-14 border border-amber-200/60 rounded-lg px-1 sm:px-2 py-1 text-center text-xs sm:text-sm font-medium bg-white/70 focus:bg-white focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-all duration-200"
                 aria-label="Page number"
               />
-              <span className="mx-2">
+              <span className="mx-1 sm:mx-3 text-xs sm:text-sm font-medium text-amber-700">
                 of {Math.min(numPages || 1, numberOfPagesToDisplayInPreview)}
               </span>
             </div>
@@ -825,36 +910,78 @@ const BookDetails = () => {
                 pageNumber >=
                 Math.min(numPages || 1, numberOfPagesToDisplayInPreview)
               }
-              className="px-2 py-1 bg-amber-100 text-amber-800 rounded hover:bg-amber-200 disabled:opacity-50"
+              className="group relative flex-shrink-0 px-3 sm:px-6 py-2.5 bg-gradient-to-r from-amber-50 to-stone-50 text-amber-800 rounded-xl hover:from-amber-100 hover:to-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow border border-amber-100/60 disabled:hover:shadow-none font-medium text-sm"
             >
-              Next
+              <span className="flex items-center gap-2">
+                <span className="hidden sm:inline">Next</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </span>
             </button>
           </div>
 
-          {/* Footer with navigation */}
-          <div className="border-t border-amber-100 p-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+          {/* Footer with navigation - Modern premium styling */}
+          <div className="border-t border-amber-100/60 bg-gradient-to-r from-amber-50/30 to-stone-50/30 p-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-xs sm:text-sm text-stone-600 text-center sm:text-left font-medium">
                 Showing{" "}
-                {Math.min(numPages || 0, numberOfPagesToDisplayInPreview)} of{" "}
-                {numPages || 0} pages (Preview)
+                <span className="text-amber-700 font-semibold">
+                  {Math.min(numPages || 0, numberOfPagesToDisplayInPreview)}
+                </span>{" "}
+                of{" "}
+                <span className="text-amber-700 font-semibold">
+                  {numPages || 0}
+                </span>{" "}
+                pages <span className="text-amber-600">(Preview)</span>
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={scrollToTop}
-                  className="px-4 py-2 bg-amber-100 text-amber-800 rounded hover:bg-amber-200"
+                  className="group px-4 py-2 bg-gradient-to-r from-amber-100 to-amber-50 text-amber-800 rounded-xl hover:from-amber-200 hover:to-amber-100 text-sm touch-manipulation transition-all duration-200 shadow-sm hover:shadow border border-amber-200/60 font-medium"
                 >
-                  Back to Top
+                  <span className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="group-hover:-translate-y-0.5 transition-transform duration-200"
+                    >
+                      <path d="m18 15-6-6-6 6" />
+                    </svg>
+                    Back to Top
+                  </span>
                 </button>
               </div>
             </div>
 
             {!isAvailableOnline && numPages > 20 && (
-              <div className="preview-limit-message">
-                <p className="text-center py-4 bg-amber-50 border-t border-amber-200">
-                  This is a preview. Purchase the book to access all {numPages}{" "}
-                  pages.
-                </p>
+              <div className="preview-limit-message mt-3">
+                <div className="text-center py-3 bg-gradient-to-r from-amber-100/50 to-stone-100/50 border border-amber-200/60 rounded-xl">
+                  <p className="text-xs sm:text-sm text-amber-800 font-medium">
+                    📚 This is a preview. Purchase the book to access all{" "}
+                    <span className="font-semibold text-amber-900">
+                      {numPages}
+                    </span>{" "}
+                    pages.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -880,6 +1007,8 @@ const BookDetails = () => {
     pageNumber,
     scrollToTop,
     isAvailableOnline,
+    calculatePdfWidth,
+    scrollProgress,
   ]);
 
   // Loading state

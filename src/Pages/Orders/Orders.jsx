@@ -698,7 +698,7 @@ const Orders = () => {
                           Total Amount
                         </span>
                         <span className="font-medium text-lg text-amber-700 bg-clip-text text-transparent bg-gradient-to-r from-amber-800 to-amber-600">
-                          ${order.total_amount.toFixed(2)}
+                          {order.total_amount.toLocaleString("vi-VN")} VND
                         </span>
                       </div>
                       <div>
@@ -832,8 +832,9 @@ const Orders = () => {
                                     <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
                                     <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
                                   </svg>
-                                  {item.quantity} × $
-                                  {item.price_per_unit?.toFixed(2) || "0.00"}
+                                  {item.quantity} ×
+                                  {item.price_per_unit?.toLocaleString("vi-VN")}{" "}
+                                  VND
                                 </p>
                               </div>
                             </div>

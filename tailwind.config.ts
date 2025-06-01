@@ -18,6 +18,13 @@ export default {
       },
     },
     extend: {
+      animation: {
+        wiggle: 'wiggle 3s ease-in-out infinite',
+        float: 'float 5s ease-in-out infinite',
+        swing: 'swing 2s ease-in-out infinite',
+        flip: 'flip 1.5s ease-in-out infinite',
+        sparkle: 'sparkle 2s ease-in-out infinite',
+      },
       colors: {
         amber: {
           50: "#FFF8E1",
