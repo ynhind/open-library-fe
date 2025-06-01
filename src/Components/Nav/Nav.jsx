@@ -15,6 +15,7 @@ import {
   Package,
   Home,
   X,
+  Settings,
 } from "lucide-react";
 import { getCategories, searchBooks } from "../../utils/bookApi";
 import { getCartItems } from "../../utils/cartApi";
@@ -29,6 +30,7 @@ const Nav = () => {
   const [error, setError] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   // Search functionality
   const [searchQuery, setSearchQuery] = useState("");
@@ -75,10 +77,23 @@ const Nav = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check if user is logged in
+  // Check if user is logged in and get user role
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
     setIsLoggedIn(!!token);
+
+    if (user && user !== "undefined") {
+      try {
+        const userData = JSON.parse(user);
+        setUserRole(userData.role);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        setUserRole(null);
+      }
+    } else {
+      setUserRole(null);
+    }
   }, []);
 
   // Fetch cart items count
@@ -162,6 +177,36 @@ const Nav = () => {
     };
   }, []);
 
+  // Perform search using searchBooks API
+  const performSearch = React.useCallback(
+    async (query) => {
+      if (!query || query.trim() === "") {
+        setSearchResults([]);
+        setShowSearchResults(false);
+        return;
+      }
+
+      setIsSearching(true);
+      setShowSearchResults(false); // Hide results while searching
+      try {
+        // Create search params based on the selected search type
+        const searchParams = {};
+        searchParams[searchType] = query;
+
+        const results = await searchBooks(searchParams);
+        setSearchResults(results);
+        setShowSearchResults(true); // Show results container after search completes
+      } catch (error) {
+        console.error("Error searching books:", error);
+        setSearchResults([]);
+        setShowSearchResults(true); // Show "no results" message on error
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [searchType]
+  );
+
   useEffect(() => {
     // Check if search query has a value
     if (debouncedSearchQuery.trim() !== "") {
@@ -171,39 +216,12 @@ const Nav = () => {
       setSearchResults([]);
       setShowSearchResults(false);
     }
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, performSearch]);
 
   // Handle search input change
   const handleSearchChange = (e) => {
     const { value } = e.target;
     setSearchQuery(value);
-  };
-
-  // Perform search using searchBooks API
-  const performSearch = async (query) => {
-    if (!query || query.trim() === "") {
-      setSearchResults([]);
-      setShowSearchResults(false);
-      return;
-    }
-
-    setIsSearching(true);
-    setShowSearchResults(false); // Hide results while searching
-    try {
-      // Create search params based on the selected search type
-      const searchParams = {};
-      searchParams[searchType] = query;
-
-      const results = await searchBooks(searchParams);
-      setSearchResults(results);
-      setShowSearchResults(true); // Show results container after search completes
-    } catch (error) {
-      console.error("Error searching books:", error);
-      setSearchResults([]);
-      setShowSearchResults(true); // Show "no results" message on error
-    } finally {
-      setIsSearching(false);
-    }
   };
 
   // Handle search form submission
@@ -311,6 +329,31 @@ const Nav = () => {
     { name: "Sign Out", path: "/signout", icon: <LogOut size={16} /> },
   ];
 
+  // Admin-specific menu items
+  const adminMenuItems = [
+    { name: "Admin Dashboard", path: "/admin", icon: <Settings size={16} /> },
+    { name: "Manage Books", path: "/admin/books", icon: <Book size={16} /> },
+    {
+      name: "Manage Categories",
+      path: "/admin/categories",
+      icon: <ChevronDown size={16} />,
+    },
+    { name: "Manage Users", path: "/admin/users", icon: <User size={16} /> },
+  ];
+
+  // Get appropriate menu items based on user role
+  const getMenuItems = () => {
+    const baseItems = [...userMenuItems];
+    if (userRole === "ADMIN") {
+      // Insert admin items before "Sign Out"
+      const signOutIndex = baseItems.findIndex(
+        (item) => item.path === "/signout"
+      );
+      baseItems.splice(signOutIndex, 0, ...adminMenuItems);
+    }
+    return baseItems;
+  };
+
   // Determine active link for visual indication
   const getActiveClass = (path) => {
     return location.pathname === path
@@ -394,6 +437,18 @@ const Nav = () => {
             >
               Home
             </Link>
+
+            {/* Admin Dashboard Link - Only show for admins */}
+            {userRole === "ADMIN" && (
+              <Link
+                to="/admin"
+                className={`transition-colors font-medium py-2 ${getActiveClass(
+                  "/admin"
+                )}`}
+              >
+                Admin Dashboard
+              </Link>
+            )}
 
             {/* Categories Dropdown */}
             <div
@@ -703,6 +758,7 @@ const Nav = () => {
                 >
                   {isLoggedIn && (
                     <div className="px-5 py-3 mb-1 border-b border-amber-200/50">
+                      {" "}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300 flex items-center justify-center text-amber-800 font-medium mr-3 shadow-sm">
@@ -710,22 +766,34 @@ const Nav = () => {
                           </div>
                           <div className="text-sm">
                             <p className="font-semibold text-stone-800">
-                              Member
+                              {userRole === "ADMIN" ? "Admin" : "Member"}
                             </p>
                             <p className="text-xs text-stone-500">
                               Welcome back!
                             </p>
                           </div>
                         </div>
-                        <span className="inline-flex h-5 items-center px-1.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200/80">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
-                          Active
+                        <span
+                          className={`inline-flex h-5 items-center px-1.5 rounded-full text-xs font-medium border ${
+                            userRole === "ADMIN"
+                              ? "bg-amber-100 text-amber-800 border-amber-200/80"
+                              : "bg-green-100 text-green-800 border-green-200/80"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full mr-1 ${
+                              userRole === "ADMIN"
+                                ? "bg-amber-500"
+                                : "bg-green-500"
+                            }`}
+                          ></span>
+                          {userRole === "ADMIN" ? "Admin" : "Active"}
                         </span>
                       </div>
                     </div>
                   )}
 
-                  {userMenuItems.map((item, index) => (
+                  {getMenuItems().map((item, index) => (
                     <React.Fragment key={index}>
                       <Link
                         to={item.path}
@@ -736,7 +804,7 @@ const Nav = () => {
                         </span>
                         {item.name}
                       </Link>
-                      {index === userMenuItems.length - 2 && (
+                      {index === getMenuItems().length - 2 && (
                         <div className="border-t border-amber-100 my-1.5"></div>
                       )}
                     </React.Fragment>
@@ -950,9 +1018,19 @@ const Nav = () => {
                     <p className="font-semibold text-stone-800">
                       Welcome back!
                     </p>
-                    <span className="inline-flex h-5 items-center px-1.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
-                      Member
+                    <span
+                      className={`inline-flex h-5 items-center px-1.5 rounded-full text-xs font-medium border ${
+                        userRole === "ADMIN"
+                          ? "bg-amber-100 text-amber-800 border-amber-200"
+                          : "bg-green-100 text-green-800 border-green-200"
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full mr-1 ${
+                          userRole === "ADMIN" ? "bg-amber-500" : "bg-green-500"
+                        }`}
+                      ></span>
+                      {userRole === "ADMIN" ? "Admin" : "Member"}
                     </span>
                   </div>
                 </div>
@@ -1054,11 +1132,12 @@ const Nav = () => {
 
               <div className="border-t border-amber-200 my-3"></div>
 
-              {userMenuItems.map((item, index) => (
+              {getMenuItems().map((item, index) => (
                 <Link
                   key={index}
                   to={item.path}
                   className="flex items-center py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
                     {React.cloneElement(item.icon, {

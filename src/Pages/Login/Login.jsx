@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../utils/authApi";
+import { redirectBasedOnRole } from "../../utils/roleUtils";
 import FeaturedBook5 from "../../assets/FeaturedBooksImages/FeaturedBook5.png";
 import { Eye, EyeOff, Mail, Lock, LogIn } from "lucide-react";
 
@@ -48,8 +49,12 @@ export default function Login() {
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
 
-      // Redirect to home page
-      navigate("/");
+      // Redirect based on user role
+      if (response.user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
       setShowVerificationLink(true);
     } catch (err) {
       console.error("Login error:", err);

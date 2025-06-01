@@ -11,6 +11,7 @@ import NotFound from "../Pages/NotFound/NotFound";
 import AdminDashboard from "../Pages/Admin/AdminDashboard";
 import BookManagement from "../Pages/Admin/BookManagement";
 import { CategoryManagement } from "../Pages/Admin/CategoryManagement";
+import UserManagement from "../Pages/Admin/UserManagement";
 import { AdminRoute } from "../Components/AdminRoute";
 
 import Layout from "../Components/Layout/Layout";
@@ -42,6 +43,7 @@ export default function Router() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/books" element={<BookManagement />} />
           <Route path="/admin/categories" element={<CategoryManagement />} />
+          <Route path="/admin/users" element={<UserManagement />} />
         </Route>
         <Route element={<Layout />}>
           <Route path="/categories" element={<BookCollection />} />
