@@ -198,3 +198,29 @@
     }
   }
 }
+/* Add these styles to the end of the file */
+
+.touch-action-pan-y {
+  touch-action: pan-y;
+}
+
+@media (max-width: 640px) {
+  .react-pdf__Page {
+    margin: 0 auto;
+    max-width: 100% !important;
+  }
+
+  .react-pdf__Page__canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Larger close button target area for mobile */
+  .pdf-close-button-mobile {
+    min-height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -727,7 +727,16 @@ const BookDetails = () => {
     if (!previewActive || !book) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-1 sm:p-2 md:p-4">
+      <div
+        className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-1 sm:p-2 md:p-4"
+        onClick={(e) => {
+          // Close preview when clicking outside the PDF container
+          if (e.target === e.currentTarget) {
+            setPreviewActive(false);
+          }
+        }}
+      >
+        {" "}
         <div className="bg-white rounded-lg w-full h-full sm:h-[98vh] md:h-[95vh] sm:max-w-sm md:max-w-3xl lg:max-w-5xl flex flex-col">
           {/* Header with controls - Mobile optimized */}
           <div className="flex flex-col sm:flex-row justify-between items-center p-2 sm:p-4 border-b border-amber-100 gap-2 sm:gap-0">
@@ -792,10 +801,10 @@ const BookDetails = () => {
               </div>
               <button
                 onClick={() => setPreviewActive(false)}
-                className="p-2.5 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 touch-manipulation text-stone-500 hover:shadow-sm border border-transparent hover:border-red-100"
+                className="p-2.5 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 touch-manipulation text-stone-500 hover:shadow-sm border border-transparent hover:border-red-100 pdf-close-button-mobile"
                 aria-label="Close preview"
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
           </div>
@@ -803,8 +812,12 @@ const BookDetails = () => {
           {/* PDF content - Mobile optimized */}
           <div
             ref={scrollContainerRef}
-            className="flex-grow overflow-auto p-1 sm:p-2 flex flex-col items-center justify-center bg-gray-50 relative pdf-viewer-mobile"
+            className="flex-grow overflow-auto p-1 sm:p-2 flex flex-col items-center justify-center bg-gray-50 relative pdf-viewer-mobile touch-action-pan-y"
             onScroll={handleScroll}
+            style={{
+              WebkitOverflowScrolling: "touch",
+              overscrollBehaviorY: "contain",
+            }}
           >
             {/* Animated background */}
             {/* Scroll progress indicator */}
