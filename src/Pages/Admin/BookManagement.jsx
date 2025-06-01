@@ -861,28 +861,28 @@ export default function BookManagement() {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-lg shadow">
-            <table className="min-w-full divide-y divide-amber-200">
+            <table className="min-w-full table-fixed divide-y divide-amber-200">
               <thead className="bg-amber-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-16 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Title
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Author
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-20 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-16 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Qty
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-24 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Format
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
+                  <th className="w-32 px-6 py-3 text-left text-xs font-medium text-stone-700 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -893,39 +893,45 @@ export default function BookManagement() {
                     key={book.bookId}
                     className="hover:bg-amber-50/50 transition-colors"
                   >
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-700">
                       {book.bookId}
                     </td>
-                    <td className="px-4 py-3 whitespace-normal text-sm font-medium text-stone-800 max-w-[200px] truncate">
-                      {book.title}
+                    <td className="px-6 py-4 text-sm font-medium text-stone-800">
+                      <div className="truncate" title={book.title}>
+                        {book.title}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
-                      {book.author}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-700">
+                      <div className="truncate" title={book.author}>
+                        {book.author}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-700">
                       ${book.price}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-700">
                       {book.quantity_available}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-stone-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-stone-700">
                       <span className="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800">
                         {book.format?.toLowerCase()}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                      <button
-                        className="bg-amber-600 text-white px-3 py-1 rounded mr-2 text-xs hover:bg-amber-700 transition-colors"
-                        onClick={() => handleEdit(book)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors"
-                        onClick={() => handleDelete(book.bookId)}
-                      >
-                        Delete
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex gap-1">
+                        <button
+                          className="bg-amber-600 text-white px-3 py-1 rounded text-xs hover:bg-amber-700 transition-colors"
+                          onClick={() => handleEdit(book)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors"
+                          onClick={() => handleDelete(book.bookId)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

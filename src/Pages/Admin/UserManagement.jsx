@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Search,
@@ -6,53 +7,119 @@ import {
   MoreVertical,
   Crown,
   Shield,
+  AlertCircle,
+  Ban,
+  UserCheck,
+  UserX,
+  Trash2,
+  ArrowLeft,
 } from "lucide-react";
+import { getAllUsers, toggleUserBlock, deleteUser } from "../../utils/userApi";
+import { toast } from "react-toastify";
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(null);
   const usersPerPage = 10;
 
-  // Mock data for demonstration - replace with actual API call
+  // Fetch users from API
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockUsers = [
-        {
-          id: 1,
-          username: "admin",
-          email: "admin@library.com",
-          role: "ADMIN",
-          status: "ACTIVE",
-          joinDate: "2024-01-15",
-          lastLogin: "2024-12-20",
-        },
-        {
-          id: 2,
-          username: "user1",
-          email: "user1@example.com",
-          role: "USER",
-          status: "ACTIVE",
-          joinDate: "2024-02-10",
-          lastLogin: "2024-12-19",
-        },
-        {
-          id: 3,
-          username: "user2",
-          email: "user2@example.com",
-          role: "USER",
-          status: "INACTIVE",
-          joinDate: "2024-03-05",
-          lastLogin: "2024-12-10",
-        },
-      ];
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 1000);
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await getAllUsers();
+
+      // Transform the API data to match the component's expected format
+      const transformedUsers = data.map((user) => ({
+        id: user.userId,
+        username: user.username,
+        email: user.email,
+        role: user.role || "MEMBER",
+        status: user.isBlocked ? "BLOCKED" : "ACTIVE",
+        joinDate: new Date(user.created_at).toLocaleDateString(),
+        lastLogin: "N/A", // This data is not available from the current API
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: user.address,
+        isBlocked: user.isBlocked,
+        created_at: user.created_at,
+      }));
+
+      setUsers(transformedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError("Failed to load users. Please try again.");
+      toast.error("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleUserBlock = async (userId, currentStatus) => {
+    try {
+      setActionLoading(userId);
+      const shouldBlock = currentStatus === "ACTIVE";
+
+      await toggleUserBlock(userId, shouldBlock);
+
+      // Update the user in the local state
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? {
+                ...user,
+                status: shouldBlock ? "BLOCKED" : "ACTIVE",
+                isBlocked: shouldBlock,
+              }
+            : user
+        )
+      );
+
+      toast.success(
+        `User has been ${shouldBlock ? "blocked" : "unblocked"} successfully`
+      );
+    } catch (error) {
+      console.error("Error toggling user block:", error);
+      toast.error("Failed to update user status");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId, username) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete user "${username}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setActionLoading(userId);
+      await deleteUser(userId);
+
+      // Remove the user from local state
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+
+      toast.success("User deleted successfully");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   // Filter users based on search term and role filter
   const filteredUsers = users.filter((user) => {
@@ -96,10 +163,22 @@ const UserManagement = () => {
   const getStatusBadge = (status) => {
     const baseClasses =
       "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
-    const statusClasses =
-      status === "ACTIVE"
-        ? "bg-green-100 text-green-800 border border-green-200"
-        : "bg-red-100 text-red-800 border border-red-200";
+
+    let statusClasses, statusText;
+
+    switch (status) {
+      case "ACTIVE":
+        statusClasses = "bg-green-100 text-green-800 border border-green-200";
+        statusText = "Active";
+        break;
+      case "BLOCKED":
+        statusClasses = "bg-red-100 text-red-800 border border-red-200";
+        statusText = "Blocked";
+        break;
+      default:
+        statusClasses = "bg-gray-100 text-gray-800 border border-gray-200";
+        statusText = "Unknown";
+    }
 
     return (
       <span className={`${baseClasses} ${statusClasses}`}>
@@ -108,7 +187,7 @@ const UserManagement = () => {
             status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
           }`}
         ></span>
-        {status}
+        {statusText}
       </span>
     );
   };
@@ -125,18 +204,53 @@ const UserManagement = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-stone-50 pt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col items-center justify-center h-64">
+            <AlertCircle className="text-red-500 mb-4" size={48} />
+            <h2 className="text-xl font-semibold text-stone-800 mb-2">
+              Error Loading Users
+            </h2>
+            <p className="text-stone-600 mb-4">{error}</p>
+            <button
+              onClick={fetchUsers}
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-stone-50 pt-20">
+    <div className="min-h-screen bg-amber-50 pt-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <User className="text-amber-600" size={24} />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <User className="text-amber-600" size={24} />
+              </div>
+              <h1 className="text-3xl font-bold text-stone-700">
+                User Management
+              </h1>
             </div>
-            <h1 className="text-3xl font-bold text-stone-800">
-              User Management
-            </h1>
+            <button
+              onClick={fetchUsers}
+              disabled={loading}
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {loading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              ) : (
+                "Refresh"
+              )}
+            </button>
           </div>
           <p className="text-stone-600">
             Manage user accounts, roles, and permissions
@@ -174,9 +288,35 @@ const UserManagement = () => {
               >
                 <option value="ALL">All Roles</option>
                 <option value="ADMIN">Admin</option>
-                <option value="USER">User</option>
+                <option value="MEMBER">Member</option>
               </select>
             </div>
+          </div>
+
+          {/* User Statistics */}
+          <div className="mt-4 flex items-center gap-6 text-sm text-stone-600">
+            <span>
+              Total Users: <strong>{users.length}</strong>
+            </span>
+            <span>
+              Showing: <strong>{filteredUsers.length}</strong>
+            </span>
+            <span>
+              Active:{" "}
+              <strong>
+                {users.filter((u) => u.status === "ACTIVE").length}
+              </strong>
+            </span>
+            <span>
+              Blocked:{" "}
+              <strong>
+                {users.filter((u) => u.status === "BLOCKED").length}
+              </strong>
+            </span>
+            <span>
+              Admins:{" "}
+              <strong>{users.filter((u) => u.role === "ADMIN").length}</strong>
+            </span>
           </div>
         </div>
 
@@ -239,9 +379,49 @@ const UserManagement = () => {
                         {user.lastLogin}
                       </td>
                       <td className="py-4 px-6">
-                        <button className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
-                          <MoreVertical size={16} className="text-stone-400" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {/* Block/Unblock Button */}
+                          <button
+                            onClick={() =>
+                              handleToggleUserBlock(user.id, user.status)
+                            }
+                            disabled={actionLoading === user.id}
+                            className={`p-2 rounded-lg transition-colors ${
+                              user.status === "ACTIVE"
+                                ? "hover:bg-red-100 text-red-600 hover:text-red-700"
+                                : "hover:bg-green-100 text-green-600 hover:text-green-700"
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            title={
+                              user.status === "ACTIVE"
+                                ? "Block User"
+                                : "Unblock User"
+                            }
+                          >
+                            {actionLoading === user.id ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                            ) : user.status === "ACTIVE" ? (
+                              <Ban size={16} />
+                            ) : (
+                              <UserCheck size={16} />
+                            )}
+                          </button>
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() =>
+                              handleDeleteUser(user.id, user.username)
+                            }
+                            disabled={actionLoading === user.id}
+                            className="p-2 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Delete User"
+                          >
+                            {actionLoading === user.id ? (
+                              <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -301,6 +481,17 @@ const UserManagement = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Back to Admin Dashboard Button */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center space-x-2 bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm"
+          >
+            <ArrowLeft size={20} />
+            <span>Back to Admin Dashboard</span>
+          </button>
         </div>
       </div>
     </div>

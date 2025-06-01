@@ -196,6 +196,27 @@ export const createCategory = async (categoryName) => {
     throw error;
   }
 };
+
+//delete category
+export const deleteCategory = async (categoryId) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    return await apiRequest(`books/delete-categories/${categoryId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
 //get book by id
 export const getBookById = async (bookId) => {
   try {
@@ -232,6 +253,36 @@ export const addRating = async (bookId, ratingData) => {
     });
   } catch (error) {
     console.error("Error adding rating:", error);
+    throw error;
+  }
+};
+
+// Get related books based on categories
+export const getRelatedBooks = async (
+  categories,
+  currentBookId,
+  limit = 10
+) => {
+  try {
+    if (!categories || categories.length === 0) {
+      // If no categories, return some random books
+      const allBooks = await getBooks();
+      return allBooks
+        .filter((book) => book.bookId !== currentBookId)
+        .slice(0, limit);
+    }
+
+    // Search for books in the same categories
+    const relatedBooks = await searchBooks({
+      categories: categories,
+    });
+
+    // Filter out the current book and limit results
+    return relatedBooks
+      .filter((book) => book.bookId !== currentBookId)
+      .slice(0, limit);
+  } catch (error) {
+    console.error("Error fetching related books:", error);
     throw error;
   }
 };

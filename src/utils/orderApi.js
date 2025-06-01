@@ -107,3 +107,27 @@ export const buyNow = async (orderData) => {
     throw error;
   }
 };
+
+/**
+ * Get all orders across all users (admin only)
+ * @returns {Promise<Array>} Array of all orders
+ */
+export const getAllOrders = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    const response = await apiRequest("order/get-all-orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.orders || [];
+  } catch (error) {
+    console.error("Error fetching all orders:", error);
+    throw error;
+  }
+};

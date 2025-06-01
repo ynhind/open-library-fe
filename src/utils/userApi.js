@@ -171,3 +171,96 @@ export const confirmPasswordChange = async (token, newPassword) => {
     throw error;
   }
 };
+
+// Admin only: Get all users
+export const getAllUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    try {
+      return await apiRequest("user/all-users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // Check if token has expired
+      if (error.message === "Token has been expired") {
+        // Redirect to login page
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    throw error;
+  }
+};
+
+// Admin only: Toggle user block/unblock status
+export const toggleUserBlock = async (userId, block) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    try {
+      return await apiRequest(`user/toggle-block/${userId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: { block },
+      });
+    } catch (error) {
+      // Check if token has expired
+      if (error.message === "Token has been expired") {
+        // Redirect to login page
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error toggling user block status:", error);
+    throw error;
+  }
+};
+
+// Admin only: Delete user
+export const deleteUser = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    try {
+      return await apiRequest(`user/delete-user/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // Check if token has expired
+      if (error.message === "Token has been expired") {
+        // Redirect to login page
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+};
