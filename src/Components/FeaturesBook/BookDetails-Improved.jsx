@@ -354,11 +354,18 @@ const BookDetails = () => {
             );
           }
         });
-        
+
         // Calculate scroll progress for the scroll indicator
         if (container.scrollHeight > container.clientHeight) {
-          const scrollableHeight = container.scrollHeight - container.clientHeight;
-          const scrollProgress = Math.min(100, Math.max(0, Math.round((container.scrollTop / scrollableHeight) * 100)));
+          const scrollableHeight =
+            container.scrollHeight - container.clientHeight;
+          const scrollProgress = Math.min(
+            100,
+            Math.max(
+              0,
+              Math.round((container.scrollTop / scrollableHeight) * 100)
+            )
+          );
           setScrollProgress(scrollProgress);
         }
 
@@ -804,21 +811,27 @@ const BookDetails = () => {
           >
             {/* Animated background */}
             <AnimatedBackground />
-            
+
             {/* Floating emojis */}
             <FloatingEmojis />
-            
+
             {/* Cute stickers around PDF */}
             <PdfStickers />
-            
+
             {/* Bookmark ribbon */}
             <BookmarkRibbon />
-            
+
             {/* Scroll progress indicator */}
             <ScrollIndicator progress={scrollProgress} />
-            
+
             {/* Page counter */}
-            <PageCounter currentPage={pageNumber} totalPages={Math.min(numPages || 1, numberOfPagesToDisplayInPreview)} />
+            <PageCounter
+              currentPage={pageNumber}
+              totalPages={Math.min(
+                numPages || 1,
+                numberOfPagesToDisplayInPreview
+              )}
+            />
             <Document
               file={book.filePath}
               onLoadSuccess={onDocumentLoadSuccess}
@@ -826,7 +839,9 @@ const BookDetails = () => {
               error={
                 <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-100 p-4 shadow-sm">
                   <p className="font-medium mb-2">Oops! Failed to load PDF</p>
-                  <p className="text-sm">Please try refreshing or select another book</p>
+                  <p className="text-sm">
+                    Please try refreshing or select another book
+                  </p>
                 </div>
               }
               className="max-h-full"

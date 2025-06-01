@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const CuteLoadingAnimation = () => {
   return (
@@ -13,10 +13,15 @@ const CuteLoadingAnimation = () => {
             <div className="w-2/3 h-[4px] bg-amber-500 rounded-full"></div>
           </div>
         </div>
-        
+
         {/* Page flip animation */}
-        <div className="absolute right-0 top-0 w-1/2 h-full bg-stone-100 rounded-tr-md origin-left animate-[flip_1.5s_ease-in-out_infinite]" 
-             style={{transformStyle: 'preserve-3d', backfaceVisibility: 'hidden'}}>
+        <div
+          className="absolute right-0 top-0 w-1/2 h-full bg-stone-100 rounded-tr-md origin-left animate-[flip_1.5s_ease-in-out_infinite]"
+          style={{
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+          }}
+        >
           <div className="absolute inset-0 p-2">
             <div className="w-full h-[3px] bg-stone-300 mb-1 rounded-full"></div>
             <div className="w-1/2 h-[3px] bg-stone-300 rounded-full"></div>
