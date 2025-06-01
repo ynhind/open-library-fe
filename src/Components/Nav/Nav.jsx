@@ -306,17 +306,6 @@ const Nav = () => {
                 </span>
               </span>
             </div>
-
-            <Link
-              to="/"
-              className="flex items-center gap-1 text-amber-800 hover:text-amber-900 transition-colors group"
-            >
-              <ArrowLeft
-                size={16}
-                className="group-hover:-translate-x-1 transition-transform"
-              />
-              <span className="font-medium">Continue Shopping</span>
-            </Link>
           </div>
         </div>
       </nav>

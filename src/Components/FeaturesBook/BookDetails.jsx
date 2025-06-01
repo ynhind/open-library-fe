@@ -702,7 +702,7 @@ const BookDetails = () => {
                   <span className="mx-1 text-stone-500">/</span>
                 </>
               )}
-              <span className="text-stone-500 truncate max-w-[120px] sm:max-w-xs md:max-w-sm">
+              <span className="text-stone-500 truncate max-w-[120px] sm:max-w-xs md:max-w-sm overflow-hidden">
                 {book.title}
               </span>
             </nav>
@@ -744,7 +744,7 @@ const BookDetails = () => {
               <div className="p-6 md:p-8 md:w-2/3">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start">
                   <div className="flex-1 pr-4">
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-stone-800 mb-2 leading-tight line-clamp-3">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-stone-800 mb-2 leading-tight overflow-hidden break-words">
                       {book.title}
                     </h1>
                     <p className="text-base md:text-lg text-stone-600 mb-4 flex items-center">
@@ -790,11 +790,11 @@ const BookDetails = () => {
                 {/* Price and Buttons with improved styling */}
                 <div className="mb-8">
                   <div className="flex flex-wrap items-center gap-4 mb-6">
-                    <p className="text-3xl font-bold text-amber-800 flex items-baseline">
+                    <p className="text-3xl font-bold text-amber-800 flex flex-wrap items-baseline whitespace-nowrap">
                       ${book.price?.toFixed(2)}
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
-                          <span className="text-lg text-stone-500 line-through ml-2">
+                          <span className="text-lg text-stone-500 line-through ml-2 whitespace-nowrap">
                             ${book.originalPrice.toFixed(2)}
                           </span>
                         )}
@@ -817,10 +817,10 @@ const BookDetails = () => {
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                  <div className="flex flex-wrap gap-4 mb-4">
                     <button
                       onClick={handleAddToCart}
-                      className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                      className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 min-w-0 flex-shrink-0 whitespace-nowrap"
                       aria-label={`Add ${book.title} to cart`}
                     >
                       <ShoppingCart size={18} className="animate-bounce" />
@@ -828,14 +828,14 @@ const BookDetails = () => {
                     </button>
                     <button
                       onClick={() => setPreviewActive(true)}
-                      className="flex items-center justify-center gap-2 border-2 border-amber-200 bg-white hover:bg-amber-50 text-amber-800 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
+                      className="flex items-center justify-center gap-2 border-2 border-amber-200 bg-white hover:bg-amber-50 text-amber-800 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow min-w-0 flex-shrink-0 whitespace-nowrap"
                       aria-label={`Preview ${book.title}`}
                     >
                       <BookOpen size={18} />
                       {isAvailableOnline ? "Preview" : "Preview (Limited)"}
                     </button>
                     <button
-                      className="flex items-center justify-center gap-2 border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow"
+                      className="flex items-center justify-center gap-2 border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 py-3 px-6 rounded-lg transition-all duration-300 shadow-sm hover:shadow min-w-0 flex-shrink-0 whitespace-nowrap"
                       aria-label={`Borrow ${book.title}`}
                     >
                       <Bookmark size={18} />
@@ -890,47 +890,47 @@ const BookDetails = () => {
                     Book Details
                   </h2>
                   <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 bg-amber-50/50 p-4 rounded-lg">
-                    <div className="flex items-center">
-                      <dt className="flex items-center text-stone-600 mr-2">
+                    <div className="flex flex-wrap items-start flex-shrink-0">
+                      <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
                         <BookCopy size={16} className="mr-2 text-amber-700" />
                         Format:
                       </dt>
-                      <dd className="font-medium text-stone-800">
+                      <dd className="font-medium text-stone-800 break-words">
                         {book.format ? book.format.toLowerCase() : "Paperback"}
                       </dd>
                     </div>
 
                     {book?.isbn && (
-                      <div className="flex items-center">
-                        <dt className="flex items-center text-stone-600 mr-2">
+                      <div className="flex flex-wrap items-start flex-shrink-0">
+                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
                           <Hash size={16} className="mr-2 text-amber-700" />
                           ISBN:
                         </dt>
-                        <dd className="font-medium text-stone-800">
+                        <dd className="font-medium text-stone-800 break-words break-all">
                           {book.isbn}
                         </dd>
                       </div>
                     )}
 
                     {book?.publisher && (
-                      <div className="flex items-center">
-                        <dt className="flex items-center text-stone-600 mr-2">
+                      <div className="flex flex-wrap items-start flex-shrink-0">
+                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
                           <User size={16} className="mr-2 text-amber-700" />
                           Publisher:
                         </dt>
-                        <dd className="font-medium text-stone-800">
+                        <dd className="font-medium text-stone-800 break-words">
                           {book.publisher}
                         </dd>
                       </div>
                     )}
 
                     {book?.publishDate && (
-                      <div className="flex items-center">
-                        <dt className="flex items-center text-stone-600 mr-2">
+                      <div className="flex flex-wrap items-start flex-shrink-0">
+                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
                           <Calendar size={16} className="mr-2 text-amber-700" />
                           Published:
                         </dt>
-                        <dd className="font-medium text-stone-800">
+                        <dd className="font-medium text-stone-800 break-words">
                           {new Date(book.publishDate).toLocaleDateString(
                             undefined,
                             {
@@ -944,8 +944,8 @@ const BookDetails = () => {
                     )}
 
                     {book.quantity_available !== undefined && (
-                      <div className="flex items-center">
-                        <dt className="flex items-center text-stone-600 mr-2">
+                      <div className="flex flex-wrap items-start flex-shrink-0">
+                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 mr-2 text-amber-700"
@@ -963,7 +963,7 @@ const BookDetails = () => {
                           Availability:
                         </dt>
                         <dd
-                          className={`font-medium ${
+                          className={`font-medium break-words ${
                             book.quantity_available > 0
                               ? "text-green-700"
                               : "text-red-600"
