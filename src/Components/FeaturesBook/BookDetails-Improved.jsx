@@ -1229,9 +1229,9 @@ const BookDetails = () => {
                     </svg>
                     Book Details
                   </h2>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 bg-amber-50/50 p-3 rounded-lg text-sm">
-                    <div className="flex items-start">
-                      <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
+                  <dl className="space-y-3 bg-amber-50/50 p-3 rounded-lg text-sm md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-3 md:space-y-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start">
+                      <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                         <BookCopy size={14} className="mr-1.5 text-amber-700" />
                         Format:
                       </dt>
@@ -1241,8 +1241,8 @@ const BookDetails = () => {
                     </div>
 
                     {book?.isbn && (
-                      <div className="flex items-start">
-                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start">
+                        <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                           <Hash size={14} className="mr-1.5 text-amber-700" />
                           ISBN:
                         </dt>
@@ -1253,8 +1253,8 @@ const BookDetails = () => {
                     )}
 
                     {book?.publisher && (
-                      <div className="flex items-start">
-                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start">
+                        <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                           <User size={14} className="mr-1.5 text-amber-700" />
                           Publisher:
                         </dt>
@@ -1265,8 +1265,8 @@ const BookDetails = () => {
                     )}
 
                     {book?.publishDate && (
-                      <div className="flex items-start">
-                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start">
+                        <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                           <Calendar
                             size={14}
                             className="mr-1.5 text-amber-700"
@@ -1287,8 +1287,8 @@ const BookDetails = () => {
                     )}
 
                     {book.quantity_available !== undefined && (
-                      <div className="flex items-start">
-                        <dt className="flex items-center text-stone-600 mr-2 flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start">
+                        <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 mr-1.5 text-amber-700"
@@ -1320,8 +1320,8 @@ const BookDetails = () => {
                     )}
 
                     {book.categories && book.categories.length > 0 && (
-                      <div className="flex flex-wrap items-start col-span-2">
-                        <dt className="flex items-center text-stone-600 mr-2">
+                      <div className="flex flex-col sm:flex-row sm:items-start md:col-span-2">
+                        <dt className="flex items-center text-stone-600 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 mr-1.5 text-amber-700"
