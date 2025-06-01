@@ -10,13 +10,10 @@ import { getBookById, addRating } from "../../utils/bookApi";
 import { Document, Page } from "react-pdf";
 import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { pdfjs } from "react-pdf";
-import PdfStickers from "../UI/PdfStickers";
-import AnimatedBackground from "../UI/AnimatedBackground";
-import CuteLoadingAnimation from "../UI/CuteLoadingAnimation";
+
 import ScrollIndicator from "../UI/ScrollIndicator";
 import PageCounter from "../UI/PageCounter";
-import BookmarkRibbon from "../UI/BookmarkRibbon";
-import FloatingEmojis from "../UI/FloatingEmojis";
+
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
 import { buyNow } from "../../utils/orderApi.js";
@@ -810,20 +807,8 @@ const BookDetails = () => {
             onScroll={handleScroll}
           >
             {/* Animated background */}
-            <AnimatedBackground />
-
-            {/* Floating emojis */}
-            <FloatingEmojis />
-
-            {/* Cute stickers around PDF */}
-            <PdfStickers />
-
-            {/* Bookmark ribbon */}
-            <BookmarkRibbon />
-
             {/* Scroll progress indicator */}
             <ScrollIndicator progress={scrollProgress} />
-
             {/* Page counter */}
             <PageCounter
               currentPage={pageNumber}
@@ -832,10 +817,10 @@ const BookDetails = () => {
                 numberOfPagesToDisplayInPreview
               )}
             />
+
             <Document
               file={book.filePath}
               onLoadSuccess={onDocumentLoadSuccess}
-              loading={<CuteLoadingAnimation />}
               error={
                 <div className="text-center py-10 text-red-500 bg-red-50 rounded-lg border border-red-100 p-4 shadow-sm">
                   <p className="font-medium mb-2">Oops! Failed to load PDF</p>

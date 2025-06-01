@@ -174,29 +174,15 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
-    -webkit-tap-highlight-color: transparent;
-    backface-visibility: hidden;
   }
 
   /* Ensure PDF pages are properly sized on mobile */
   .react-pdf__Page {
     @apply max-w-full;
-    margin-bottom: 16px;
-    position: relative;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    border-radius: 4px;
   }
 
   .react-pdf__Page__canvas {
     @apply max-w-full h-auto;
-    border-radius: 4px;
-    transform: translateZ(0); /* Hardware acceleration */
-  }
-
-  .react-pdf__Document {
-    @apply w-full;
-    padding-bottom: 20px;
   }
 
   /* Touch-friendly buttons */
@@ -205,27 +191,10 @@
     min-width: 44px;
   }
 
-  /* Hide text layer on mobile for better performance */
-  .react-pdf__Page__textContent {
-    display: none;
-  }
-
   /* Prevent zoom on input focus on iOS */
   @media screen and (max-width: 768px) {
     input[type="number"] {
       font-size: 16px;
-    }
-    
-    /* Mobile-specific PDF optimizations */
-    .pdf-page-mobile-container {
-      padding: 8px;
-      margin-bottom: 12px;
-    }
-    
-    /* Improve touch scrolling */
-    .pdf-viewer-mobile {
-      touch-action: pan-y;
-      overscroll-behavior-y: contain;
     }
   }
 }
