@@ -1106,7 +1106,9 @@ const BookDetails = () => {
                 <div className="mb-6">
                   <div className="flex flex-wrap items-center gap-4 mb-5">
                     <p className="text-2xl md:text-3xl font-bold text-amber-800 flex items-baseline flex-wrap">
-                      <span className="whitespace-nowrap">{book.price?.toLocaleString("vi-VN")} VND</span>
+                      <span className="whitespace-nowrap">
+                        {book.price?.toLocaleString("vi-VN")} VND
+                      </span>
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
                           <span className="text-base md:text-lg text-stone-500 line-through ml-2 whitespace-nowrap">
@@ -1169,7 +1171,9 @@ const BookDetails = () => {
                       aria-label={`Preview ${book.title}`}
                     >
                       <BookOpen size={18} />
-                      <span className="whitespace-nowrap">{isAvailableOnline ? "Preview" : "Preview (Limited)"}</span>
+                      <span className="whitespace-nowrap">
+                        {isAvailableOnline ? "Preview" : "Preview (Limited)"}
+                      </span>
                     </button>
                     <button
                       className="flex items-center justify-center gap-2 border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-700 py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm hover:shadow min-w-0 flex-shrink-0"

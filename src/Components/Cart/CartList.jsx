@@ -958,7 +958,7 @@ const CartList = () => {
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         Selected items subtotal:
                       </span>
-                      <span className="font-medium">
+                      <span className="font-medium whitespace-nowrap">
                         {selectedItemsSubtotal.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
@@ -994,7 +994,7 @@ const CartList = () => {
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         Subtotal:
                       </span>
-                      <span className="font-medium">
+                      <span className="font-medium whitespace-nowrap">
                         {cartSubtotal.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
@@ -1005,7 +1005,9 @@ const CartList = () => {
                       </span>
                       <span
                         className={
-                          shipping === 0 ? "text-green-600 font-medium" : ""
+                          shipping === 0
+                            ? "text-green-600 font-medium whitespace-nowrap"
+                            : "whitespace-nowrap"
                         }
                       >
                         {shipping === 0

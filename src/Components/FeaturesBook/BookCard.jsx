@@ -130,7 +130,7 @@ const BookCard = ({ book, className, isReloading }) => {
 
       {/* Price tag - always visible, positioned at top-left */}
       <div className="absolute top-0 left-0 z-10">
-        <div className="bg-amber-800 text-white text-sm font-medium py-1 px-3 rounded-br-lg shadow-sm">
+        <div className="bg-amber-800 text-white text-sm font-medium py-1 px-3 rounded-br-lg shadow-sm whitespace-nowrap">
           {price.toLocaleString("vi-VN")} VND
         </div>
       </div>

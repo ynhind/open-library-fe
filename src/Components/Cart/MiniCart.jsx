@@ -98,7 +98,7 @@ const MiniCart = () => {
                           {item.book.author}
                         </p>
                         <div className="flex justify-between items-center mt-1">
-                          <span className="text-amber-700 text-sm">
+                          <span className="text-amber-700 text-sm whitespace-nowrap">
                             {item.book.price.toLocaleString("vi-VN")} VND
                           </span>
                           <span className="text-xs text-gray-500">

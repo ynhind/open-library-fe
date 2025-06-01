@@ -707,7 +707,7 @@ const Wishlist = () => {
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4">
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="text-white font-semibold text-lg">
+                      <span className="text-white font-semibold text-lg whitespace-nowrap">
                         {book.price
                           ? book.price.toLocaleString("vi-VN")
                           : "N/A"}{" "}
@@ -715,7 +715,7 @@ const Wishlist = () => {
                       </span>
                       {book.originalPrice &&
                         book.originalPrice > book.price && (
-                          <span className="text-white/70 text-sm line-through ml-2">
+                          <span className="text-white/70 text-sm line-through ml-2 whitespace-nowrap">
                             {book.originalPrice.toLocaleString("vi-VN")} VND
                           </span>
                         )}

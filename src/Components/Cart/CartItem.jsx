@@ -55,7 +55,7 @@ const CartItem = ({
         <h3 className="font-medium text-lg text-stone-800 truncate">
           {book.title}
         </h3>
-        <p className="text-amber-700 font-medium mt-1">
+        <p className="text-amber-700 font-medium mt-1 whitespace-nowrap">
           {book.price.toLocaleString("vi-VN")} VND
         </p>
 
@@ -95,9 +95,9 @@ const CartItem = ({
       </div>
 
       {/* Subtotal */}
-      <div className="text-right sm:w-24">
-        <div className="font-semibold text-stone-800">
-          ${subtotal.toFixed(2)}
+      <div className="text-right sm:w-32 min-w-0">
+        <div className="font-semibold text-stone-800 whitespace-nowrap">
+          {subtotal.toLocaleString("vi-VN")} VND
         </div>
       </div>
 

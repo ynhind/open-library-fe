@@ -140,8 +140,8 @@ const RelatedBookCard = ({ book }) => {
 
         {/* Price badge */}
         {book.price && (
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-            {book.price.toLocaleString()}VND
+          <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm whitespace-nowrap">
+            {book.price.toLocaleString("vi-VN")} VND
           </div>
         )}
       </div>
