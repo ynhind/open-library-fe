@@ -20,12 +20,19 @@ const BookCard = ({ book, className, isReloading }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
 
-  const { bookId, title, author, coverImage, price, rating, ratingCount } =
-    book;
+  // Handle both data structures: transformed data with 'id' and raw data with 'bookId'
+  const bookId = book.id || book.bookId;
+  const { title, author, coverImage, price, rating, ratingCount } = book;
 
   // Check wishlist status when component mounts
   useEffect(() => {
     const checkWishlistStatus = async () => {
+      // Only check if bookId is available
+      if (!bookId) {
+        console.warn("BookCard: bookId is not available yet");
+        return;
+      }
+
       try {
         const inWishlist = await isInWishlist(bookId);
         setIsFavorite(inWishlist);
@@ -40,6 +47,12 @@ const BookCard = ({ book, className, isReloading }) => {
   // Handle toggling wishlist
   const handleToggleWishlist = async (e) => {
     e.preventDefault();
+
+    // Validate bookId before proceeding
+    if (!bookId) {
+      toast.error("Unable to update wishlist: Book ID is missing");
+      return;
+    }
 
     try {
       setIsUpdatingWishlist(true);

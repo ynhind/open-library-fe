@@ -580,10 +580,20 @@ const BookDetails = () => {
   }, [id]);
 
   useEffect(() => {
+    console.log("BookDetails useEffect - id:", id, "type:", typeof id);
+
+    if (!id) {
+      console.error("BookDetails - No id provided!");
+      setError("No book ID provided");
+      setLoading(false);
+      return;
+    }
+
     const fetchBook = async () => {
       try {
         setLoading(true);
         setError(null);
+        console.log("BookDetails - Calling getBookById with id:", id);
         const data = await getBookById(id);
         setBook(data);
         // Use the isAvailableOnline field from the API, not just pdfUrl
