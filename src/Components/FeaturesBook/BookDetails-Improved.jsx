@@ -13,6 +13,7 @@ import { pdfjs } from "react-pdf";
 
 import ScrollIndicator from "../UI/ScrollIndicator";
 import PageCounter from "../UI/PageCounter";
+import CuteCharacter from "../UI/CuteCharacter";
 
 import { toast } from "react-toastify";
 import { addToCart } from "../../utils/cartApi.js";
@@ -353,18 +354,24 @@ const BookDetails = () => {
         });
 
         // Calculate scroll progress for the scroll indicator
+        let scrollProgress = 0;
         if (container.scrollHeight > container.clientHeight) {
           const scrollableHeight =
             container.scrollHeight - container.clientHeight;
-          const scrollProgress = Math.min(
+          scrollProgress = Math.min(
             100,
             Math.max(
               0,
               Math.round((container.scrollTop / scrollableHeight) * 100)
             )
           );
-          setScrollProgress(scrollProgress);
+        } else {
+          // If content doesn't scroll, calculate progress based on current page
+          scrollProgress = Math.round(
+            (mostVisiblePage / numberOfPagesToDisplayInPreview) * 100
+          );
         }
+        setScrollProgress(scrollProgress);
 
         // Only update if we're actually changing pages and not in the middle of a programmatic change
         if (
@@ -831,6 +838,22 @@ const BookDetails = () => {
               )}
             />
 
+            {/* Cute character for limited preview */}
+            <CuteCharacter
+              isVisible={
+                !isAvailableOnline && numPages > numberOfPagesToDisplayInPreview
+              }
+              message={`Buy to unlock all ${numPages} pages!`}
+              onBuyClick={() => {
+                // Scroll to buy section or trigger buy modal
+                setPreviewActive(false);
+                document
+                  .getElementById("book-actions")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              bookTitle={book?.title || "this amazing book"}
+            />
+
             <Document
               file={book.filePath}
               onLoadSuccess={onDocumentLoadSuccess}
@@ -1277,7 +1300,10 @@ const BookDetails = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 mb-4 flex-wrap">
+                  <div
+                    id="book-actions"
+                    className="flex flex-col sm:flex-row gap-3 mb-4 flex-wrap"
+                  >
                     <button
                       onClick={handleAddToCart}
                       className="flex items-center justify-center gap-2 bg-amber-800 hover:bg-amber-900 text-white py-2.5 px-5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 min-w-0 flex-shrink-0"

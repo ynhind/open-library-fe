@@ -20,13 +20,14 @@ const BookCard = ({ book, className, isReloading }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
 
-  const { id, title, author, coverImage, price, rating, ratingCount } = book;
+  const { bookId, title, author, coverImage, price, rating, ratingCount } =
+    book;
 
   // Check wishlist status when component mounts
   useEffect(() => {
     const checkWishlistStatus = async () => {
       try {
-        const inWishlist = await isInWishlist(id);
+        const inWishlist = await isInWishlist(bookId);
         setIsFavorite(inWishlist);
       } catch (err) {
         console.error("Error checking wishlist status:", err);
@@ -34,7 +35,7 @@ const BookCard = ({ book, className, isReloading }) => {
     };
 
     checkWishlistStatus();
-  }, [id]);
+  }, [bookId]);
 
   // Handle toggling wishlist
   const handleToggleWishlist = async (e) => {
@@ -44,13 +45,13 @@ const BookCard = ({ book, className, isReloading }) => {
       setIsUpdatingWishlist(true);
 
       if (isFavorite) {
-        await removeFromWishlist(id);
+        await removeFromWishlist(bookId);
         toast.success(`${title} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 3000,
         });
       } else {
-        await addToWishlist(id);
+        await addToWishlist(bookId);
         toast.success(`${title} added to your wishlist!`, {
           position: "top-right",
           autoClose: 3000,
@@ -151,7 +152,7 @@ const BookCard = ({ book, className, isReloading }) => {
 
       {/* Book cover */}
       <div className="relative aspect-[4/5] overflow-hidden w-full">
-        <Link to={`/book/${id}`} className="block">
+        <Link to={`/book/${bookId}`} className="block">
           <img
             src={coverImage}
             alt={title}
@@ -194,7 +195,7 @@ const BookCard = ({ book, className, isReloading }) => {
 
       {/* Book info */}
       <div className="p-4">
-        <Link to={`/book/${id}`} className="block">
+        <Link to={`/book/${bookId}`} className="block">
           <h3 className="font-serif font-medium text-lg text-stone-800 hover:text-amber-700 transition-colors truncate">
             {title}
           </h3>
