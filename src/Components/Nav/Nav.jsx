@@ -177,7 +177,7 @@ const Nav = () => {
     };
   }, []);
 
-  // Perform search using searchBooks API
+  // Perform search using searchBooks API or podcast API
   const performSearch = React.useCallback(
     async (query) => {
       if (!query || query.trim() === "") {
@@ -189,15 +189,15 @@ const Nav = () => {
       setIsSearching(true);
       setShowSearchResults(false); // Hide results while searching
       try {
-        // Create search params based on the selected search type
+        // Search books using existing API
         const searchParams = {};
         searchParams[searchType] = query;
-
         const results = await searchBooks(searchParams);
+
         setSearchResults(results);
         setShowSearchResults(true); // Show results container after search completes
       } catch (error) {
-        console.error("Error searching books:", error);
+        console.error("Error searching:", error);
         setSearchResults([]);
         setShowSearchResults(true); // Show "no results" message on error
       } finally {
@@ -332,6 +332,11 @@ const Nav = () => {
 
   // Get appropriate menu items based on user role
   const getMenuItems = () => {
+    // Only return menu items if user is logged in
+    if (!isLoggedIn) {
+      return [];
+    }
+
     const baseItems = [...userMenuItems];
     if (userRole === "ADMIN") {
       // Insert admin items before "Sign Out"
@@ -358,8 +363,8 @@ const Nav = () => {
           : "bg-amber-50/95"
       } border-b border-amber-200/30 transition-all duration-300`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20 gap-2 sm:gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="p-1.5 rounded-lg bg-amber-100/50 group-hover:bg-amber-100 transition-all">
@@ -417,7 +422,7 @@ const Nav = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
             <Link
               to="/"
               className={`transition-colors font-medium py-2 ${getActiveClass(
@@ -524,12 +529,12 @@ const Nav = () => {
             </div>
 
             <Link
-              to="/new-arrivals"
+              to="/podcast"
               className={`transition-colors font-medium py-2 ${getActiveClass(
-                "/new-arrivals"
+                "/podcast"
               )}`}
             >
-              New Arrivals
+              Podcast
             </Link>
 
             <Link
@@ -576,7 +581,7 @@ const Nav = () => {
                         .find((t) => t.value === searchType)
                         ?.label.toLowerCase() || "title"
                     }...`}
-                    className="w-48 lg:w-64 h-8 pl-9 pr-4 rounded-r-full bg-amber-100/80 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all"
+                    className="w-40 md:w-48 lg:w-64 h-8 pl-9 pr-4 rounded-r-full bg-amber-100/80 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all"
                     value={searchQuery}
                     onChange={handleSearchChange}
                   />
@@ -697,7 +702,7 @@ const Nav = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="relative p-2 bg-amber-50 hover:bg-amber-100 rounded-full transition-all group"
+              className="relative p-3 bg-amber-50 hover:bg-amber-100 rounded-full transition-all group min-w-[48px] min-h-[48px] flex items-center justify-center"
             >
               <ShoppingCart
                 size={20}
@@ -724,7 +729,7 @@ const Nav = () => {
               {/* Add an invisible element to increase the hit area between the button and menu */}
               <div className="absolute w-full h-4 bottom-0 left-0 translate-y-full"></div>
 
-              <button className="p-2 bg-amber-50 hover:bg-amber-100 rounded-full transition-all relative">
+              <button className="p-3 bg-amber-50 hover:bg-amber-100 rounded-full transition-all relative min-w-[48px] min-h-[48px] flex items-center justify-center">
                 <User size={20} className="text-amber-800" />
                 {isLoggedIn && (
                   <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-amber-50"></span>
@@ -830,8 +835,9 @@ const Nav = () => {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 ml-4 bg-amber-50 hover:bg-amber-100 rounded-full transition-all"
+              className="md:hidden p-3 ml-4 bg-amber-50 hover:bg-amber-100 rounded-full transition-all min-w-[48px] min-h-[48px] flex items-center justify-center"
               onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
             >
               <Menu size={20} className="text-amber-800" />
             </button>
@@ -841,7 +847,7 @@ const Nav = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-amber-50/98 border-t border-amber-200 animate-fade-in shadow-xl">
-            <div className="p-5 space-y-4">
+            <div className="p-4 sm:p-5 space-y-4 max-h-[80vh] overflow-y-auto">
               <form onSubmit={handleSearch} className="mb-5">
                 <div className="flex flex-col space-y-3">
                   <select
@@ -944,11 +950,11 @@ const Nav = () => {
                             </ul>
                           </>
                         ) : (
-                          <div className=" text-center">
-                            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-700 mx-auto">
-                              <Book size={8} />
+                          <div className="py-6 text-center">
+                            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-700 mx-auto mb-3">
+                              <Book size={20} />
                             </div>
-                            <p className="text-sm text-stone-600">
+                            <p className="text-sm text-stone-600 font-medium">
                               No books found
                             </p>
                             <p className="text-xs text-stone-500 mt-1">
@@ -1027,7 +1033,7 @@ const Nav = () => {
 
               <Link
                 to="/"
-                className="flex items-center py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                className="flex items-center py-4 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors min-h-[48px]"
               >
                 <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
                   <Home size={18} className="text-amber-700" />
@@ -1036,7 +1042,7 @@ const Nav = () => {
               </Link>
 
               <button
-                className="flex items-center justify-between w-full py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                className="flex items-center justify-between w-full py-4 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors min-h-[48px]"
                 onClick={toggleCategories}
               >
                 <div className="flex items-center">
@@ -1074,7 +1080,7 @@ const Nav = () => {
                           to={`/category/${category.name
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
-                          className="block py-3 px-3 text-sm font-medium text-stone-700 hover:bg-amber-50 hover:text-amber-900 transition-colors rounded-md border border-transparent hover:border-amber-200"
+                          className="block py-4 px-4 text-sm font-medium text-stone-700 hover:bg-amber-50 hover:text-amber-900 transition-colors rounded-md border border-transparent hover:border-amber-200 min-h-[48px] flex items-center"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {category.name}
@@ -1100,18 +1106,18 @@ const Nav = () => {
               )}
 
               <Link
-                to="/new-arrivals"
-                className="flex items-center py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                to="/podcast"
+                className="flex items-center py-4 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors min-h-[48px]"
               >
                 <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
-                  <span className="text-amber-700">✨</span>
+                  <span className="text-amber-700">🎙️</span>
                 </span>
-                <span className="font-medium">New Arrivals</span>
+                <span className="font-medium">Podcast</span>
               </Link>
 
               <Link
                 to="/my-library"
-                className="flex items-center py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
+                className="flex items-center py-4 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors min-h-[48px]"
               >
                 <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
                   <span className="text-amber-700">📚</span>
@@ -1121,33 +1127,35 @@ const Nav = () => {
 
               <div className="border-t border-amber-200 my-3"></div>
 
-              {getMenuItems().map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className="flex items-center py-3 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
-                    {React.cloneElement(item.icon, {
-                      className: "text-amber-700",
-                    })}
-                  </span>
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              ))}
+              {/* Only show user menu items if logged in */}
+              {isLoggedIn &&
+                getMenuItems().map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className="flex items-center py-4 px-4 text-stone-700 hover:bg-amber-50 rounded-lg transition-colors min-h-[48px]"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center mr-3">
+                      {React.cloneElement(item.icon, {
+                        className: "text-amber-700",
+                      })}
+                    </span>
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                ))}
 
               {!isLoggedIn && (
-                <div className="mt-4 pt-4 border-t border-amber-200 flex flex-col gap-3">
+                <div className="mt-4 pt-4 border-t border-amber-200 flex flex-col gap-4">
                   <Link
                     to="/login"
-                    className="py-2.5 px-4 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-center font-medium transition-colors shadow-sm"
+                    className="py-3.5 px-4 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-center font-medium transition-colors shadow-sm min-h-[48px] flex items-center justify-center"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="py-2.5 px-4 bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 rounded-lg text-center font-medium transition-colors shadow-sm"
+                    className="py-3.5 px-4 bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 rounded-lg text-center font-medium transition-colors shadow-sm min-h-[48px] flex items-center justify-center"
                   >
                     Create Account
                   </Link>

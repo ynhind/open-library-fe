@@ -171,71 +171,24 @@
 @layer utilities {
   .pdf-viewer-mobile {
     /* Improve touch scrolling on mobile */
-    -webkit-overflow-scrolling: touch !important;
+    -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    will-change: transform, scroll-position; /* Optimize for GPU acceleration */
-    backface-visibility: hidden; /* Reduce GPU memory consumption */
-    -webkit-transform: translateZ(0) translate3d(0,0,0); /* Force hardware acceleration */
   }
 
   /* Ensure PDF pages are properly sized on mobile */
   .react-pdf__Page {
     @apply max-w-full;
-    margin-bottom: 12px !important;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    border-radius: 4px;
-    will-change: transform;
-    backface-visibility: hidden;
   }
 
-  /* Optimized canvas rendering for mobile */
   .react-pdf__Page__canvas {
     @apply max-w-full h-auto;
-    border-radius: 4px;
-    transform: translateZ(0); /* Hardware acceleration */
-    margin: 0 auto !important;
-    image-rendering: optimizeSpeed; /* Prioritize rendering speed over quality on mobile */
-    -webkit-backface-visibility: hidden; /* Prevent flickering */
-  }
-
-  /* Specific optimization for mobile PDF pages */
-  .mobile-pdf-page {
-    transform: translate3d(0, 0, 0); /* Force hardware acceleration */
-    image-rendering: auto; /* Default rendering for better quality when zoomed */
-    visibility: visible !important;
   }
 
   /* Touch-friendly buttons */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
-  }
-  
-  .pdf-close-button-mobile {
-    min-height: 48px !important;
-    min-width: 48px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    touch-action: manipulation !important;
-  }
-  
-  /* Explicit width control for PDF container on mobile */
-  .mobile-pdf-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-  }
-  
-  /* Hide annotation and text layers for performance */
-  .react-pdf__Page__annotations,
-  .react-pdf__Page__textContent {
-    display: none !important;
   }
 
   /* Prevent zoom on input focus on iOS */
@@ -255,15 +208,11 @@
   .react-pdf__Page {
     margin: 0 auto;
     max-width: 100% !important;
-    transform: translateZ(0); /* Force hardware acceleration */
   }
 
   .react-pdf__Page__canvas {
     max-width: 100% !important;
     height: auto !important;
-    /* Improve performance */
-    image-rendering: optimizeSpeed;
-    -webkit-font-smoothing: none;
   }
 
   /* Larger close button target area for mobile */
@@ -274,21 +223,33 @@
     align-items: center;
     justify-content: center;
   }
-  
-  /* Enhanced touch area */
-  .mobile-pdf-container {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    touch-action: manipulation;
-  }
-  
-  /* Optimize rendering for weak mobile devices */
-  .react-pdf__Document {
-    contain: content; /* CSS containment for performance */
-  }
-  
-  /* Prevent sub-pixel rendering issues */
-  .react-pdf__Page__annotations,
-  .react-pdf__Page__textContent {
-    display: none !important; /* For performance */
-  }
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.line-clamp-4 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }

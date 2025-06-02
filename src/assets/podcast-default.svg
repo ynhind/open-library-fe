@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#gradient)"/>
+  
+  <!-- Microphone Icon -->
+  <g transform="translate(200, 200)">
+    <!-- Microphone Body -->
+    <rect x="-20" y="-80" width="40" height="80" rx="20" fill="#D97706" opacity="0.9"/>
+    <!-- Microphone Grille -->
+    <rect x="-15" y="-70" width="30" height="5" rx="2" fill="#92400E"/>
+    <rect x="-15" y="-58" width="30" height="5" rx="2" fill="#92400E"/>
+    <rect x="-15" y="-46" width="30" height="5" rx="2" fill="#92400E"/>
+    <rect x="-15" y="-34" width="30" height="5" rx="2" fill="#92400E"/>
+    <rect x="-15" y="-22" width="30" height="5" rx="2" fill="#92400E"/>
+    <rect x="-15" y="-10" width="30" height="5" rx="2" fill="#92400E"/>
+    <!-- Microphone Stand -->
+    <rect x="-2" y="0" width="4" height="60" fill="#92400E"/>
+    <!-- Base -->
+    <ellipse cx="0" cy="60" rx="25" ry="8" fill="#92400E"/>
+  </g>
+  
+  <!-- Sound Waves -->
+  <g transform="translate(200, 120)" opacity="0.6">
+    <path d="M -40 0 Q -30 -15 -20 0 Q -30 15 -40 0" stroke="#F59E0B" stroke-width="3" fill="none"/>
+    <path d="M 20 0 Q 30 -15 40 0 Q 30 15 20 0" stroke="#F59E0B" stroke-width="3" fill="none"/>
+    <path d="M -50 0 Q -35 -25 -20 0 Q -35 25 -50 0" stroke="#F59E0B" stroke-width="2" fill="none"/>
+    <path d="M 20 0 Q 35 -25 50 0 Q 35 25 20 0" stroke="#F59E0B" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Definitions -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FDE68A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+</svg>

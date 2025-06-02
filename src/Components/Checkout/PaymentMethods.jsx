@@ -270,7 +270,8 @@ const PaymentMethods = () => {
                             <>
                               <Lock size={20} />
                               <span>
-                                Pay ${totalAmount.toFixed(2)} Securely
+                                Pay {totalAmount.toLocaleString("vi-VN")} VND
+                                Securely
                               </span>
                             </>
                           )}
@@ -306,7 +307,7 @@ const PaymentMethods = () => {
                     <div className="flex justify-between items-center py-3 border-b border-stone-100">
                       <span className="text-stone-600">Subtotal</span>
                       <span className="font-semibold text-stone-800">
-                        ${totalAmount.toFixed(2)}
+                        {totalAmount.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-3 border-b border-stone-100">
@@ -318,7 +319,7 @@ const PaymentMethods = () => {
                         Total
                       </span>
                       <span className="text-2xl font-bold text-amber-800">
-                        ${totalAmount.toFixed(2)}
+                        {totalAmount.toLocaleString("vi-VN")} VND
                       </span>
                     </div>
                   </div>

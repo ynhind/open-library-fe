@@ -29,6 +29,7 @@ import SearchResults from "../Pages/Search/SearchResults";
 import Wishlist from "../Pages/Wishlist/Wishlist";
 import Orders from "../Pages/Orders/Orders";
 import OrderDetail from "../Pages/Orders/OrderDetail";
+import { PodcastPage, PodcastDetailPage } from "../Pages/Podcast";
 
 export default function Router() {
   return (
@@ -59,6 +60,8 @@ export default function Router() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:orderId" element={<OrderDetail />} />
+          <Route path="/podcast" element={<PodcastPage />} />
+          <Route path="/podcast/:id" element={<PodcastDetailPage />} />
           {/* Nested route for order confirmation */}
           <Route
             path="/order-confirmation/:orderId"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { searchBooks } from "../../utils/bookApi";
+import { searchPodcasts } from "../../utils/podcastApi";
 import BookCard from "../../Components/FeaturesBook/BookCard";
 import {
   Loader2,
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 
 const SearchResults = () => {
-  const [books, setBooks] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,7 +26,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!searchQuery.trim()) {
-        setBooks([]);
+        setResults([]);
         setLoading(false);
         return;
       }
@@ -34,19 +35,38 @@ const SearchResults = () => {
         setLoading(true);
         setError(null);
 
-        // Create search params based on the selected search type
-        const searchParams = {};
+        let searchResults = [];
 
-        // Handle the special case for category search which uses 'names' parameter
-        if (searchType === "names") {
-          searchParams.names = searchQuery;
+        if (searchType === "podcast") {
+          // Search podcasts using external API
+          const podcastResults = await searchPodcasts(
+            searchQuery,
+            "podcast",
+            20
+          );
+          searchResults = podcastResults.map((podcast) => ({
+            ...podcast,
+            type: "podcast",
+          }));
         } else {
-          searchParams[searchType] = searchQuery;
+          // Create search params based on the selected search type for books
+          const searchParams = {};
+
+          // Handle the special case for category search which uses 'names' parameter
+          if (searchType === "names") {
+            searchParams.names = searchQuery;
+          } else {
+            searchParams[searchType] = searchQuery;
+          }
+
+          const bookResults = await searchBooks(searchParams);
+          searchResults = bookResults.map((book) => ({
+            ...book,
+            type: "book",
+          }));
         }
 
-        const results = await searchBooks(searchParams);
-
-        setBooks(results);
+        setResults(searchResults);
       } catch (err) {
         console.error("Error fetching search results:", err);
         setError("Failed to load search results. Please try again.");
@@ -96,7 +116,7 @@ const SearchResults = () => {
           </div>
 
           <span className="mt-6 text-2xl text-stone-700 font-serif font-medium bg-clip-text text-transparent bg-gradient-to-r from-amber-800 to-amber-600">
-            Searching for books...
+            Searching for {searchType === "podcast" ? "podcasts" : "books"}...
           </span>
 
           <div className="relative w-48 h-1.5 bg-stone-100 rounded-full mt-6 overflow-hidden">
@@ -104,7 +124,8 @@ const SearchResults = () => {
           </div>
 
           <p className="text-stone-500 mt-5 max-w-xs text-center leading-relaxed">
-            We're looking through our collection to find your books.
+            We're looking through our collection to find your{" "}
+            {searchType === "podcast" ? "podcasts" : "books"}.
             <span className="block mt-1 text-amber-700 font-serif">
               This will only take a moment.
             </span>
@@ -256,9 +277,9 @@ const SearchResults = () => {
                   Search Results
                   <div className="relative">
                     <span className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm py-1 px-3.5 rounded-full font-sans font-medium ml-1 inline-flex items-center shadow-sm">
-                      {books.length}
+                      {results.length}
                       <span className="hidden sm:inline ml-1">
-                        {books.length === 1 ? "match" : "matches"}
+                        {results.length === 1 ? "match" : "matches"}
                       </span>
                     </span>
                     <span className="absolute -inset-0.5 bg-amber-300 rounded-full blur opacity-30"></span>
@@ -310,7 +331,15 @@ const SearchResults = () => {
           </div>
           <div>
             <div className="text-stone-700 font-medium">
-              {books.length} {books.length === 1 ? "book" : "books"} found
+              {results.length}{" "}
+              {searchType === "podcast"
+                ? results.length === 1
+                  ? "podcast"
+                  : "podcasts"
+                : results.length === 1
+                ? "book"
+                : "books"}{" "}
+              found
             </div>
             <div className="text-stone-400 text-xs mt-0.5">
               Browse our collection
@@ -370,7 +399,7 @@ const SearchResults = () => {
         </div>
       </div>
 
-      {books.length === 0 ? (
+      {results.length === 0 ? (
         <div className="bg-white border border-amber-50 shadow-sm rounded-xl p-12 text-center relative overflow-hidden">
           {/* Premium top accent */}
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100"></div>
@@ -408,7 +437,9 @@ const SearchResults = () => {
           </h2>
 
           <p className="text-stone-600 mb-10 max-w-lg mx-auto relative z-10 leading-relaxed">
-            We couldn't find any books matching your search criteria.
+            We couldn't find any{" "}
+            {searchType === "podcast" ? "podcasts" : "books"} matching your
+            search criteria.
             <span className="block mt-2 italic text-amber-700 font-serif">
               Try searching with different keywords or browse our collection.
             </span>
@@ -443,9 +474,52 @@ const SearchResults = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {books.map((book) => (
-            <BookCard key={book.bookId} book={book} />
-          ))}
+          {results.map((item) =>
+            item.type === "podcast" ? (
+              <div
+                key={item.id}
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-stone-200 p-6"
+              >
+                <div className="aspect-square mb-4 relative overflow-hidden rounded-lg bg-stone-100">
+                  {item.coverImage ? (
+                    <img
+                      src={item.coverImage}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = "/src/assets/podcast-default.svg";
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-4xl">🎙️</span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-semibold text-stone-800 mb-2 line-clamp-2">
+                  {item.title}
+                </h3>
+                <p className="text-stone-600 text-sm mb-2">{item.author}</p>
+                <p className="text-stone-500 text-xs mb-3 line-clamp-2">
+                  {item.description}
+                </p>
+                <div className="flex items-center justify-between text-xs text-stone-500 mb-4">
+                  <span>{item.totalEpisodes || 0} episodes</span>
+                  <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full">
+                    Podcast
+                  </span>
+                </div>
+                <Link
+                  to={`/podcast/${item.id}`}
+                  className="block w-full text-center py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                >
+                  Listen Now
+                </Link>
+              </div>
+            ) : (
+              <BookCard key={item.bookId} book={item} />
+            )
+          )}
         </div>
       )}
     </div>
