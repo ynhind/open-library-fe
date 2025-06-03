@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Book,
+  BookOpen,
   ShoppingCart,
   User,
   Search,
@@ -314,6 +315,7 @@ const Nav = () => {
   const userMenuItems = [
     { name: "My Account", path: "/account", icon: <User size={16} /> },
     { name: "My Orders", path: "/orders", icon: <Package size={16} /> },
+    { name: "My Library", path: "/my-library", icon: <BookOpen size={16} /> },
     { name: "Wishlist", path: "/wishlist", icon: <Heart size={16} /> },
     { name: "Sign Out", path: "/signout", icon: <LogOut size={16} /> },
   ];

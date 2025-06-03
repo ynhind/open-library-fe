@@ -264,3 +264,32 @@ export const deleteUser = async (userId) => {
     throw error;
   }
 };
+
+export const getPurchasedBooks = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+
+    try {
+      return await apiRequest("user/purchased-books", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // Check if token has expired
+      if (error.message === "Token has been expired") {
+        // Redirect to login page
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error getting purchased books:", error);
+    throw error;
+  }
+};
