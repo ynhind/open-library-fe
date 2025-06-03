@@ -858,7 +858,7 @@ const DashboardContent = ({
 };
 
 // Stat Card Component - Updated with amber color scheme
-const StatCard = ({ title, value, icon: color, description }) => {
+const StatCard = ({ title, value, icon: Icon, color, description }) => {
   const colorClasses = {
     primary: {
       bg: "bg-amber-50",
@@ -884,12 +884,15 @@ const StatCard = ({ title, value, icon: color, description }) => {
 
   const classes = colorClasses[color] || colorClasses.primary;
 
+  // Fallback icon in case Icon is undefined
+  const IconComponent = Icon || BookOpen;
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-amber-200 p-6 hover:shadow-md transition-shadow">
       <div
         className={`w-12 h-12 ${classes.bg} rounded-lg flex items-center justify-center mb-4`}
       >
-        <Icon className={`w-6 h-6 ${classes.icon}`} />
+        <IconComponent className={`w-6 h-6 ${classes.icon}`} />
       </div>
       <div className={`text-2xl font-bold ${classes.value} mb-1`}>{value}</div>
       <div className="text-stone-800 font-medium mb-1">{title}</div>
