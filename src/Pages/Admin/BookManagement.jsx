@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import {
   getBooks,
@@ -55,24 +54,12 @@ export default function BookManagement() {
   const coverImageRef = useRef(null);
 
   // Remaining state and hook logic (unchanged)
-=======
-import React, { useState, useEffect } from "react";
-import { apiRequest } from "../../utils/api";
-import "./Admin.css";
-import { getBooks, createBook } from "../../utils/bookApi";
-
-export default function BookManagement() {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
->>>>>>> 7838768 (authentication)
   const [formData, setFormData] = useState({
     title: "",
     author: "",
     price: 0,
     quantity_available: 0,
     description: "",
-<<<<<<< HEAD
-<<<<<<< HEAD
     publisher: "",
     publishDate: "",
     isbn: "",
@@ -358,169 +345,10 @@ export default function BookManagement() {
       } catch (error) {
         console.error("Error deleting book:", error);
       }
-=======
-=======
-    publisher: "",
-    publishDate: "",
-    isbn: "",
-    format: "PAPERBACK", // Default value
->>>>>>> 2f3b3e4 (add book management for admin)
-    isAvailableOnline: false,
-    previewPages: 0,
-    categories: [],
-  });
-  const [editingBookId, setEditingBookId] = useState(null);
-  //   const [bookFile, setBookFile] = useState(null);
-  //   const [coverImage, setCoverImage] = useState(null);
-  const [error, setError] = useState("");
-
-  // Fetch books on component load
-  useEffect(() => {
-    fetchBooks();
-  }, []);
-
-  const fetchBooks = async () => {
-    try {
-      const data = await getBooks();
-      setBooks(data);
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      setError("Failed to load books. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (name === "categories" && type === "select-multiple") {
-      // Handle multi-select element differently
-      const selectedOptions = Array.from(
-        e.target.selectedOptions,
-        (option) => option.value
-      );
-      setFormData({
-        ...formData,
-        [name]: selectedOptions,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]:
-          type === "checkbox"
-            ? checked
-            : type === "number"
-            ? parseFloat(value)
-            : value,
-      });
-    }
-    if (name === "publishDate") {
-      // Always store dates as ISO strings for the API
-      const dateValue = value ? new Date(value).toISOString() : "";
-      setFormData({ ...formData, [name]: dateValue });
-    } else {
-      // Handle other form fields normally
-      const fieldValue = type === "checkbox" ? checked : value;
-      setFormData({ ...formData, [name]: fieldValue });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      console.log("Categories before processing:", formData.categories);
-      const bookData = {
-        ...formData,
-
-        price: Number(formData.price),
-        quantity_available: Number(formData.quantity_available),
-
-        publishDate: formData.publishDate
-          ? new Date(formData.publishDate).toISOString()
-          : null,
-        previewPages: Number(formData.previewPages),
-        categories: Array.isArray(formData.categories)
-          ? formData.categories.map((id) => Number(id))
-          : [], // Provide a fallback empty array
-      };
-      console.log("Processed book data:", bookData);
-
-      await createBook(bookData);
-      // Reset form
-      setFormData({
-        title: "",
-        author: "",
-        price: 0,
-        quantity_available: 0,
-        description: "",
-        publisher: "",
-        publishDate: "",
-        isbn: "",
-        format: "PAPERBACK", // Default value
-        isAvailableOnline: false,
-        previewPages: 0,
-        categories: [],
-      });
-      setEditingBookId(null);
-      // Refresh book list
-      await fetchBooks();
-    } catch (error) {
-      console.error("Error saving book:", error);
-    }
-  };
-
-  const handleEdit = (book) => {
-    setFormData({
-      title: book.title,
-      author: book.author,
-      price: book.price || 0,
-      quantity_available: book.quantity_available || 0,
-      description: book.description || "",
-      isAvailableOnline: book.isAvailableOnline || false,
-      previewPages: book.previewPages || 20,
-      publisher: book.publisher || "",
-      publishDate: book.publishDate || "",
-      isbn: book.isbn || "",
-      format: book.format || "PAPERBACK",
-      categories: book.categories.map((category) => category.categoryId),
-    });
-    setEditingBookId(book.bookId);
-  };
-
-  const handleDelete = async (bookId) => {
-    if (!window.confirm("Are you sure you want to delete this book?")) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You must be logged in to perform this action");
-      return;
-    }
-
-    setError("");
-    try {
-      await apiRequest(`books/${bookId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Update books list
-      setBooks(books.filter((book) => book.bookId !== bookId));
-    } catch (error) {
-      console.error("Error deleting book:", error);
-<<<<<<< HEAD
->>>>>>> 7838768 (authentication)
-=======
-      setError("Failed to delete book. Please try again.");
->>>>>>> 2f3b3e4 (add book management for admin)
     }
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-amber-50/50 py-10 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6 sm:p-8">
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-amber-800 mb-6">
@@ -1104,269 +932,6 @@ export default function BookManagement() {
                           Delete
                         </button>
                       </div>
-=======
-    <div className="admin-page">
-      <div className="admin-container">
-        <h2>Book Management</h2>
-
-        {error && <div className="error-message">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="admin-form">
-          <h3>{editingBookId ? "Edit Book" : "Add New Book"}</h3>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="title">Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="author">Author</label>
-              <input
-                type="text"
-                id="author"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="price">Price ($)</label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                step="0.01"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="quantity_available">Quantity Available</label>
-              <input
-                type="number"
-                id="quantity_available"
-                name="quantity_available"
-                value={formData.quantity_available}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="4"
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="publisher">Publisher</label>
-              <input
-                type="text"
-                id="publisher"
-                name="publisher"
-                value={formData.publisher}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <input
-              type="date"
-              name="publishDate"
-              value={
-                formData.publishDate
-                  ? formData.publishDate.substring(0, 10)
-                  : ""
-              }
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="isbn">ISBN</label>
-              <input
-                type="text"
-                id="isbn"
-                name="isbn"
-                value={formData.isbn}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="format">Format</label>
-              <select
-                id="format"
-                name="format"
-                value={formData.format}
-                onChange={handleChange}
-              >
-                <option value="PAPERBACK">Paperback</option>
-                <option value="HARDCOVER">Hardcover</option>
-                <option value="EBOOK">Ebook</option>
-                <option value="AUDIOBOOK">Audiobook</option>
-              </select>
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="isbn">Categories</label>
-              <select
-                id="categories"
-                name="categories"
-                value={formData.categories}
-                onChange={handleChange}
-                multiple
-              >
-                <option value="1">Fiction</option>
-                <option value="2">Non-Fiction</option>
-                <option value="3">Science</option>
-                <option value="4">History</option>
-                <option value="5">Biography</option>
-                <option value="6">Fantasy</option>
-                <option value="7">Mystery</option>
-
-                <option value="8">Romance</option>
-                <option value="9">Thriller</option>
-                <option value="10">Self-Help</option>
-                <option value="11">Health</option>
-                <option value="12">Travel</option>
-                <option value="13">Cookbooks</option>
-              </select>
-            </div>
-          </div>
-
-          {/* <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="bookFileInput">Book File (PDF)</label>
-              <input
-                type="file"
-                id="bookFileInput"
-                name="bookFile"
-                onChange={handleFileChange}
-                accept=".pdf"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="coverImageInput">Cover Image</label>
-              <input
-                type="file"
-                id="coverImageInput"
-                name="coverImage"
-                onChange={handleFileChange}
-                accept="image/jpeg, image/png"
-              />
-            </div>
-          </div> */}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="previewPages">Preview Pages</label>
-              <input
-                type="number"
-                id="previewPages"
-                name="previewPages"
-                value={formData.previewPages}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="isAvailableOnline"
-                  checked={formData.isAvailableOnline}
-                  onChange={handleChange}
-                />
-                Available Online
-              </label>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button type="submit" className="admin-button primary">
-              {editingBookId ? "Update Book" : "Add Book"}
-            </button>
-            {editingBookId && (
-              <button
-                type="button"
-                className="admin-button secondary"
-                onClick={() => {
-                  setEditingBookId(null);
-                  setFormData({
-                    title: "",
-                    author: "",
-                    price: 0,
-                    quantity_available: 0,
-                    description: "",
-                    isAvailableOnline: false,
-                    previewPages: 20,
-                  });
-                }}
-              >
-                Cancel Editing
-              </button>
-            )}
-          </div>
-        </form>
-
-        <h3 className="section-title">All Books</h3>
-        {loading ? (
-          <p>Loading books...</p>
-        ) : (
-          <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Online</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.map((book) => (
-                  <tr key={book.bookId}>
-                    <td>{book.bookId}</td>
-                    <td>{book.title}</td>
-                    <td>{book.author}</td>
-                    <td>${book.price}</td>
-                    <td>{book.quantity_available}</td>
-                    <td>{book.isAvailableOnline ? "Yes" : "No"}</td>
-                    <td>
-                      <button
-                        className="table-btn edit"
-                        onClick={() => handleEdit(book)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="table-btn delete"
-                        onClick={() => handleDelete(book.bookId)}
-                      >
-                        Delete
-                      </button>
->>>>>>> 7838768 (authentication)
                     </td>
                   </tr>
                 ))}
@@ -1374,7 +939,6 @@ export default function BookManagement() {
             </table>
           </div>
         )}
-<<<<<<< HEAD
         <div className="mt-8 flex justify-end">
           <button
             onClick={() => (window.location.href = "/admin")}
@@ -1395,8 +959,6 @@ export default function BookManagement() {
             <span>Back to Admin Dashboard</span>
           </button>
         </div>
-=======
->>>>>>> 7838768 (authentication)
       </div>
     </div>
   );
