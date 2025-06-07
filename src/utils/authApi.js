@@ -16,6 +16,7 @@ export const registerUser = async (data) => {
   }
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export const loginUser = async (formData) => {
   try {
@@ -53,12 +54,18 @@ export const resendVerification = async (email) => {
   });
 };
 =======
+=======
+
+>>>>>>> 2f3b3e4 (add book management for admin)
 export const loginUser = async (credentials) => {
   try {
+    // No mapping needed - just use the credentials directly
     const response = await apiRequest("auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
+    localStorage.setItem("token", response.token);
+
     return response;
   } catch (error) {
     throw new Error(error.message || "Login failed");

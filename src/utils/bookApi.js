@@ -10,8 +10,12 @@ export const getBooks = async () => {
     throw error;
   }
 };
+<<<<<<< HEAD
 
 //create book with file upload
+=======
+// src/utils/bookApi.js
+>>>>>>> 2f3b3e4 (add book management for admin)
 export const createBook = async (bookData) => {
   try {
     const token = localStorage.getItem("token");
@@ -19,6 +23,7 @@ export const createBook = async (bookData) => {
       throw new Error("Authentication required. Please log in.");
     }
 
+<<<<<<< HEAD
     // Create FormData object for multipart/form-data request
     const formData = new FormData();
 
@@ -49,19 +54,27 @@ export const createBook = async (bookData) => {
       }
     });
 
+=======
+>>>>>>> 2f3b3e4 (add book management for admin)
     return await apiRequest("books/create", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+<<<<<<< HEAD
         // No Content-Type header - browser will set it with the correct boundary
       },
       body: formData,
+=======
+      },
+      body: JSON.stringify(bookData),
+>>>>>>> 2f3b3e4 (add book management for admin)
     });
   } catch (error) {
     console.error("Error creating book:", error);
     throw error;
   }
 };
+<<<<<<< HEAD
 
 //update book
 export const updateBook = async (bookId, bookData) => {
@@ -286,3 +299,5 @@ export const getRelatedBooks = async (
     throw error;
   }
 };
+=======
+>>>>>>> 2f3b3e4 (add book management for admin)

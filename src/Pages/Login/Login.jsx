@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { loginUser } from "../../utils/authApi";
 import { redirectBasedOnRole } from "../../utils/roleUtils";
 import FeaturedBook5 from "../../assets/FeaturedBooksImages/FeaturedBook5.png";
@@ -11,13 +12,20 @@ export default function Login() {
     identifier: "",
 =======
 import { apiRequest } from "../../utils/api";
+=======
+import { loginUser } from "../../utils/authApi";
+>>>>>>> 2f3b3e4 (add book management for admin)
 import "./Login.css";
 import BookCoverImage from "../../assets/HeaderBooks/headerBook1.png";
 
 export default function Login() {
   const [formData, setFormData] = useState({
+<<<<<<< HEAD
     email: "",
 >>>>>>> 7838768 (authentication)
+=======
+    identifier: "",
+>>>>>>> 2f3b3e4 (add book management for admin)
     password: "",
   });
   const [error, setError] = useState("");
@@ -59,6 +67,7 @@ export default function Login() {
 
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
       const response = await loginUser(formData);
 =======
       const response = await apiRequest("auth/login", {
@@ -66,6 +75,9 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 >>>>>>> 7838768 (authentication)
+=======
+      const response = await loginUser(formData);
+>>>>>>> 2f3b3e4 (add book management for admin)
 
       // Store the token in localStorage
       localStorage.setItem("token", response.token);
@@ -385,7 +397,7 @@ export default function Login() {
   {
     showVerificationLink && (
       <div className="auth-info">
-        <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+        <Link to={`/verify?email=${encodeURIComponent(formData.identifier)}`}>
           Click here to verify your account
         </Link>
       </div>
@@ -404,7 +416,9 @@ export default function Login() {
           {error && <div className="auth-error">{error}</div>}
           {showVerificationLink && (
             <div className="auth-info">
-              <Link to={`/verify?email=${encodeURIComponent(formData.email)}`}>
+              <Link
+                to={`/verify?email=${encodeURIComponent(formData.identifier)}`}
+              >
                 Click here to verify your account
               </Link>
             </div>
@@ -414,10 +428,10 @@ export default function Login() {
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="identifier"
+                id="identifier"
+                name="identifier"
+                value={formData.identifier}
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
