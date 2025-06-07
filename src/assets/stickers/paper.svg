@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Paper body -->
+    <path d="M30,30 L80,30 L80,90 L30,90 Z" fill="#FFFFFF" stroke="#9E9E9E"/>
+    <!-- Corner fold -->
+    <path d="M70,30 L80,30 L80,40 Z" fill="#E0E0E0" stroke="#9E9E9E"/>
+    <!-- Lines -->
+    <path d="M40,45 L70,45 M40,55 L70,55 M40,65 L70,65 M40,75 L60,75" stroke="#9E9E9E" stroke-linecap="round"/>
+    <!-- Clip -->
+    <path d="M50,20 L60,20 L65,30 L45,30 Z" fill="#FF5722" stroke="#BF360C"/>
+    <!-- Face -->
+    <circle cx="45" cy="50" r="1" fill="#333"/>
+    <circle cx="65" cy="50" r="1" fill="#333"/>
+    <path d="M50,60 C53,62 57,62 60,60" stroke="#333" stroke-linecap="round"/>
+  </g>
+</svg>

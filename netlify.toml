@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+[[redirects]]
+  from = "/api/*"
+  to = "https://open-library-be.onrender.com/api/:splat"
+  status = 200
+  force = true

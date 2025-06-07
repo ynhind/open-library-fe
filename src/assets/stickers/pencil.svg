@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Pencil body -->
+    <path d="M30,90 L80,20 L90,30 L40,95 Z" fill="#FFCA28" stroke="#F57F17"/>
+    <path d="M30,90 L40,95 L35,100 Z" fill="#795548" stroke="#3E2723"/>
+    <path d="M80,20 L90,30 L95,25 L85,15 Z" fill="#EC407A" stroke="#880E4F"/>
+    <!-- Face -->
+    <circle cx="55" cy="60" r="2" fill="#3E2723"/>
+    <circle cx="65" cy="50" r="2" fill="#3E2723"/>
+    <path d="M50,65 C53,67 58,62 60,60" stroke="#3E2723" stroke-linecap="round"/>
+  </g>
+</svg>

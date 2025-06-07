@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke-width="2">
+    <!-- Coffee cup -->
+    <path d="M40,40 L80,40 L75,80 C75,85 45,85 45,80 Z" fill="#795548" stroke="#5D4037"/>
+    <path d="M40,40 L80,40 L80,50 L40,50 Z" fill="#8D6E63" stroke="#5D4037"/>
+    <!-- Steam -->
+    <path d="M55,30 Q60,20 65,30 M50,35 Q55,25 60,35 M60,35 Q65,25 70,35" stroke="#BDBDBD" stroke-linecap="round"/>
+    <!-- Face -->
+    <circle cx="55" cy="60" r="2" fill="#FFF"/>
+    <circle cx="65" cy="60" r="2" fill="#FFF"/>
+    <path d="M55,70 C58,73 62,73 65,70" stroke="#FFF" stroke-linecap="round"/>
+    <!-- Heart -->
+    <path d="M60,85 Q70,75 80,85 Q85,95 60,105 Q35,95 40,85 Q50,75 60,85" fill="#E57373" stroke="#C62828"/>
+  </g>
+</svg>
